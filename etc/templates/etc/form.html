@@ -1,0 +1,28 @@
+{% load staticfiles %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'etc/style.css' %}" />
+
+<form action="{% url 'etc:results' %}" method="get">
+
+    <fieldset>
+        <legend>Target</legend>
+        {{ form1 }}
+    </fieldset>
+
+    <fieldset>
+        <legend>Instrument</legend>
+        {{ form2 }}
+    </fieldset>
+
+    <fieldset>
+        <legend>Conditions</legend>
+        {{ form3 }}
+    </fieldset>
+
+    <fieldset>
+        <legend>Setup</legend>
+        {{ form4 }}
+    </fieldset>
+
+    <input type="submit" value="Submit" />
+</form>
