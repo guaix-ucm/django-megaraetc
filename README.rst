@@ -2,7 +2,7 @@
 MEGARA ETC
 ==========
 
-Run megaraetc as a django app
+Run MEGARA ETC  as a Django APP
 
 Quick start
 -----------
