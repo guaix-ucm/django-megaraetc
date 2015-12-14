@@ -1,0 +1,4 @@
+** CONTINUUM FLUX **
+For point sources, flux of source continuum in c.g.s. unit system (erg/s/cm**2/AA) in the selected continuum band.
+For extended sources, this flux is provided per arcsec**2.
+Only available if the 'Continuum Magnitude' option is not set.

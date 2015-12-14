@@ -1,0 +1,3 @@
+** APERTURE FOR CONTINUUM SUBSTRACTION **
+Aperture to estimate continuum around the line for continuum-sustraction, in line FWHM units.
+This parameter is available only if the 'Continuum+Line' option is set.

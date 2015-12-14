@@ -5,5 +5,6 @@ from . import views
 urlpatterns = [
     url(r'^$', views.basic, name='index'),
     url(r'^form$', views.etc_form, name='form'),
-    url(r'^do$', views.etc_do, name='results'),
+    url(r'^do$', views.etc_do, name='results'),\
+    url(r'^tab', views.etc_tab, name='tab'),\
 ]

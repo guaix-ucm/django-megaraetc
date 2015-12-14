@@ -2,13 +2,77 @@
 
 <link rel="stylesheet" type="text/css" href="{% static 'etc/style.css' %}" />
 
-<p>Method: {{ request.method }}</p>
-<p>GET values</p>
+<div id="result_wrapper">
+    <div id="result_content">
+<!--<p>Method: {{ request.method }}</p>-->
+<!--<p>GET Input parameters</p>-->
+<!--<ul>-->
+<!--{% for key, val in request.GET.items %}-->
+    <!--<li>{{ key }} = {{ val }}</li>-->
+<!--{% endfor %}-->
+<!--</ul>-->
 
-<ul>
-{% for key, val in request.GET.items %}
-<li>{{ key }} = {{ val }}</li>
-{% endfor %}
+<!--<p>RESULTS</p>-->
+        <div id="result_header">
+            {{ outtext|linebreaksbr }}
+        </div>
+        <div id="result_left">
+            {{ textcout|linebreaksbr }}
+        </div>
+        <div id="result_center">
+            {{ textlout|linebreaksbr }}
+        </div>
+        <div id="result_right">
+            PLOTS:<BR>
+            <img id="img_plot1" src="{% static 'etc/plot_test.png' %}" />
+        </div>
+        <div id="result_bottom">
+            {{ textinput|linebreaksbr }}
+        </div>
+    </div>
+    <!---->
+</div>
+
+
+
+
+<!---->
+{% comment "All the tests" %}
+<ul>COMPUTE4 TEST
+    <li><h2>{{ result4 }}</h2></li>
+    <li>{{ fvega }}</li>
 </ul>
 
-<a href="{% url 'etc:form' %}">Back</a>
+
+<ul>IT'S WORKING!!!
+    <li>{{ result0 }}</li>
+</ul>
+
+COMPARE GET PARAM WITH INPUT PARAM!
+<p>Input Parameters:</p>
+<ul>
+    <li>{{ result1|linebreaksbr }}</li>
+</ul>
+
+<p>Continuum Output S/N:</p>
+<ul>
+    <!--<li>{{ result2|linenumbers }}</li>-->
+    <li>{{ result2|linebreaksbr }}</li>
+</ul>
+
+<p>Line Output S/N:</p>
+<ul>
+    <!--<li>{{ result3|linenumbers }}</li>-->
+    <li>{{ result3|linebreaksbr }}</li>
+</ul>
+{% endcomment %}
+
+
+
+
+
+{% comment "Optional note" %}
+<p>THIS SHOULD BE COMMENTED OUT</p>
+{% endcomment %}
+
+<!--<a href="{% url 'etc:form' %}">Back</a>-->

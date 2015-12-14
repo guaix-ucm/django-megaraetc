@@ -1,28 +1,34 @@
 {% load staticfiles %}
-
+<!--<html>-->
 <link rel="stylesheet" type="text/css" href="{% static 'etc/style.css' %}" />
 
-<form action="{% url 'etc:results' %}" method="get">
+<!--<body>-->
+<h1>MEGARA Online Exposure Time Calculator</h1>
+    <!--<p class="headertitle">Target Input Flux Distribution</p>-->
 
+<form action="{% url 'etc:results' %}" method="get">
     <fieldset>
-        <legend>Target</legend>
-        {{ form1 }}
+        <legend class="headertitle">Target Input Flux Distribution</legend>
+        {{ form1|linebreaksbr }}
     </fieldset>
 
     <fieldset>
-        <legend>Instrument</legend>
+        <legend class="headertitle">Instrument Setup</legend>
         {{ form2 }}
     </fieldset>
 
     <fieldset>
-        <legend>Conditions</legend>
+        <legend class="headertitle">Atmospheric Conditions</legend>
         {{ form3 }}
     </fieldset>
 
     <fieldset>
-        <legend>Setup</legend>
+        <legend class="headertitle">Observational Setup</legend>
         {{ form4 }}
     </fieldset>
 
     <input type="submit" value="Submit" />
+    <INPUT TYPE="reset" VALUE="Reset" />
 </form>
+<!--</body>-->
+<!--</html>-->

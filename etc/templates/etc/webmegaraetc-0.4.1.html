@@ -1,0 +1,343 @@
+{% load staticfiles %}
+<!--
+// Created by Alexandre BOUQUIN
+// Start date: 27 May 2015
+// Updated for DJANGO: 8 Dec 2015
+//  -->
+<!--<HTML>-->
+<HEAD>
+    <TITLE>MEGARA Online Exposure Time Calculator</TITLE>
+<!--LOAD CSS file-->
+    <LINK HREF="{% static 'etc/webmegaraetc-0.4.1.css' %}" REL="stylesheet" TYPE="text/css" />
+<!--LOAD javascript file-->
+    <SCRIPT SRC="{% static 'etc/webmegaraetc-0.4.1.js' %}"></SCRIPT>
+<!--ADD this chunk for doing onload submit-->
+    <!--<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>-->
+    <script type="text/javascript" src="{% static 'etc/jquery.min.js' %}"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+        window.document.forms[0].submit();
+        });
+    </script>
+</HEAD>
+
+
+<BODY ID="body">
+<DIV ID="wrapper">
+    <!--<a href="{% url 'etc:form' %}">-->
+    <a href="{% url 'etc:index' %}">
+        <DIV ID="header">
+            <TABLE id="headertable">
+                <TR id="headertabletr">
+                    <TD class="ucmlogotd">
+                        <IMG ID="ucmlogoimg" SRC="{% static 'etc/images/ucm-small.jpg' %}"/>
+                    </TD>
+                    <TD class="maintitletd">
+                        MEGARA Online<BR />
+                        Exposure Time Calculator <BR />
+                        (v0.4.1)
+                    </TD>
+                    <TD class="megaralogotd">
+                        <IMG SRC="{% static 'etc/images/megara_logo.gif' %}" WIDTH=150px />
+                    </TD>
+                </TR>
+            </TABLE>
+        </DIV>
+    </a>
+    <!--</a>-->
+    <DIV ID="theformcontainer">
+        <DIV ID="leftdiv">
+            <P>Target Input Flux Distribution</P>
+            <FORM id="myform" action="{% url 'etc:results' %}" method="get" target="my_iframe">
+            <TABLE id="tabletarget">
+                <TR id="TRtarget">
+                    <TD class="tdstype">Source type:<BR /><BR /><FONT id="sizet">Size:</FONT></TD>
+                    <TD WIDTH=25% ALIGN="left" valign="top">
+                        {{ form1.stype }}
+
+                        {{ form1.size }}
+
+                        <a href="Javascript:newPopup(' {% static 'etc/help/size.txt' %} ');">
+                            <INPUT TYPE="BUTTON" VALUE="?">
+                        </a>
+                    </TD>
+                    <TD WIDTH=2% ALIGN="center">
+                    </TD>
+                    <TD WIDTH=25% ALIGN="right" valign="top">
+                        Continuum band:
+                    </TD>
+                    <TD WIDTH=16% valign="top">
+                        {{ form1.pfilter }}
+                    </TD>
+                    <TD WIDTH=5% ALIGN="center">
+                    </TD>
+                </TR>
+                <TR id="TRtarget">
+                    <TD class="inputfluxtd">
+                        Input flux:
+                    </TD>
+                    <TD valign="top">
+                        {{ form1.iflux }}
+                    </TD>
+                    <TD>
+                    </TD>
+                    <TD>
+                        {{ form1.contmagflux }}
+                    </TD>
+                    <TD valign="top" style="padding:3px 0 0 0">
+                        {{ form1.contmagval }}
+                        <a href="Javascript:newPopup(' {% static 'etc/help/continuummagnitude.txt' %} ');">
+                            <INPUT TYPE="BUTTON" VALUE="?">
+                        </a>
+                        {{ form1.contfluxval }}
+                        <a href="Javascript:newPopup(' {% static 'etc/help/continuumflux.txt' %} ');">
+                            <INPUT TYPE="BUTTON" VALUE="?">
+                        </a>
+                    </TD>
+                    <TD ALIGN="center">
+                    </TD>
+                </TR>
+                <TR id="TRtarget">
+                    <TD ALIGN="right">Resolved line?:
+                    </TD>
+                    <TD>
+                        {{ form1.rline }}
+                    </TD>
+                    <TD>
+                    </TD>
+                    <TD ALIGN="right">
+                        <FONT ID="greylineflux">Line flux (cgs units):</FONT>
+                    </TD>
+                    <TD>
+                        {{ form1.lineflux }}
+                        <a href="Javascript:newPopup(' {% static 'etc/help/lineflux.txt' %} ');">
+                            <INPUT TYPE="BUTTON" VALUE="?">
+                        </a>
+                    </TD>
+                    <TD>
+                    </TD>
+                </TR>
+                <TR id="TRtarget">
+                    <TD>
+                    </TD>
+                    <TD>
+                    </TD>
+                    <TD>
+                    </TD>
+                    <TD ALIGN="right">
+                        <FONT ID="greylinewave">Line wavelength (Angstroms):</FONT>
+                    </TD>
+                    <TD>
+                        {{ form1.linewave }}
+                        <a href="Javascript:newPopup(' {% static 'etc/help/linewavelength.txt' %} ');">
+                            <INPUT TYPE="BUTTON" VALUE="?">
+                        </a>
+                    </TD>
+                    <TD>
+                    </TD>
+                </TR>
+                <TR id="TRtarget">
+                    <TD ALIGN="right">
+                        Input spectrum:
+                    </TD>
+                    <TD>
+                        {{ form1.spectype }}
+                    </TD>
+                    <TD>
+                    </TD>
+                    <TD ALIGN="right">
+                        <FONT ID="greylinefwhm">Line FWHM (Angstroms):</FONT>
+                    </TD>
+                    <TD>
+                        {{ form1.linefwhm }}
+                        <a href="Javascript:newPopup(' {% static 'etc/help/linefwhm.txt' %} ');">
+                            <INPUT TYPE="BUTTON" VALUE="?">
+                        </a>
+                    </TD>
+                    <TD>
+                    </TD>
+                </TR>
+            </TABLE>
+        </DIV>
+
+        <DIV ID="rightdiv">
+            <CENTER><P>Instrument Setup</P></CENTER>
+            <TABLE WIDTH=100%>
+                <TR>
+                    <TD ALIGN=center>
+                        Observing Mode: {{ form2.om_val }}
+                        <a href="Javascript:newPopup(' {% static 'etc/help/observingmodes.txt' %} ');">
+                            <INPUT TYPE="BUTTON" VALUE="?">
+                        </a>
+                    </TD>
+                    <TD ALIGN=left>VPH setup: {{ form2.vph }}
+                        <a href="Javascript:newPopupBig(' {% static 'etc/help/vphsetup.html' %} ');">
+                            <INPUT TYPE="BUTTON" VALUE="?" />
+                        </a>
+                    </TD>
+                </TR>
+            </TABLE>
+            <CENTER><P>Atmospheric Conditions</P></CENTER>
+            <TABLE border="0">
+                <TR>
+                    <TD ALIGN="right">
+                        Moon Phase:
+                        {{ form3.moonph }}
+                    </TD>
+                    <TD WIDTH="6.5%">
+                    </TD>
+                    <TD WIDTH=55%>
+                        <TABLE border="0" WIDTH=100%>
+                            <TR>
+                                <TD WIDTH=30% ALIGN="right">
+                                    Airmass:
+                                </TD>
+                                <TD WIDTH=20% ALIGN="left">
+                                    {{ form3.airmass }}
+                                    <a href="Javascript:newPopup(' {% static 'etc/help/airmass.txt' %} ');">
+                                        <INPUT TYPE="BUTTON" VALUE="?" />
+                                    </a>
+                                </TD>
+                            </TR>
+                            <TR>
+                                <TD WIDTH=20% ALIGN="right">
+                                    Seeing (arcsecs):
+                                </TD>
+                                <TD WIDTH=25% ALIGN="left">
+                                    {{ form3.seeing }}
+                                    <a href="Javascript:newPopup(' {% static 'etc/help/seeing.txt' %} ');">
+                                        <INPUT TYPE="BUTTON" VALUE="?" />
+                                    </a>
+                                </TD>
+                            </TR>
+                        </TABLE>
+                    </TD>
+                </TR>
+            </TABLE>
+            <CENTER><P>Observational Setup</P></CENTER>
+            <TABLE width=100% border=0>
+                <TR>
+                    <TD WIDTH=20% ALIGN="right">
+                        Exptime (sec):
+                    </TD>
+                    <TD WIDTH=2% ALIGN="left">
+                        {{ form4.exptime }}
+                    </TD>
+                    <TD WIDTH=20% ALIGN="right">
+                        <FONT ID="greylineap">Line aperture: </FONT>
+                    </TD>
+                    <TD WIDTH=17% ALIGN="left">
+                        {{ form4.lineap }}
+                        <a href="Javascript:newPopup(' {% static 'etc/help/lineaperture.txt' %} ');">
+                            <INPUT TYPE="BUTTON" VALUE="?" />
+                        </a>
+                    </TD>
+                </TR>
+                <TR>
+                    <TD ALIGN="right" valign="top" style="padding:3 0 0 0" >
+                        (*)No. of sky fibers:
+                    </TD>
+                    <TD ALIGN="left">
+                        {{ form4.nfibers }}
+                        <a href="Javascript:newPopup(' {% static 'etc/help/skyfiber.txt' %} ');">
+                            <INPUT TYPE="BUTTON" VALUE="?" />
+                        </a>
+                    </TD>
+                    <TD ALIGN="right">
+                        <FONT ID="greycontap">Continuum aperture: </FONT>
+                    </TD>
+                    <TD ALIGN="left">
+                        {{ form4.contap }}
+                        <a href="Javascript:newPopup(' {% static 'etc/help/continuumaperture.txt' %} ');">
+                            <INPUT TYPE="BUTTON" VALUE="?" />
+                        </a>
+                    </TD>
+                </TR>
+            </TABLE>
+        </DIV>
+    </DIV>
+    <DIV ID="submitbuttonsdiv">
+        <HR>
+        <TABLE id="tablebuttons">
+            <TR>
+                <TD width="30%" align="left">
+                    <input type="submit" value="Submit" id="btn1"/>
+                    <INPUT TYPE="reset" VALUE="Reset" />
+                </TD>
+                <TD width="40% align="right">
+                    <a href="Javascript:newPopupBig(' {% static 'etc/help/HELP.txt' %} ');">
+                        <INPUT TYPE="BUTTON" VALUE="Help">
+                    </a>
+                    <input type='button' id='btn2' value='New Window'>
+                    <a href="{% static 'etc/outputcalc.txt' %}" download>
+                        <input type="button" value="Print to file">
+                    </a>
+                </TD>
+                <TD align="right">
+                    <font id="smalltext">original ETC (offline) python v0.4.1 (114MB)</font>
+                    <a href="{% static 'etc/megaraetc-0.4.1.tar' %}" download>
+                        <input type="button" value="Download">
+                    </a>
+                </TD>
+                <!--Required to output the result to different targets-->
+                <script>
+                    var form = document.getElementById('myform');
+                    form.onsubmit = function() {
+                    form.target = 'my_iframe';
+
+                    };
+
+                    document.getElementById('btn2').onclick = function() {
+                    form.target = '_blank';
+                    form.submit();
+                    }
+                </script>
+            </TR>
+        </TABLE>
+    </DIV>
+    <HR />
+    </FORM>
+
+<!-- THE OUTPUT FORM STARTS HERE -->
+    <DIV ID="theoutput">
+        <TABLE>
+            <TR>
+                <TD align="center">
+                    <p>RESULTS</p>
+                    <b>Output Continuum S/N:</b>
+                    <a href="Javascript:newPopup(' {% static 'etc/help/continuumoutput.txt' %} ');">
+                        <INPUT TYPE="BUTTON" VALUE="?">
+                    </a>
+                    <b>Output Line S/N:</b>
+                    <a href="Javascript:newPopup(' {% static 'etc/help/lineoutput.txt' %} ');">
+                        <INPUT TYPE="BUTTON" VALUE="?">
+                    </a>
+                    <b>Input Parameters:</b>
+                    <a href="Javascript:newPopup(' {% static 'etc/help/inputparameters.txt' %} ');">
+                        <INPUT TYPE="BUTTON" VALUE="?">
+                    </a>
+                    <!--<video controls loop autoplay width=70px>-->
+                      <!--<source src="{% static 'etc/movie.mp4' %}" type="video/mp4">-->
+                      <!--<source src="{% static 'etc/movie.ogg' %}" type="video/ogg">-->
+                      <!--Your browser does not support the video tag.-->
+                    <!--</video>-->
+                </TD>
+            </TR>
+        </TABLE>
+        <div id="results">
+            <iframe id="my_iframe" name="my_iframe" src="{% url 'etc:results' %}">
+            </iframe>
+        </div>
+        <HR>
+        MEGARA Online Exposure Time Calculator version 0.4.1<BR />
+        ported to DJANGO version 1.8.6 by Alexandre Y. K. BOUQUIN<BR />
+        <div style="float:right">
+            Last modified on:
+            <SCRIPT LANGUAGE="JavaScript">
+            document.write(document.lastModified);
+            </SCRIPT>
+        </div>
+    </DIV>
+<!--CLOSE WRAPPER-->
+</DIV>
+</BODY>

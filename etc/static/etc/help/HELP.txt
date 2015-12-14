@@ -1,0 +1,328 @@
+MEGARA Exposure Time Calculator Help
+Preliminary version 0.3.0, December 2014
+Help Page
+
+Overview:
+
+1) General description of MEGARA ETC.
+2) Description of input parameters.
+3) Description of output parameters.
+4) Version
+
+-----------------------
+1) General description
+-----------------------
+
+MEGARA ETC is an exposure time calculator for the MEGARA instrument
+(Multi-Espectrografo en GTC de Alta Resolucion para Astronomia) at the GTC
+10m-telescope. This tool is intended to simulate signal-to-noise ratios (SNRs)
+for a given exposure time for GTC/MEGARA. 
+
+Given a set of input parameters defining the continuum flux distribution of the
+input source, MEGARA ETC provides the SNR expected for a given exposure time,
+instrument configuration, night atmospheric conditions, and  observational
+setup. In case that the properties of a line in the source spectrum are also
+provided, MEGARA ETC also computes its expected SNR. 
+
+Once you have selected a certain combination of input parameters, click the
+"Compute" button to start the computation. The input parameters will be updated
+in the "Input parameters" output window, and the resulting SNRs will appear in
+the "Continuum output S/N" and "Line output S/N" windows on the right of the
+MEGARA ETC, for the selected continuum and the line input parameters
+respectively.
+
+Outputs can be written/appended to an output file (megaraetc.out), located in
+the present directory, just clicking on the "Print to file" button.
+
+For more information, click on the "Help" button of the MEGARA ETC, or read the
+"Exposure Time Calculator for GTC/MEGARA - Users manual" <web-link TBD>
+
+To quit, press the "Quit" button or just press "q".
+
+** Important remark **
+
+Notice that this tool provides the modelled SNRs for a given exposure time
+without accounting for instrument and telescope overheads. This means that you
+must add the typical overheads to the exposure time estimated by the MEGARA ETC
+for obtaining your required SNR (typical overheads ~ 20-30% of the total
+exposure time). 
+
+A total, uniform coverage of the FoV by the fibers in LCB.
+
+The total transmission curve considers: Atmosphere transmission at La Palma
+Observatory + GTC 3-Mirrors reflectability + field lens transm. + fiber link
+transm. + spectrograph transm. (optics + VPHs + detector QE).
+
+-----------------------------------
+2) Description of input parameters
+-----------------------------------
+
+
+* Target Input Flux Distribution 
+
+This set of parameters is intended to describe the flux distribution of the
+source to observe. 
+
+    1) Source Type:
+
+If the source is point or extended. If point source is chosen, the target
+object is assumed to be an emitter with negligible angular size. This can be
+selected for objects with an angular radius of much less than the sky-projected
+pixel size. If extended source is chosen, the target object is assumed to have
+a uniform intensity along its whole apparent area. If "Source type=extended",
+then the input parameter "Size" becomes mandatory.
+
+    2) Size:
+
+For extended sources, apparent projected area of source in arcsec**2. Circular
+shape is assumed for the source. This parameter is available only if the
+'Source Type=Extended' option is set.
+
+    3) Input flux:
+
+Kind of data inserted to get the signal-to-noise. If "Input flux=Continuum",
+only input data necessary to define the continuum of the source are required
+for computation. If "Input flux=Line+Continuum", the following input parameters
+become mandatory too: "Resolved line", "Line flux", "Line wavelength", "Line
+aperture", and "Continuum aperture".
+
+    4) Resolved line:
+
+This parameter indicates if the line can or not be resolved, and it is relevant
+only if "Input flux=Line+Continuum". If the line is resolved, the user must
+insert the line full-width-at-half-maximum (FWHM). Otherwise, the FWHM of the
+line is determined by the selected VPH.
+
+    5) Input spectrum
+
+The target model can be defined by the target's spectral type. It uses a
+template spectrum, which is scaled to the provided magnitude and filter. The
+spectral type is used to make the color correction. ** NOT ACTIVE OPTION YET **
+
+    6) Continuum band:
+
+Band in which the input continuum magnitude or flux is provided. The input
+template spectrum is scaled to the input magnitude in this band.
+
+    7) Continuum magnitude:
+
+For point sources, Vega apparent magnitude of the source continuum in the
+selected continuum band. For extended sources, the magnitude must be provided
+per arcsec**2 in the selected band. Only available if 'Continuum flux' option
+is not set.
+
+    8) Continuum flux:
+
+For point sources, flux of source continuum in c.g.s. unit system
+(erg/s/cm**2/AA) in the selected continuum band. For extended sources, this
+flux is provided per arcsec**2. Only available if the 'Continuum Magnitude'
+option is not set.
+      
+    9) Line flux:
+
+For point sources, flux of line in c.g.s. unit system (erg/s/cm**2). For
+extended sources, this flux must be provided per arcsec**2. This parameter is
+available only if the 'Input flux=Continuum+Line' option is set.
+
+    10) Line wavelength:
+
+Line wavelength in Armstrong. This parameter is available only if the 'Input
+flux=Continuum+Line' option is set.
+
+    11) Line FWHM:
+
+Line FWHM in Armstrong. If the line is not resolved, the nominal FWHM of the
+selected VPH at its central wavelength is assumed. This parameter is available
+only if the 'Input flux=Continuum+Line' and 'Resolved line=yes' options are
+set.
+
+
+* Instrumental setup
+
+   1) MEGARA observing mode:
+
+  Select the observing mode that you are going to use (LCB: Large Compact
+  Bundle, or MOS: Multi-Object Spectrograph). This basically sets the radius of
+  fibers and the achieved spectral resolution. 
+
+  Both, LCB and the MOS modes, use fibers of 0.620 arcsec (100 microns
+  diameter), providing spectral resolutions of 6000, 12000, and 18700 in
+  low-, medium-, and high-resolution VPHs in a diameter enclosing 80% of
+  energy, respectively. 
+
+    2) VPH setup:
+
+Consult the characteristics of each spectral setup in the table accesible
+through the help button (labeled as '?') placed next to the 'VPH setup'. The
+wavelength of the input spectral line must be located into the wavelength range
+of the selected VPH. A program warning is shown if this is the case and no
+computation will be performed.
+
+
+* Atmosphere
+
+    1) Moon phase:
+
+The following options for the night brightness are available: dark/grey/bright.
+The sky magnitude at a dark night in La Palma is initially set in the
+photometric band nearest to the user-selected VPH (consult Table 2). The
+typical average extra brightness between a dark and grey or bright night is
+added, depending on the user-selected moon phase (consult Table 3), assuming
+that the difference of emission between dark-bright and dark-grey does not
+depend on the optical band. The average emission due to zodiacal light,
+airglow, and starlight are also considered. Atmospheric extinction will be
+considered in next versions.
+
+Table 2: Near-zenith dark-of-moon broad-band sky brightness 
+at La Palma for different bands in mag/arcsec**2 
+(C.R.Benn & S.L. Ellison 1997, La Palma technical note 115.)
+-------------------------------
+# Band # Magnitude/arcsec**2 (*1)
+-------------------------------
+U  22.0
+B  22.7
+V  21.9
+R  21.0
+I  20.0
+-------------------------------
+(*1) Values found to be independent of atmospheric extinction, 
+usually do not vary appreciably during the night, but with solar 
+cycle, latitude and airmass
+
+
+Table 3: Extra magnitudes to be added to reference values of sky emission in
+Table 2, for bright, grey, and dark nights in La Palma, in mag/arcsec**2 in the
+V-band, in order to account for zodiacal light, airglow, and starlight (I.
+Skillen, 2002, ING Technical Note 127)
+--------------------------------------------------
+# Moon phase  # Extra emission in mag/arcsec**2
+--------------------------------------------------
+Bright  3.1
+Grey    1.5
+Dark    0.5
+--------------------------------------------------
+
+    2) Airmass
+
+Airmass scales the number of photons from the sky background with according to
+the following expression: (-0.000278719*X**3 - 0.0653841*X**2 + 1.11979*X -
+0.0552132).
+
+
+    3) Seeing at Airmass
+
+Seeing in arcsec. The value refers to the FWHM of the seeing disk in V band, at
+the previously indicated airmass X. For illustration purposes, the seeing at
+airmass = 1.0 (zenith) is also computed, assuming that it scales with the
+airmass X as follows: Seeing(Zenith) = Seeing(X) / X**3/5. Both seeing values
+are written to the "Input parameters" output window of the "Results" menu.
+
+
+* Observational Setup
+
+    1) Exptime:
+
+Total exposure time in seconds. This exposure time does not take into account
+instrument and telescope overheads or the dithering required to ensure total
+coverage of the target (see ** Important remark **, in section 1) of this
+help).
+
+    2) No. of sky mini-bundles:
+
+Number of sky mini-bundles used to derive the sky spectrum to subtract. The
+maximum no. is 100. Each sky bundle consists on 7 fibres in a compact
+distribution (lenslets appended to fibers are hexagonal). 
+
+    3) Line aperture:
+
+Aperture to derive line flux in spectrum, in line FWHM units. This parameter is
+available only if the 'Input flux=Continuum+Line' option is set.
+
+    4) Continuum aperture:
+
+Aperture to estimate continuum around the line for continuum-subtraction, in
+line FWHM units. This parameter is available only if the 'Input
+flux=Continuum+Line' option is set.
+
+---------------------------------
+3) Description of output windows
+---------------------------------
+
+    * Input parameters:
+
+A summary of the selected input parameters is provided here, with some warnings
+and extra information about the input source flux distribution.
+
+    * Continuum output S/N:
+
+The SNRs of the continuum input flux distribution expected for the input
+observational and instrumental setup, and for the input atmospheric conditions
+are provided. 
+
+In case the input source is punctual, the provided SNRs are for:
+ - the total source area(*1), in 4 spectral pixels(*2), in 1 Armstrong, in the
+   total collapsed spectrum (spaxel);
+ - in one fibre, in 4 spectral pixels(*2), in 1 Armstrong, in the total
+   collapsed spectrum (spaxel);
+ - per detector pixel.
+
+Notice that the SNR in one fibre, considering 4 spectral pixels is, by
+definition, a SPAXEL(*2), i.e., the minimum spatial and spectral resolution
+element of the observation.
+
+In case of extended sources, the following outputs are additionally provided:
+ - for 1 seeing disk, in 4 spectral pixels(*2), in 1 Armstrong, in the total
+   collapsed spectrum (spaxel);
+ - for 1 arcsec**2,  in 4 spectral pixels(*2), in 1 Armstrong, in the total
+   collapsed spectrum (spaxel).
+
+ Note: (*1) The number of fibres required to sample the whole source is also
+            provided.
+
+       (*2) At least, 4 spectral pixels are required to fulfill the
+            Nyquist-Shanon sampling theorem in spectral direction. By
+            construction, MEGARA always projects the VPH FWHM of any selected
+            VPH onto 4 pixels in the spectral direction of the detector.
+
+    * Continuum line S/N:
+
+The SNRs of the line input flux distribution expected for the input
+observational and instrumental setup, and for the input atmospheric conditions
+are provided. 
+
+In case the input source is punctual, the provided SNRs are for(*3):
+ - the total source area, in the selected line spectral aperture(*4);
+ - per arcsec and per Armstrong in the detector(*5);
+ - in one fibre, in the selected line spectral aperture(*4);
+ - in one fibre, per Armstrong(*5);
+ - per voxel(*6,*7);
+ - per detector pixel(*8).
+
+In case of extended sources, the following outputs are additionally provided:  
+ - for 1 seeing disk, in the selected line spectral aperture(*4); 
+ - for 1 arcsec**2,  in the selected line spectral aperture(*4).
+
+ Note: (*3) Considering that all the line flux is completely enclosed into the
+            FWHM of the line.
+       (*4) Assuming the selected spectral apertures for line and continuum
+            subtraction indicated as inputs. If you want to know exactly the
+            SNR in 1 line FWHM, set the spectral apertures of line to 1 (i.e.,
+            to one line FWHM). 
+       (*5) Assuming a spectral aperture of 1 Armstrong.
+       (*6) Assuming 4 spectral pixels as spectral aperture (i.e., the FWHM of
+            the selected VPH).
+       (*7) A voxel is the minimum spatial and spectral resolution element
+            sampled. In our case, a voxel is the projection of the whole fibre
+            (minimum spatial resolution element) into the FWHM of the VPH in
+            the spectral direction (minimum spectral resolution element
+            according to the Nyquist-Shanon sampling theorem). The FWHM of all
+            VPHs in MEGARA is projected onto 4 spectral pixels by design.
+       (*8) Assuming 1 spectral pixel as spectral aperture.
+
+------------
+4) Version
+------------
+
+Preliminary tool, version 0.3.0  (M. Carmen Eliche-Moral, Sergio Pascual,
+Nicolás Cardiel).  Please, report any comment, complaint, error or bug you find
+of the tool to the authors (cardiel<at>ucm.es). They all are welcome.

@@ -1,0 +1,3 @@
+** LINE WAVELENGTH **
+Line wavelength in Angstromgs.
+This parameter is available only if the 'Continuum+Line' option is set.

@@ -1,0 +1,8 @@
+** OBSERVING MODES **
+MEGARA provides two observing modes according to the design on December, 2014:
+
+ * Large Compact Bundle (LCB):
+   An IFU covering 12.5x11.3 arcsec^2, with fibers of 0.62 arcsec diameter and a 1D spectral FWHM sampling of 3.6 pix.
+   
+  * Multi-Object Spectrograph (MOS):
+   This mode allows observing up to 100 targets in a region of 3.5x3.5 arcmin^2, with fibers of 0.62 arcsec diameter and a 1D spectral FWHM sampling of 3.6 pix.

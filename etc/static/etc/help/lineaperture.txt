@@ -1,0 +1,3 @@
+** APERTURE FOR THE SPECTRAL LINE **
+Aperture to derive line flux in spectrum, in line FWHM units.
+This parameter is available only if the 'Continuum+Line' option is set.
