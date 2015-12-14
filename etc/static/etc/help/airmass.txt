@@ -1,0 +1,2 @@
+** AIRMASS **
+Airmass scales the number of photons from the sky background with according to the following expression: (-0.000278719*X**3 - 0.0653841*X**2 + 1.11979*X - 0.0552132).

@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class SpectralTemplate(models.Model):
     name = models.CharField(max_length=10)
     path = models.CharField(max_length=100)

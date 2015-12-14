@@ -1,0 +1,2 @@
+** INPUT PARAMETERS **
+A summary of the selected input parameters is provided here, with some warnings and extra information about the input source flux distribution (as if line FWHM is dominated by the VPH FWHM, if the seeing determines the image area instead of the projected area of source, the continuum flux equivalent to an input magnitude, or the sky flux considered).

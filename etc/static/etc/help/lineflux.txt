@@ -1,0 +1,4 @@
+** LINE FLUX **
+For point sources, flux of line in c.g.s. unit system (erg/s/cm**2).
+For extended sources, this flux must be provided per arcsec**2.
+This parameter is available only if the 'Continuum+Line' option is set.

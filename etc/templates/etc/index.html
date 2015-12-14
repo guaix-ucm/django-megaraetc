@@ -2,7 +2,41 @@
 
 <link rel="stylesheet" type="text/css" href="{% static 'etc/style.css' %}" />
 
-<h1>Blah, blah, blah</h1>
-<p>Blah</p>
+<div id="index_wrapper">
+<div id="index_content">
 
-<a href="{% url 'etc:form' %}">Go to form</a>
+<div id="index_leftdiv">
+<a href="{% url 'etc:form' %}">
+<img id="img_bigImage"
+src="{% static 'etc/images/button_hex_green.png' %}"
+onmouseover="changeImage('{% static 'etc/images/button_hex_blue.png' %}')"
+onmouseout="changeImage('{% static 'etc/images/button_hex_green.png' %}')"
+onclick="changeImage('{% static 'etc/images/button_hex_red.png' %}')"
+/>
+<script type="text/javascript" language="javascript">
+function changeImage(img){
+document.getElementById('img_bigImage').src=img;
+}
+</script>
+</a>
+</div>
+
+<div id="index_centerdiv">
+<h3>Welcome to<BR />
+MEGARA Online
+<hr id="index_hr_special" />
+Exposure Time Calculator version 0.4.1</h3>
+</div>
+<div id="index_rightdiv">
+<img src="{% static 'etc/images/django.jpg' %}" id="img_poweredby"/>
+</div>
+
+<br />
+<br />
+<hr id="index_footerline">
+    <div id="index_footer">
+        <font id="copyright">&copy;2015 MEGARA</font>
+    </div>
+</div>
+<!--close wrapper-->
+</div>

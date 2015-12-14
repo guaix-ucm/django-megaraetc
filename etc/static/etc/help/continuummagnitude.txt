@@ -1,0 +1,4 @@
+** CONTINUUM MAGNITUDE **
+For point sources, Vega apparent magnitude of the source continuum in the selected continuum band.
+For extended sources, the magnitude must be provided per arcsec**2 in the selected band.
+Only available if 'Continuum flux' option is not set.

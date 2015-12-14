@@ -1,0 +1,9 @@
+<HTML>
+<BODY>
+** VPH SETUP **
+Consult the characteristics of each spectral setup in the figure below.
+The wavelength of the input spectral line must be located into the wavelength range of the selected VPH.
+<BR><BR>
+<IMG SRC="../images/vph_setup2.gif" />
+</BODY>
+</HTML>

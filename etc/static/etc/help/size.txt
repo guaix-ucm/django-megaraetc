@@ -1,0 +1,3 @@
+** SOURCE SIZE ** 
+For extended sources, apparent projected area of source in arcsec**2. Circular shape is assumed for the source. 
+This parameter is available only if the 'Source Type=Extended' option is set.

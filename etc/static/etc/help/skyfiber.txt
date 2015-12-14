@@ -1,0 +1,8 @@
+** NUMBER OF SKY BUNDLES **
+Number of sky mini-bundles used (max. = 100).
+Each minibundle has 7 fibres.
+The bundles of 8 robotic actuators, located at the corners
+of the MOS FoV, are used to measure the sky in the LCB observing mode.
+They are projected at different positions along the pseudo-slit
+to estimate projection effects and different transmissions of instrument depending on the spectrum position in the
+detector.
