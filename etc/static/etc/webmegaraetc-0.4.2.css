@@ -49,20 +49,20 @@ TD.megaralogotd {
 
 #theformcontainer {
     background-color: #FFFFFF;
-    /* height:50% */
+    height:350px;
     width:100%;
     /* float:left; */
-    padding:5px;
+    padding:0px;
 }
 
 #leftdiv{
-    width:60%;
+    width:55%;
     float:left;
     height: 300px;
 }
 
 #rightdiv{
-    width:40%;
+    width:45%;
     float:right;
     height: 300px;
 }
@@ -98,12 +98,14 @@ TD.megaralogotd {
     text-align: left; 
     border: 1px solid black;
     background-color: white;
-    overflow:hidden; overflow-y:hidden;
+    overflow:hidden;
+    overflow-y:scroll;
 }
 
 #my_iframe {
+    scrolling: "yes";
     width:100%;
-    height: 2000px;
+    height: 2200px;
     background-color: white;
 }
 
@@ -178,5 +180,6 @@ TD.tdstype {
 }
 TD.inputfluxtd {
     text-align: right;
-    padding: 0px 0 0 0;
+    /* padding: 0px 0 0 0; */
+
 }

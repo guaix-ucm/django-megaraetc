@@ -126,12 +126,12 @@ available only if the 'Input flux=Continuum+Line' option is set.
 
     10) Line wavelength:
 
-Line wavelength in Armstrong. This parameter is available only if the 'Input
+Line wavelength in Angstrom. This parameter is available only if the 'Input
 flux=Continuum+Line' option is set.
 
     11) Line FWHM:
 
-Line FWHM in Armstrong. If the line is not resolved, the nominal FWHM of the
+Line FWHM in Angstrom. If the line is not resolved, the nominal FWHM of the
 selected VPH at its central wavelength is assumed. This parameter is available
 only if the 'Input flux=Continuum+Line' and 'Resolved line=yes' options are
 set.
@@ -260,9 +260,9 @@ observational and instrumental setup, and for the input atmospheric conditions
 are provided. 
 
 In case the input source is punctual, the provided SNRs are for:
- - the total source area(*1), in 4 spectral pixels(*2), in 1 Armstrong, in the
+ - the total source area(*1), in 4 spectral pixels(*2), in 1 Angstrom, in the
    total collapsed spectrum (spaxel);
- - in one fibre, in 4 spectral pixels(*2), in 1 Armstrong, in the total
+ - in one fibre, in 4 spectral pixels(*2), in 1 Angstrom, in the total
    collapsed spectrum (spaxel);
  - per detector pixel.
 
@@ -271,9 +271,9 @@ definition, a SPAXEL(*2), i.e., the minimum spatial and spectral resolution
 element of the observation.
 
 In case of extended sources, the following outputs are additionally provided:
- - for 1 seeing disk, in 4 spectral pixels(*2), in 1 Armstrong, in the total
+ - for 1 seeing disk, in 4 spectral pixels(*2), in 1 Angstrom, in the total
    collapsed spectrum (spaxel);
- - for 1 arcsec**2,  in 4 spectral pixels(*2), in 1 Armstrong, in the total
+ - for 1 arcsec**2,  in 4 spectral pixels(*2), in 1 Angstrom, in the total
    collapsed spectrum (spaxel).
 
  Note: (*1) The number of fibres required to sample the whole source is also
@@ -292,9 +292,9 @@ are provided.
 
 In case the input source is punctual, the provided SNRs are for(*3):
  - the total source area, in the selected line spectral aperture(*4);
- - per arcsec and per Armstrong in the detector(*5);
+ - per arcsec and per Angstrom in the detector(*5);
  - in one fibre, in the selected line spectral aperture(*4);
- - in one fibre, per Armstrong(*5);
+ - in one fibre, per Angstrom(*5);
  - per voxel(*6,*7);
  - per detector pixel(*8).
 
@@ -308,7 +308,7 @@ In case of extended sources, the following outputs are additionally provided:
             subtraction indicated as inputs. If you want to know exactly the
             SNR in 1 line FWHM, set the spectral apertures of line to 1 (i.e.,
             to one line FWHM). 
-       (*5) Assuming a spectral aperture of 1 Armstrong.
+       (*5) Assuming a spectral aperture of 1 Angstrom.
        (*6) Assuming 4 spectral pixels as spectral aperture (i.e., the FWHM of
             the selected VPH).
        (*7) A voxel is the minimum spatial and spectral resolution element

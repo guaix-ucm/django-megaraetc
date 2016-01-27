@@ -3,13 +3,13 @@
 The SNRs of the continuum input flux distribution expected for the input observational and instrumental setup, and for the input atmospheric conditions are provided.
 
 In case the input source is punctual, the provided SNRs are for:
- * one fibre, in one spectral FWHM(*2), in 1 Armstrong, in the total collapsed spectrum;
+ * one fibre, in one spectral FWHM(*2), in 1 Angstrom, in the total collapsed spectrum;
  * per detector pixel;
- * the total source area(*1), in one spectral FWHM (*2), in 1 Armstrong, in the total collapsed spectrum.
+ * the total source area(*1), in one spectral FWHM (*2), in 1 Angstrom, in the total collapsed spectrum.
  
  In case of extended sources, the following outputs are additionally provided:  
- * for 1 seeing disk, in one spectral FWHM(*2), in 1 Armstrong, in the total collapsed spectrum;
- * for 1 arcsec**2, in one spectral FWHM(*2), in 1 Armstrong, in the total collapsed spectrum.
+ * for 1 seeing disk, in one spectral FWHM(*2), in 1 Angstrom, in the total collapsed spectrum;
+ * for 1 arcsec**2, in one spectral FWHM(*2), in 1 Angstrom, in the total collapsed spectrum.
  
  Note: (*1) The number of fibres required to sample the whole source is also provided.
          (*2) At least, 3.6 spectral pixels in LCB/MOS modes are required to fulfill the Nyquist-Shanon sampling theorem in spectral direction (the VPH FWHM is projected onto 3.6 spectral pixels for all VPHs in LCB/MOS, by construction).

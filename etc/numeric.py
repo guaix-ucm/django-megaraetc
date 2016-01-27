@@ -273,6 +273,7 @@ def specparline(om_val, xit, areasource, diamsource, ps, disp, nfibres, areafibr
 # wv1 - Lower wavelength of bandwidth (AA)
 # wv2 - Upper wavelength of bandwidth (AA)
 # ispect - Input spectrum template to normalize
+# iband - Input filter transmission
 #
 def sclspect (iflux, wv, wv1, wv2, ispect, iband):
 

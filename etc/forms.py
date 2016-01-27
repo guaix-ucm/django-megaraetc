@@ -29,7 +29,7 @@ IFLUX=[('C','Continuum'),
 RLINECHOICES=[('N','No'),
               ('Y','Yes')]
 
-CONTMAGFLUX=[('M','Continuum magnitude'),
+CONTMAGFLUX=[('M','Continuum mag'),
             ('F','Continuum flux')]
 
 def template_choice():
@@ -49,7 +49,7 @@ class HorizontalRadioRenderer(forms.RadioSelect.renderer):
 
 class TargetForm(forms.Form):
     stype = forms.ChoiceField(label="Source type", initial="P", choices=STYPE, widget=forms.RadioSelect(renderer=HorizontalRadioRenderer, attrs={'onclick':'selector()'}))
-    size = forms.FloatField(label="Size", initial=1.0, min_value=0.0, max_value=3600, widget=forms.TextInput(attrs={'size':'10','disabled':'true'}))
+    size = forms.FloatField(label="Size", initial=1.0, min_value=0.0, max_value=3600, widget=forms.TextInput(attrs={'size':'7','disabled':'true'}))
 
     iflux = forms.ChoiceField(label="Input flux", initial="C", choices=IFLUX, widget=forms.RadioSelect(attrs={'onclick':'selectInputflux()'}))
     rline = forms.ChoiceField(label="Resolved line?", initial="N", choices=RLINECHOICES, widget=forms.RadioSelect(renderer=HorizontalRadioRenderer, attrs={'onclick':'selectRline()','disabled':'true'})) #attrs={'disabled':'disabled'}
@@ -58,12 +58,13 @@ class TargetForm(forms.Form):
     pfilter = forms.ChoiceField(label="Continuum band", initial=3, choices=filter_choice()) #, widget=forms.Select(attrs={'size':'5', 'style':'width:100px' }))
 
     contmagflux = forms.ChoiceField(label="", initial="M", choices=CONTMAGFLUX, widget=forms.RadioSelect(attrs={'onclick':'selectcontmagflux()'}))
-    contmagval = forms.FloatField(label="", initial=20.0, widget=forms.TextInput(attrs={'size':'10'}))
-    contfluxval = forms.FloatField(label="", initial=1e-16, widget=forms.TextInput(attrs={'size':'10','disabled':'true'}))
+    contmagval = forms.FloatField(label="", initial=20.0, widget=forms.TextInput(attrs={'size':'7'}))
+    contfluxval = forms.FloatField(label="", initial=1e-16, widget=forms.TextInput(attrs={'size':'7','disabled':'true'}))
 
-    lineflux = forms.FloatField(label="Line flux (cgs units)", initial=1e-13, widget=forms.TextInput(attrs={'size':'10','disabled':'true'}))
-    linewave = forms.FloatField(label="Line wavelength (Angstroms)", initial=6562.8, widget=forms.TextInput(attrs={'size':'10','disabled':'true'}))
-    linefwhm = forms.FloatField(label="Line FWHM (Angstroms)", initial=6, widget=forms.TextInput(attrs={'size':'10','disabled':'true'}))
+    lineflux = forms.FloatField(label="Line flux (cgs units)", initial=1e-13, widget=forms.TextInput(attrs={'size':'7','disabled':'true'}))
+    linewave = forms.FloatField(label="Line wavelength (Angstroms)", initial=6562.8, widget=forms.TextInput(attrs={'size':'7','disabled':'true'}))
+    linefwhm = forms.FloatField(label="Line FWHM (Angstroms)", initial=6, widget=forms.TextInput(attrs={'size':'7','disabled':'true'}))
+
 
 class InstrumentForm(forms.Form):
     om_val = forms.ChoiceField(label="Observing mode", initial="LCB", choices=OMODE) #, widget=forms.Select(attrs={'size':'2', 'style':'width:100px' }))
@@ -75,7 +76,8 @@ class AtmosphericConditionsForm(forms.Form):
     seeing = forms.FloatField(label="Seeing", initial=0.5, min_value=0.0, max_value=5, widget=forms.TextInput(attrs={'size':'7'}))
 
 class ObservationalSetupForm(forms.Form):
-    exptime = forms.FloatField(label="Exptime (sec)", initial=3600.0, min_value=1.0, widget=forms.TextInput(attrs={'size':'10'}))
+    numshot = forms.IntegerField(label="Num. Exp.", initial=1, min_value=1, widget=forms.TextInput(attrs={'size':'7'}))
+    exptimepshot = forms.FloatField(label="Exptime per shot(sec)", initial=3600.0, min_value=1.0, widget=forms.TextInput(attrs={'size':'7'}))
     nfibers = forms.IntegerField(label="(*)No. of sky fibers", initial=100, min_value=0, max_value=3600, widget=forms.TextInput(attrs={'size':'6'}))
-    lineap = forms.FloatField(label="Line aperture", initial=1.0, widget=forms.TextInput(attrs={'size':'7','disabled':'true'}))
-    contap = forms.FloatField(label="Continuum aperture", initial=1.0, widget=forms.TextInput(attrs={'size':'7','disabled':'true'}))
+    lineap = forms.FloatField(label="Line aperture", initial=1.0, widget=forms.TextInput(attrs={'size':'5','disabled':'true'}))
+    contap = forms.FloatField(label="Continuum aperture", initial=1.0, widget=forms.TextInput(attrs={'size':'5','disabled':'true'}))

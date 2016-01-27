@@ -1,23 +1,19 @@
 import math
 from StringIO import StringIO
-import base64
 import pkgutil
-import os.path
-
-from Tkinter import Tk, Frame, Label, Radiobutton, Button, Entry
-from Tkinter import Listbox, Scrollbar, PhotoImage, Toplevel, Message
-from Tkinter import StringVar
-from Tkinter import Text, Toplevel, Message, Scrollbar
-from Tkinter import RIDGE, N, W, E, S, LEFT, CENTER, BROWSE, NS, VERTICAL
-from Tkinter import END, SINGLE, SW, RIGHT
-from Tkinter import FALSE, WORD, NS, VERTICAL, END, HORIZONTAL, EW
-import tkMessageBox
-
 import numpy
 
 from .numeric import mag2flux, sclspect, specpar, signal, dark
 from .numeric import darknoisesq, readoutnoise, flux2mag, specparline
 from .numeric import linesignal
+
+from .models import PhotometricFilter
+from .models import SpectralTemplate, VPHSetup
+
+# from plot1 import plot_and_save
+
+# from forms import *
+
 
 ####################
 def reading(filename, skipline):
@@ -57,9 +53,9 @@ def outmessage(textcode):
     elif textcode == 4:
         outtext = "** LINE FLUX **\nFor point sources, flux of line in c.g.s. unit system (erg/s/cm**2).\nFor extended sources, this flux must be provided per arcsec**2.\nThis parameter is available only if the 'Continuum+Line' option is set."
     elif textcode == 5:
-        outtext = "** LINE WAVELENGTH **\nLine wavelength in Angstromgs.\nThis parameter is available only if the 'Continuum+Line' option is set."
+        outtext = "** LINE WAVELENGTH **\nLine wavelength in Angstroms.\nThis parameter is available only if the 'Continuum+Line' option is set."
     elif textcode == 6:
-        outtext = "** LINE FWHM **\nLine FWHM in Angstromgs.\nIf the line is not resolved, the nominal FWHM of the selected VPH at its central wavelength is assumed.\nThis parameter is available only if the 'Continuum+Line' and 'Resolved line=yes' options are set."
+        outtext = "** LINE FWHM **\nLine FWHM in Angstroms.\nIf the line is not resolved, the nominal FWHM of the selected VPH at its central wavelength is assumed.\nThis parameter is available only if the 'Continuum+Line' and 'Resolved line=yes' options are set."
     elif textcode == 7:
         outtext = "** AIRMASS **\nAirmass scales the number of photons from the sky background with according to the following expression: (-0.000278719*X**3 - 0.0653841*X**2 + 1.11979*X - 0.0552132)."
     elif textcode == 8:
@@ -75,9 +71,9 @@ def outmessage(textcode):
     elif textcode == 13:
         outtext = "** INPUT PARAMETERS **\nA summary of the selected input parameters is provided here, with some warnings and extra information about the input source flux distribution (as if line FWHM is dominated by the VPH FWHM, if the seeing determines the image area instead of the projected area of source, the continuum flux equivalent to an input magnitude, or the sky flux considered)."
     elif textcode == 14:
-        outtext = "** OUTPUT CONTINUUM SNRs **\n\nThe SNRs of the continuum input flux distribution expected for the input observational and instrumental setup, and for the input atmospheric conditions are provided.\n\nIn case the input source is punctual, the provided SNRs are for:\n * one fibre, in one spectral FWHM(*2), in 1 Armstrong, in the total collapsed spectrum;\n * per detector pixel;\n * the total source area(*1), in one spectral FWHM (*2), in 1 Armstrong, in the total collapsed spectrum.\n\nIn case of extended sources, the following outputs are additionally provided:  \n * for 1 seeing disk, in one spectral FWHM(*2), in 1 Armstrong, in the total collapsed spectrum;\n * for 1 arcsec**2, in one spectral FWHM(*2), in 1 Armstrong, in the total collapsed spectrum.\n\n Note: (*1) The number of fibres required to sample the whole source is also provided.\n         (*2) At least, 3.6 spectral pixels in LCB/MOS modes are required to fulfill the Nyquist-Shanon sampling theorem in spectral direction (the VPH FWHM is projected onto 3.6 spectral pixels for all VPHs in LCB/MOS, by construction)."
+        outtext = "** OUTPUT CONTINUUM SNRs **\n\nThe SNRs of the continuum input flux distribution expected for the input observational and instrumental setup, and for the input atmospheric conditions are provided.\n\nIn case the input source is punctual, the provided SNRs are for:\n * one fibre, in one spectral FWHM(*2), in 1 Angstrom, in the total collapsed spectrum;\n * per detector pixel;\n * the total source area(*1), in one spectral FWHM (*2), in 1 Angstrom, in the total collapsed spectrum.\n\nIn case of extended sources, the following outputs are additionally provided:  \n * for 1 seeing disk, in one spectral FWHM(*2), in 1 Angstrom, in the total collapsed spectrum;\n * for 1 arcsec**2, in one spectral FWHM(*2), in 1 Angstrom, in the total collapsed spectrum.\n\n Note: (*1) The number of fibres required to sample the whole source is also provided.\n         (*2) At least, 3.6 spectral pixels in LCB/MOS modes are required to fulfill the Nyquist-Shanon sampling theorem in spectral direction (the VPH FWHM is projected onto 3.6 spectral pixels for all VPHs in LCB/MOS, by construction)."
     elif textcode == 15:
-        outtext = "** OUTPUT LINE SNRs **\n\nThe SNRs of the line input flux distribution expected for the input observational and instrumental setup, and for the input atmospheric conditions are provided.\n\nIn case the input source is punctual, the provided SNRs are for(*1):\n * per arcsec and per Armstrong in the detector(*2);\n * in one fibre, in the selected line spectral aperture(*3);\n * in one fibre per Armstrong(*2);\n * per voxel(*4,*5);\n * per detector pixel(*6);\n * the total source area, in the selected line spectral aperture(*3).\n\nIn case of extended sources, the following outputs are additionally provided:  \n * for 1 seeing disk, in the selected line spectral aperture(*); \n * for 1 arcsec**2, in the selected line spectral aperture(*).\n\n Note: (*1) Considering that all the line flux is completely enclosed into the FWHM of the line.\n         (*2) Assuming a spectral aperture of 1 Armstrong.\n         (*3) Assuming the selected spectral apertures for line and continuum subtraction indicated as inputs. If you want to know exactly the SNR in 1 line FWHM, set the spectral apertures of line to 1 (i.e., to one line FWHM).\n         (*4) Assuming one spectral FWHM as spectral aperture (i.e., the FWHM of the selected VPH).\n         (*5) A voxel is the minimum spatial and spectral resolution element sampled. In our case, a voxel is the projection of the whole fibre (minimum spatial resolution element) into the FWHM of the VPH in the spectral direction (minimum spectral resolution element according to the Nyquist-Shanon sampling theorem). The FWHM of all VPHs in MEGARA is projected onto 3.6 spectral pixels in LCB/MOS and onto 2.5 pixels by design.\n         (*6) Assuming 1 spectral pixel as spectral aperture."
+        outtext = "** OUTPUT LINE SNRs **\n\nThe SNRs of the line input flux distribution expected for the input observational and instrumental setup, and for the input atmospheric conditions are provided.\n\nIn case the input source is punctual, the provided SNRs are for(*1):\n * per arcsec and per Angstrom in the detector(*2);\n * in one fibre, in the selected line spectral aperture(*3);\n * in one fibre per Angstrom(*2);\n * per voxel(*4,*5);\n * per detector pixel(*6);\n * the total source area, in the selected line spectral aperture(*3).\n\nIn case of extended sources, the following outputs are additionally provided:  \n * for 1 seeing disk, in the selected line spectral aperture(*); \n * for 1 arcsec**2, in the selected line spectral aperture(*).\n\n Note: (*1) Considering that all the line flux is completely enclosed into the FWHM of the line.\n         (*2) Assuming a spectral aperture of 1 Angstrom.\n         (*3) Assuming the selected spectral apertures for line and continuum subtraction indicated as inputs. If you want to know exactly the SNR in 1 line FWHM, set the spectral apertures of line to 1 (i.e., to one line FWHM).\n         (*4) Assuming one spectral FWHM as spectral aperture (i.e., the FWHM of the selected VPH).\n         (*5) A voxel is the minimum spatial and spectral resolution element sampled. In our case, a voxel is the projection of the whole fibre (minimum spatial resolution element) into the FWHM of the VPH in the spectral direction (minimum spectral resolution element according to the Nyquist-Shanon sampling theorem). The FWHM of all VPHs in MEGARA is projected onto 3.6 spectral pixels in LCB/MOS and onto 2.5 pixels by design.\n         (*6) Assuming 1 spectral pixel as spectral aperture."
     elif textcode == 16:
         outtext = "** OBSERVING MODES **\nMEGARA provides two observing modes according to the design on December, 2014:\n\n * Large Compact Bundle (LCB):\n   An IFU covering 12.5x11.3 arcsec^2, with fibers of 0.62 arcsec diameter and a 1D spectral FWHM sampling of 3.6 pix.\n\n  * Multi-Object Spectrograph (MOS):\n   This mode allows observing up to 100 targets in a region of 3.5x3.5 arcmin^2, with fibers of 0.62 arcsec diameter and a 1D spectral FWHM sampling of 3.6 pix."
 
@@ -110,6 +106,10 @@ def outmessage(textcode):
     elif textcode == 112:
         outtext = "** WARNING **\nThe object is wider than the MEGARA field of view."
     elif textcode == 113:
+        outtext = "** WARNING **\nThe number of shots must be at least 1."
+    elif textcode == 114:
+        outtext = "** WARNING **\nExptime per shot value must be 0 < Exptime <1e6"
+    elif textcode == 115:
         outtext = ""
     else:
         outtext = ""
@@ -119,9 +119,11 @@ def outmessage(textcode):
 # ********************************
 # Function to create the text for giving final output for input parameters.
 
-def outtextinp(om_val, bandc_val,sourcet_val,mag_val,netflux,size_val,seeingx,pi,fluxt_val,wline_val, fline_val,
-    fwhmline_val,vph_val,moon_val, airmass_val, seeing_zenith,fsky,exptime_val, npdark_val,
-    nsbundles_val,nfwhmline_val, cnfwhmline_val,resolvedline_val, bandsky):
+def outtextinp(om_val, bandc_val, sourcet_val, mag_val, netflux, size_val,
+               seeingx, pi, fluxt_val, wline_val, fline_val, fwhmline_val,
+               vph_val, moon_val, airmass_val, seeing_zenith, fsky, numshot_val,
+               exptimepshot_val, exptime_val, npdark_val, nsbundles_val,
+               nfwhmline_val, cnfwhmline_val, resolvedline_val, bandsky):
 
     if sourcet_val == "P":
         text = '* Source type: Point\n  Continuum: %s=%5.3f mag\n' % (bandc_val,mag_val)
@@ -145,7 +147,7 @@ def outtextinp(om_val, bandc_val,sourcet_val,mag_val,netflux,size_val,seeingx,pi
 
     text = text + '* Sky: Moon=%6s\n  Airmass: X=%3.2f\n  Seeing(@X=1)=%4.2f\n' % (moon_val, airmass_val, seeing_zenith)
     text = text + '  Sky-flux(%s,@X)=%7.3e cgs\n  Seeing(@X)=%4.2f\n' % (bandsky, fsky, seeingx)
-    text = text + '* Observation: Exptime=%7.1f\n  NP_Dark=%6i\n  Sky-bundles=%i\n' % (exptime_val, npdark_val, nsbundles_val)
+    text = text + '* Observation: Num. of shots=%6i\n Exptime/shot=%7.1f\n Total Exptime=%7.1f\n NP_Dark=%6i\n  Sky-bundles=%i\n' % (numshot_val, exptimepshot_val, exptime_val, npdark_val, nsbundles_val)
 
     if fluxt_val == "L":
         text =  text + '  Spectral apertures:\n    For line=%2i\n    For continuum=%2i\n' % (nfwhmline_val, cnfwhmline_val)
@@ -299,14 +301,6 @@ textoc = ""
 textol = ""
 
 # Global definitions
-vph_list = ['HR-R', 'HR-I', 'MR-U', 'MR-UB', 'MR-B', 'MR-G', 'MR-V', 'MR-VR', 'MR-R', 'MR-RI', 'MR-I', 'MR-Z',
-            'LR-U', 'LR-B', 'LR-V', 'LR-R', 'LR-I', 'LR-Z']
-fluxt_list = [("Continuum", "C"), ("Line+\nContinuum", "L")] # Button selection
-sourcet_list = [("Point", "P"), ("Extended", "E")] # Button selection
-inputcontt_list = [("Cont. magnitude:", "M"), ("Continuum flux:", "F")] # Button selection
-resolvedline_list = [("No", "N"), ("Yes", "Y")] # Button selection
-om_list = ['LCB','MOS']
-
 # Constants
 hplanck = 6.62606885e-27  # Planck constant (ergs/s)
 lightv = 2.99792458e10    # Light velocity (cm/s)
@@ -331,74 +325,97 @@ npy = 4096.0
 # Dimensions of detector (Vertical direction). Plus 16 rows devoted to dark? npy = 4112
 npx = 4096.0
 
+
+# vph_list = list( [o.name for o in VPHSetup.objects.all()] )
+# reads the database every time it is called, so better not use it too much.
+# To avoid multiple database loads,
+# simply save the QuerySet and reuse it as follows:
+queryvph = VPHSetup.objects.all()
+vph_list = list([str(p.name) for p in queryvph if p.name != u'-empty-'])
+# vph_list = ['HR-R', 'HR-I', 'MR-U', 'MR-UB', 'MR-B', 'MR-G', 'MR-V', 'MR-VR',\
+#            'MR-R', 'MR-RI', 'MR-I', 'MR-Z',\
+#            'LR-U', 'LR-B', 'LR-V', 'LR-R', 'LR-I', 'LR-Z']
+
+vphchar = list( [(p.fwhm, p.dispersion, p.deltab, p.lambdac, p.relatedband,\
+                  p.lambda_b, p.lambda_e, p.specconf) for p in queryvph if p.name != u'-empty-'])
 # VPH configurations: FWHM @lambda_c, Dispersion (AA/pix), DeltaB (AA),
 #                     lambda_c (AA)  Band_of_VPH_to_relate_with_Vega_zp lambda_0 lambda_f Spectrograph_configuration
 # Band_of_VPH_to_relate_with_Vega_zp must be defined in bandc_list
-vphchar = [(0.354, 0.089, 380.0, 6650.0,'R', 6450., 6830., 'HR'),  # 'HR-R'
-           (0.462, 0.116, 491.0, 8630.0,'I', 8379., 8870., 'HR'),  # 'HR-I'
-           (0.358, 0.090, 360.0, 4104.0,'U', 3917., 4277., 'MR'),  # 'MR-U'
-           (0.394, 0.099, 396.0, 4431.0,'B', 4225., 4621., 'MR'),  # 'MR-UB'
-           (0.435, 0.109, 438.0, 4814.0,'B', 4586., 5024., 'MR'),  # 'MR-B'
-           (0.476, 0.119, 480.0, 5213.0,'V', 4963., 5443., 'MR'),  # 'MR-G'
-           (0.523, 0.131, 526.0, 5667.0,'V', 5393., 5919., 'MR'),  # 'MR-V'
-           (0.574, 0.144, 578.0, 6170.0,'V', 5869., 6447., 'MR'),  # 'MR-VR'
-           (0.613, 0.153, 618.0, 6563.0,'R', 6241., 6859., 'MR'),  # 'MR-R'
-           (0.669, 0.167, 673.0, 7115.0,'I', 6764., 7437., 'MR'),  # 'MR-RI'
-           (0.733, 0.183, 738.0, 7767.0,'I', 7382., 8120., 'MR'),  # 'MR-I'
-           (0.875, 0.219, 886.0, 9262.0,'I', 8800., 9686., 'MR'),  # 'MR-Z'
-           (0.739, 0.185, 733.0, 4051.0,'U', 3653., 4386., 'LR'),  # 'LR-U'
-           (0.871, 0.218, 864.0, 4800.0,'B' ,4332., 5196., 'LR'),  # 'LR-B'
-           (1.030, 0.261, 1021.0, 5695.0,'V' , 5143., 6164., 'LR'),  # 'LR-V'
-           (1.217, 0.304, 1206.0, 6747.0,'R' , 6094., 7300., 'LR'),  # 'LR-R'
-           (1.439, 0.360, 1426.0, 7991.0,'I' , 7220., 8646., 'LR'),  # 'LR-I'
-           (1.600, 0.400, 1587.0, 8900.0,'I' , 8043., 9630., 'LR')]  # 'LR-Z'
+# vphchar = [(0.354, 0.089, 380.0, 6650.0, 'R', 6450., 6830., 'HR'),  # 'HR-R'
+#            (0.462, 0.116, 491.0, 8630.0, 'I', 8379., 8870., 'HR'),  # 'HR-I'
+#            (0.358, 0.090, 360.0, 4104.0, 'U', 3917., 4277., 'MR'),  # 'MR-U'
+#            (0.394, 0.099, 396.0, 4431.0, 'B', 4225., 4621., 'MR'),  # 'MR-UB'
+#            (0.435, 0.109, 438.0, 4814.0, 'B', 4586., 5024., 'MR'),  # 'MR-B'
+#            (0.476, 0.119, 480.0, 5213.0, 'V', 4963., 5443., 'MR'),  # 'MR-G'
+#            (0.523, 0.131, 526.0, 5667.0, 'V', 5393., 5919., 'MR'),  # 'MR-V'
+#            (0.574, 0.144, 578.0, 6170.0, 'V', 5869., 6447., 'MR'),  # 'MR-VR'
+#            (0.613, 0.153, 618.0, 6563.0, 'R', 6241., 6859., 'MR'),  # 'MR-R'
+#            (0.669, 0.167, 673.0, 7115.0, 'I', 6764., 7437., 'MR'),  # 'MR-RI'
+#            (0.733, 0.183, 738.0, 7767.0, 'I', 7382., 8120., 'MR'),  # 'MR-I'
+#            (0.875, 0.219, 886.0, 9262.0, 'I', 8800., 9686., 'MR'),  # 'MR-Z'
+#            (0.739, 0.185, 733.0, 4051.0, 'U', 3653., 4386., 'LR'),  # 'LR-U'
+#            (0.871, 0.218, 864.0, 4800.0, 'B' ,4332., 5196., 'LR'),  # 'LR-B'
+#            (1.030, 0.261, 1021.0, 5695.0, 'V' , 5143., 6164., 'LR'),  # 'LR-V'
+#            (1.217, 0.304, 1206.0, 6747.0, 'R' , 6094., 7300., 'LR'),  # 'LR-R'
+#            (1.439, 0.360, 1426.0, 7991.0, 'I' , 7220., 8646., 'LR'),  # 'LR-I'
+#            (1.600, 0.400, 1587.0, 8900.0, 'I' , 8043., 9630., 'LR')]  # 'LR-Z'
 
 
 # Templates of spectrum of different astronomical objects
-spect_list = ['Uniform', 'Elliptical', 'S0', 'Sa', 'Sb', 'Sc', 'NGC1068', 'M2 I', 'Starburst1',
-             'Starburst2','Starburst3','Starburst4','Starburst5','Starburst6',
-             'Bulge', 'Liner', 'QSO', 'Sy1', 'Sy2', 'Orion', 'PN',
-             'O5 V','O7 V',
-             'O9 V', 'B0 V', 'B1 V','B3 V', 'B5 V', 'B8 V',
-             'A1 V', 'A3 V', 'A5 V', 'F0 V', 'F2 V', 'F5 V',
-             'F8 V', 'G2 V', 'G5 I',
-             'G5 V', 'G8 V', 'K0 V', 'K4 V', 'K7 V',
-             'M2 V', 'M4 V', 'M6 V']
+queryspec = SpectralTemplate.objects.all()
+spect_list = list( [str(p.name) for p in queryspec])
+# spect_list = ['Uniform', 'Elliptical', 'S0', 'Sa', 'Sb', 'Sc', 'NGC1068', 'M2 I', 'Starburst1',
+#              'Starburst2','Starburst3','Starburst4','Starburst5','Starburst6',
+#              'Bulge', 'Liner', 'QSO', 'Sy1', 'Sy2', 'Orion', 'PN',
+#              'O5 V','O7 V',
+#              'O9 V', 'B0 V', 'B1 V','B3 V', 'B5 V', 'B8 V',
+#              'A1 V', 'A3 V', 'A5 V', 'F0 V', 'F2 V', 'F5 V',
+#              'F8 V', 'G2 V', 'G5 I',
+#              'G5 V', 'G8 V', 'K0 V', 'K4 V', 'K7 V',
+#              'M2 V', 'M4 V', 'M6 V']
 
-specttmplt_list = ['SPECTRA_0.1aa/uniform.dat', 'SPECTRA_0.1aa/Elliptical.dat', 'SPECTRA_0.1aa/S0.dat',
-             'SPECTRA_0.1aa/Sa.dat', 'SPECTRA_0.1aa/Sb.dat', 'SPECTRA_0.1aa/Sc.dat',
-             'SPECTRA_0.1aa/NGC1068.dat','SPECTRA_0.1aa/M2I.dat', 'SPECTRA_0.1aa/Starburst1.dat',
-             'SPECTRA_0.1aa/Starburst2.dat', 'SPECTRA_0.1aa/Starburst3.dat', 'SPECTRA_0.1aa/Starburst4.dat',
-             'SPECTRA_0.1aa/Starburst5.dat', 'SPECTRA_0.1aa/Starburst6.dat', 'SPECTRA_0.1aa/Bulge.dat',
-             'SPECTRA_0.1aa/Liner.dat', 'SPECTRA_0.1aa/QSO.dat', 'SPECTRA_0.1aa/Sy1.dat', 'SPECTRA_0.1aa/Sy2.dat',
-             'SPECTRA_0.1aa/Orion.dat', 'SPECTRA_0.1aa/PN.dat', 'SPECTRA_0.1aa/O5V.dat', 'SPECTRA_0.1aa/O7V.dat',
-             'SPECTRA_0.1aa/O9V.dat', 'SPECTRA_0.1aa/B0V.dat', 'SPECTRA_0.1aa/B1V.dat', 'SPECTRA_0.1aa/B3V.dat',
-             'SPECTRA_0.1aa/B5V.dat', 'SPECTRA_0.1aa/B8V.dat', 'SPECTRA_0.1aa/A1V.dat', 'SPECTRA_0.1aa/A3V.dat',
-             'SPECTRA_0.1aa/A5V.dat', 'SPECTRA_0.1aa/F0V.dat', 'SPECTRA_0.1aa/F2V.dat', 'SPECTRA_0.1aa/F5V.dat',
-             'SPECTRA_0.1aa/F8V.dat', 'SPECTRA_0.1aa/G2V.dat', 'SPECTRA_0.1aa/G5I.dat', 'SPECTRA_0.1aa/G5V.dat',
-             'SPECTRA_0.1aa/G8V.dat', 'SPECTRA_0.1aa/K0V.dat', 'SPECTRA_0.1aa/K4V.dat', 'SPECTRA_0.1aa/K7V.dat',
-             'SPECTRA_0.1aa/M2V.dat', 'SPECTRA_0.1aa/M4V.dat', 'SPECTRA_0.1aa/M6V.dat']
+specttmplt_list = list( [str(p.path) for p in queryspec])
+# specttmplt_list = ['SPECTRA_0.1aa/uniform.dat', 'SPECTRA_0.1aa/Elliptical.dat', 'SPECTRA_0.1aa/S0.dat',
+#              'SPECTRA_0.1aa/Sa.dat', 'SPECTRA_0.1aa/Sb.dat', 'SPECTRA_0.1aa/Sc.dat',
+#              'SPECTRA_0.1aa/NGC1068.dat','SPECTRA_0.1aa/M2I.dat', 'SPECTRA_0.1aa/Starburst1.dat',
+#              'SPECTRA_0.1aa/Starburst2.dat', 'SPECTRA_0.1aa/Starburst3.dat', 'SPECTRA_0.1aa/Starburst4.dat',
+#              'SPECTRA_0.1aa/Starburst5.dat', 'SPECTRA_0.1aa/Starburst6.dat', 'SPECTRA_0.1aa/Bulge.dat',
+#              'SPECTRA_0.1aa/Liner.dat', 'SPECTRA_0.1aa/QSO.dat', 'SPECTRA_0.1aa/Sy1.dat', 'SPECTRA_0.1aa/Sy2.dat',
+#              'SPECTRA_0.1aa/Orion.dat', 'SPECTRA_0.1aa/PN.dat', 'SPECTRA_0.1aa/O5V.dat', 'SPECTRA_0.1aa/O7V.dat',
+#              'SPECTRA_0.1aa/O9V.dat', 'SPECTRA_0.1aa/B0V.dat', 'SPECTRA_0.1aa/B1V.dat', 'SPECTRA_0.1aa/B3V.dat',
+#              'SPECTRA_0.1aa/B5V.dat', 'SPECTRA_0.1aa/B8V.dat', 'SPECTRA_0.1aa/A1V.dat', 'SPECTRA_0.1aa/A3V.dat',
+#              'SPECTRA_0.1aa/A5V.dat', 'SPECTRA_0.1aa/F0V.dat', 'SPECTRA_0.1aa/F2V.dat', 'SPECTRA_0.1aa/F5V.dat',
+#              'SPECTRA_0.1aa/F8V.dat', 'SPECTRA_0.1aa/G2V.dat', 'SPECTRA_0.1aa/G5I.dat', 'SPECTRA_0.1aa/G5V.dat',
+#              'SPECTRA_0.1aa/G8V.dat', 'SPECTRA_0.1aa/K0V.dat', 'SPECTRA_0.1aa/K4V.dat', 'SPECTRA_0.1aa/K7V.dat',
+#              'SPECTRA_0.1aa/M2V.dat', 'SPECTRA_0.1aa/M4V.dat', 'SPECTRA_0.1aa/M6V.dat']
 
 # Band for continuum list
-bandc_list = ['U', 'B', 'V', 'R', 'I']
-filterc_list = ['FILTERS_0.1aa/u_johnsonbessel.dat','FILTERS_0.1aa/b_johnsonbessel.dat',
-                'FILTERS_0.1aa/v_johnsonbessel.dat','FILTERS_0.1aa/r_johnsonbessel.dat',
-                'FILTERS_0.1aa/i_johnsonbessel.dat']
+queryband = PhotometricFilter.objects.all()
+bandc_list = list( [str(p.name) for p in queryband])
+# bandc_list = ['U', 'B', 'V', 'R', 'I']
+
+filterc_list = list( [str(p.path) for p in queryband])
+# filterc_list = ['FILTERS_0.1aa/u_johnsonbessel.dat','FILTERS_0.1aa/b_johnsonbessel.dat',
+#                 'FILTERS_0.1aa/v_johnsonbessel.dat','FILTERS_0.1aa/r_johnsonbessel.dat',
+#                 'FILTERS_0.1aa/i_johnsonbessel.dat']
 
 # Central Wavelength and width of filters.
-filterchar_list = [(3657.5, 577.0, 3369.0, 3946.),   # For Johnson-Cousins U-band
-                   (4334.5, 975.0, 3847., 4822.),   # For Johnson-Cousins B-band
-                   (5374.0, 846.0, 4951., 5797.),   # For Johnson-Cousins V-band
-                   (6272.5, 1273.0, 5635.5, 6909.),  # For Johnson-Cousins R-band
-                   (8722.0, 2980.0, 7232., 10212.)]  # For Johnson-Cousins I-band
+filterchar_list = list( [(p.cwl, p.width, p.lambda_b, p.lambda_e) for p in queryband])
+# filterchar_list = [(3657.5, 577.0, 3369.0, 3946.),   # For Johnson-Cousins U-band
+#                    (4334.5, 975.0, 3847., 4822.),   # For Johnson-Cousins B-band
+#                    (5374.0, 846.0, 4951., 5797.),   # For Johnson-Cousins V-band
+#                    (6272.5, 1273.0, 5635.5, 6909.),  # For Johnson-Cousins R-band
+#                    (8722.0, 2980.0, 7232., 10212.)]  # For Johnson-Cousins I-band
+
 
 # Vega magnitude and flux (erg/s/cm**2/AA according to selected continuum band, following order of bandc_list
 # Colina 1996
-vegachar = [(0.030,4.22e-9),   # For Johnson-Cousins U-band
-            (0.035,6.20e-9),   # For Johnson-Cousins B-band
-            (0.035,3.55e-9),   # For Johnson-Cousins V-band
-            (0.075,1.795e-9),  # For Johnson-Cousins R-band
-            (0.095,8.60e-9)]   # For Johnson-Cousins I-band
+vegachar = list( [(p.mvega, p.fvega) for p in queryband])
+# vegachar = [(0.030,4.22e-9),   # For Johnson-Cousins U-band
+#             (0.035,6.20e-9),   # For Johnson-Cousins B-band
+#             (0.035,3.55e-9),   # For Johnson-Cousins V-band
+#             (0.075,1.795e-9),  # For Johnson-Cousins R-band
+#             (0.095,8.60e-9)]   # For Johnson-Cousins I-band
 
 # Sky emission, for bright, grey, dark nights in La Palma, in mag/arcsec**2 in the V-band.
 # (I. Skillen, 2002, ING Technical Note 127)
@@ -411,6 +428,7 @@ extraskyemission = [-3.1, -1.5, -0.5]
 # Units: Mag/arcsec**2 (C.R.Benn & S.L. Ellison, 1997, La Palma technical note 115.)
 # Independent of atmospheric extinction, not variable during the night, but with solar cycle,
 # latitude and airmass
+
 bandsky_list = ['U', 'B', 'V', 'R', 'I']
 skymag_list = [22.0,   # Sky U
                22.7,   # Sky B
@@ -418,15 +436,14 @@ skymag_list = [22.0,   # Sky U
                21.0,   # Sky R
                20.0]   # Sky I
 
+
 # Transmission curves
 # Atmospheric transmission at La Palma: 72% @400 nm, 80% @450 nm, 84% @500 nm
 # Preub, Hermann, Hofmann, & Kohnle NIMPR.
 # Section A, Volume 481, Issues 1-3, 1 April 2002, Pages 229-240
-
 tatmdat = "MEGARA_TRANSM_0.1aa/atmt_total_0.1aa.dat"
 
 # Reading transmission curve of atmosphere
-
 lamb, tatm = reading(tatmdat,2)
 tatm = numpy.array(tatm)
 
@@ -436,20 +453,19 @@ tatm = numpy.array(tatm)
 def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
          fline_val,wline_val,nfwhmline_val,cnfwhmline_val,\
          fwhmline_val,resolvedline_val,spect_val,bandc_val,\
-         om_val,vph_val,moon_val,airmass_val,seeing_val,exptime_val,nsbundles_val):
+         om_val,vph_val,moon_val,airmass_val,seeing_val,numshot_val,exptimepshot_val,\
+         nsbundles_val):
 
     global texti, textoc, textol
     # Clear previous outputs
     # Warning
     errind = 0
     frame0 = 0
+
     # Source type
-    # sourcet_val = sourcet_entry.get()
 
     # Magnitude continuum; checking float
-    # inputcontt_val = inputcontt_entry.get()
     if inputcontt_val == "M":
-        # mag_val = mag_entry.get()
         mag_val = isafloat (mag_val, 20.0)
         if abs(mag_val) > 35.0 :
             mag_val = 20.0
@@ -457,7 +473,6 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
             errind = warn(outtext,frame0,'MEGARA ETC Warning')
 
     else:
-        # fc_val = fc_entry.get()
         fc_val = isafloat(fc_val, 1.0e-16)
         if fc_val <= 0.0:
             fc_val = 1.0e-16
@@ -465,27 +480,18 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
             errind = warn(outtext,frame0,'MEGARA ETC Warning')
 
     # Size if extended in arcsec**2; checking float
-    # size_val = size_entry.get()
     size_val = isafloat(size_val, 1.0)
     if sourcet_val == "P":
         size_val = 0.
 
     # Type of computation: continuum or line+continuum
     # Input parameters related to Line
-    # fluxt_val = fluxt_entry.get()
-    # resolvedline_val = resolvedline_entry.get()
-
     if fluxt_val == "L":
-        # Resolved line?
-        # sourcet_val = sourcet_entry.get()
-
-        # fline_val = fline_entry.get()
         fline_val = isafloat(fline_val, 1.0e-13)
         if fline_val <= 0.0:
             fline_val = 1.0e-13
             outtext = outmessage(102)
             errind = warn(outtext,frame0,'MEGARA ETC Warning')
-        # wline_val = wline_entry.get()
         wline_val = isafloat(wline_val, 6562.8)
         if wline_val <= 0.0:
             wline_val = 6562.8
@@ -499,7 +505,6 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
         wline_val = numpy.array(wline_val)
 
         if resolvedline_val == "Y":
-            # fwhmline_val = fwhmline_entry.get()
             fwhmline_val = isafloat(fwhmline_val, 0.5)
         else: # We will assign its value after reading the VPH in this case
             fwhmline_val = 0.5
@@ -508,14 +513,12 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
             outtext = outmessage(104)
             errind = warn(outtext,frame0,'MEGARA ETC Warning')
 
-        # nfwhmline_val = nfwhmline_entry.get()
         nfwhmline_val = isafloat(nfwhmline_val, 1.0)
         if nfwhmline_val < 1.0:
             nfwhmline_val = 1.0
             outtext = outmessage(105)
             errind = warn(outtext,frame0,'MEGARA ETC Warning')
 
-        # cnfwhmline_val = cnfwhmline_entry.get()
         cnfwhmline_val = isafloat(cnfwhmline_val, 1.0)
         if cnfwhmline_val < 1.0:
             cnfwhmline_val = 1.0
@@ -528,28 +531,7 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
         nfwhmline_val = 0.
         cnfwhmline_val = 0.
 
-    # Reading spectrum template:
-    # spect_items = spect.curselection()
-    # spect_val = spect.get(spect_items[:])
-
-    # Band for continuum:
-    # bandc_items = bandc.curselection()
-    # bandc_val = bandc.get(bandc_items[:])
-
-    # Observing mode:
-    # om_items = om.curselection()
-    # om_val = om.get(om_items[:])
-
-    # VPH:
-    # vph_items = vph.curselection()
-    # vph_val = vph.get(vph_items[:])
-
-    # Moon:
-    # moon_items = moon.curselection()
-    # moon_val = moon.get(moon_items[:])
-
     # Airmass
-    # airmass_val = airmass_entry.get()
     airmass_val = isafloat(airmass_val,1.0)
     if airmass_val < 1.0 or airmass_val >=3.0:
         airmass_val = 1.0
@@ -557,14 +539,28 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
         errind = warn(outtext,frame0,'MEGARA ETC Warning')
 
     # Seeing
-    # seeing_val = seeing_entry.get()
     seeing_val = isafloat(seeing_val,0.5)
     if seeing_val <= 0.0 or seeing_val > 3.05:
         seeing_val = 0.5
         outtext = outmessage(108)
         errind = warn(outtext,frame0,'MEGARA ETC Warning')
 
+    # Number of shot
+    numshot_val = isafloat(numshot_val,1)
+    if numshot_val <= 0:
+        numshot_val = 1
+        outtext = outmessage(113)
+        errind = warn(outtext,frame0,'MEGARA ETC Warning')
+
+    # Exptime per shot
+    exptimepshot_val = isafloat(exptimepshot_val,1)
+    if exptimepshot_val <= 0.0 or exptimepshot_val >= 1.e6:
+        exptimepshot_val = 3600.
+        outtext = outmessage(114)
+        errind = warn(outtext,frame0,'MEGARA ETC Warning')
+
     # Exptime
+    exptime_val = numshot_val * exptimepshot_val
     # exptime_val = exptime_entry.get()
     exptime_val = isafloat(exptime_val,3600.0)
     if exptime_val <= 0.0 or exptime_val >= 1.e6:
@@ -576,7 +572,6 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
     npdark_val = 65500.
 
     # Sky fibres
-    # nsbundles_val = nsbundles_entry.get()
     nsbundles_val = isafloat(nsbundles_val,100.0)
     if nsbundles_val <= 0. or nsbundles_val > 700:
         nsbundles_val = 100.
@@ -586,15 +581,36 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
     # Setting dispersion, bandwidth, central wavelength, band for estimating sky flux from VPH setup,
     # and spectrograph configuration for setting instrument transmission.
 
+    vph_val = vph_val.encode('utf-8')   # need it to get rid of unicode
     vphfeatures = vphchar[vph_list.index(vph_val)]
+    # vphfeatures = VPHSetup.objects.filter
+    # queryfwhmvph = list( VPHSetup.objects.filter(name=vph_val).values('fwhm') )
+    # fwhmvph = queryfwhmvph[0]['fwhm']
+    #
+    # querydisp = list( VPHSetup.objects.filter(name=vph_val).values('dispersion') )
+    # disp = querydisp[0]['dispersion']
+    #
+    # querydeltab = list( VPHSetup.objects.filter(name=vph_val).values('deltab') )
+    # deltab = querydeltab[0]['deltab']
+    #
+    # queryset = list( VPHSetup.objects.filter(name=vph_val).values('lambdac') )
+    # lambdaeff = queryset[0]['lambdac']
+    # bandskyquery = list( VPHSetup.objects.filter(name=vph_val).values('relatedband') )
+    # bandsky = bandskyquery[0]['relatedband']
+    # spectrograph_conf = VPHSetup.objects.filter(name=vph_val).values('specconf')
+
     fwhmvph = vphfeatures[0]
     disp = vphfeatures[1]
     deltab = vphfeatures[2]
     lambdaeff = vphfeatures[3]
     bandsky = vphfeatures[4]
     spectrograph_conf = vphfeatures[7]
-
+    #
     # Lower and upper wavelengths of VPH
+    # querylvph1 = list(VPHSetup.objects.filter(name=vph_val).values('lambda_b'))
+    # lvph1 = querylvph1[0]['lambda_b']
+    # querylvph2 = list(VPHSetup.objects.filter(name=vph_val).values('lambda_e'))
+    # lvph2 = querylvph2[0]['lambda_e']
     lvph1 = vphfeatures[5]
     lvph2 = vphfeatures[6]
 
@@ -731,8 +747,6 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
         # Filter transmission for the continuum
         filtercdat = filterc_list[bandc_list.index(bandc_val)]
         lamb, tfilterc = reading(filtercdat,2)
-        # lamb = filtercdat[0]
-        # tfilterc = filtercdat[1]
         tfilterc = numpy.array(tfilterc)
 
         # Wavelength array
@@ -740,13 +754,11 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
 
         # Initial and final lambda of continuum filter:
         filtercar = filterchar_list[bandc_list.index(bandc_val)]
-        # filtercar = filtercar1
         lc1 = filtercar[2]
         lc2 = filtercar[3]
 
         # Initial and final lambda of sky band (included in the VPH range):
         filtercar = filterchar_list[bandc_list.index(bandsky)]
-        # filtercar = filtercar2
         ls1 = filtercar[2]
         ls2 = filtercar[3]
 
@@ -772,8 +784,6 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
         enpheff = hplanck * lightv / lambdaeffcm
 
         # System efficiency
-        # print len(tatm)
-        # print len(tgtcinst)
         effsys = tatm * tgtcinst
 
         # Telescope collecting area (cm**2)
@@ -818,7 +828,7 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
 
         # Source spectrum scaled to totalflux in continuum
         normc, fc = sclspect (fcont, lamb, lc1, lc2, sourcespectrum, tfilterc)
-
+        # plot_and_save(lambdacm, fc, spect_val)
         # Sky magnitude and scaled flux. Sky flux scaled to the airmass per arcsec**2
         # We consider the brightness due to moon phase
         # fsky is assumed to be valid in the wavelength range of the selected VPH, as it is derived in the
@@ -865,10 +875,10 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
 
         if nfibres > ntotalfibresins:
             # ERROR
-            areasource = ntotalfibresinst * areafibre
+            areasource = ntotalfibresins * areafibre
             diamsource = 2. * math.sqrt (areasource / pi)
             rsource = diamsource / 2.0
-            nfibres = ntotalfibresinst
+            nfibres = ntotalfibresins
             outtext = outmessage(112)
             errind = warn(outtext,frame0,'MEGARA ETC Warning')
         else:
@@ -899,10 +909,10 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
             npixsky = (omegasky / omegaskysource) * npix
 
             # Source continuum signal in defined spectral and spatial resolution element
-            signalcont = signal (fc, deltalambda, lambdaeff, effsys, stel, omegasource, exptime_val, enph, lamb)
+            signalcont = signal(fc, deltalambda, lambdaeff, effsys, stel, omegasource, exptime_val, enph, lamb)
 
             # Sky signal in defined spectral and spatial resolution element
-            signalsky = signal (fs, deltalambda, lambdaeff, effsys, stel, omegaskysource, exptime_val, enph, lamb)
+            signalsky = signal(fs, deltalambda, lambdaeff, effsys, stel, omegaskysource, exptime_val, enph, lamb)
 
             # Dark signal
             signaldark = dark(exptime_val, dc, npix)
@@ -915,7 +925,7 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
 
             # Noise due to sky substraction
             # Sky signal *MEASURED* in defined spectral and spatial resolution element
-            signalskymeasured = signal (fs, deltalambda,  lambdaeff, effsys, stel, omegasky, exptime_val, enph, lamb)
+            signalskymeasured = signal(fs, deltalambda,  lambdaeff, effsys, stel, omegasky, exptime_val, enph, lamb)
             ronoiseskymeasured = readoutnoise(npixsky, ron)
             signaldarkskymeasured = dark(exptime_val, dc, npixsky)
             noisedarksqskymeasured = darknoisesq(npixsky, npdark_val, exptime_val, dc, ron)
@@ -923,7 +933,7 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
             noiseskysq = (omegaskysource / omegasky)**2 * (signalskymeasured + ronoiseskymeasured + signaldarkskymeasured + noisedarksqskymeasured)
 
             # Source continuum noise in defined spectral and spatial resolution element
-            noisecont = math.sqrt (signalcont + signalsky + signaldark + ronoise + noisedarksq + noiseskysq)
+            noisecont = math.sqrt(signalcont + signalsky + signaldark + ronoise + noisedarksq + noiseskysq)
 
             # Signal-to-noise of continuum
             sncont = signalcont / noisecont
@@ -953,6 +963,7 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
                 sncont_psp_pspp = sncont / numpy.sqrt(16.)
             elif xit == 10: # 1AA, 1 fibre
                 sncont_1aa_fibre = sncont
+                print sncont_1aa_fibre
             elif xit == 11: # Bandwidth, 1 fibre
                 sncont_band_fibre = sncont
 
@@ -981,7 +992,7 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
 
                 # Line signal in defined spatial resolution element: only in the line
                 # Line flux is given already integrated (not per AA)--> bandwidth = 1 AA
-                signalline = linesignal (flineparc, 1.0, effsys, stel, omegasource, exptime_val, wline_val, lamb)
+                signalline = linesignal(flineparc, 1.0, effsys, stel, omegasource, exptime_val, wline_val, lamb)
 
                 # Continuum signal in defined spatial resolution element, in deltalambda.
                 # (If no. of line FWHMs selected is deltalambda to derive the line signal).
@@ -989,7 +1000,7 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
                 ind = numpy.where(lamb ==  wline_val)
                 contatline= fc[ind]
 
-                signalcont_line = linesignal (contatline, deltalambda, effsys, stel, omegasource,
+                signalcont_line = linesignal(contatline, deltalambda, effsys, stel, omegasource,
                   exptime_val, wline_val, lamb)
 
                 # Number of pixels in detector under consideration: just counting the factor in area
@@ -1008,7 +1019,7 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
 
                 # Noise due to continuum substraction
                 # Continuum signal *MEASURED* in spatial resolution element, in cnfwhmline_val
-                signalcontmeasured = linesignal (contatline, deltalambdacont, effsys, stel,
+                signalcontmeasured = linesignal(contatline, deltalambdacont, effsys, stel,
                   omegasource, exptime_val, wline_val, lamb)
                 ronoisecontmeasured = readoutnoise(npixcont, ron)
                 signaldarkcontmeasured = dark(exptime_val, dc, npixcont)
@@ -1036,7 +1047,7 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
                     # If line FWHM is < 1 A, line and continuum fluxes contributing to measurement
                     else:
                         signallineperAA = signalline
-                        signalcont_lineperAA = linesignal (contatline, 1.0, effsys, stel, omegasource,
+                        signalcont_lineperAA = linesignal(contatline, 1.0, effsys, stel, omegasource,
                           exptime_val, wline_val, lamb)
 
                     # Common computations, independent on if FWHM > 1AA or not.
@@ -1144,57 +1155,27 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
         ##############################
         # Output of input parameters #
         ##############################
-        row = 0
-        # hwtext0 = Label(frame1b, text=' Input parameters:', fg='black', font=("Helvetica", 14, "bold"),
-        #  justify="left", height=1)
-        # hwtext0.grid(row=row, column=0, sticky=N+W)
-
-        # outtext = outmessage(13)
-        # question = Button(frame1b, text='?', justify=RIGHT,command=lambda i=outtext, j=frame0,
-        #     k='MEGARA ETC Help': message(i,j,k))
-        # question.grid(row=row,column=2, sticky=E)
-
-        textigui,texti = outtextinp(om_val,bandc_val,sourcet_val,mag_val,netflux,size_val,seeingx,pi,fluxt_val,wline_val,
-         fline_val, fwhmline_val,vph_val,moon_val, airmass_val, seeing_zenith,fsky,exptime_val, npdark_val,
-         nsbundles_val,nfwhmline_val, cnfwhmline_val,resolvedline_val, bandsky)
-        # output(textigui,1,frame1b, 4, 30, "12",1) #12, 55
+        textigui,texti = outtextinp(om_val,bandc_val,sourcet_val,mag_val,netflux,size_val,seeingx,pi,fluxt_val,wline_val,\
+         fline_val, fwhmline_val,vph_val,moon_val, airmass_val, seeing_zenith,fsky,numshot_val,exptimepshot_val,exptime_val,\
+        npdark_val,nsbundles_val,nfwhmline_val, cnfwhmline_val,resolvedline_val, bandsky)
 
         #######################################
         # Output of continuum signal-to-noise #
         #######################################
-        row = 0
-        # hwtext0 = Label(frame1c, text='Continuum output S/N:', fg='black', font=("Helvetica", 14, "bold"))
-        # hwtext0.grid(row=row, column=0, sticky=N+W)
-
-        # outtext = outmessage(14)
-        # question = Button(frame1c, text='?', justify=RIGHT,command=lambda i=outtext, j=frame0,
-        #     k='MEGARA ETC Help': message(i,j,k))
-        # question.grid(row=row,column=2, sticky=E)
-
         textocgui,textoc = outtextoutc(sourcet_val,nfibres, nfib, nfib1def, sncont_p2sp_all, sncont_1aa_all,
          sncont_band_all,sncont_p2sp_fibre,
          sncont_1aa_fibre,sncont_band_fibre,sncont_p2sp_seeing, sncont_1aa_seeing, sncont_band_seeing,sncont_p2sp_1,
          sncont_1aa_1, sncont_band_1,sncont_psp_pspp)
 
-        # output(textocgui,1,frame1c, 6, 30, "12",1)
-
         ############################################
         # Output of line+continuum signal-to-noise #
         ############################################
-        # hwtext0 = Label(frame1d, text='Line output S/N:', fg='black', font=("Helvetica", 14, "bold"))
-        # hwtext0.grid(row=0, column=0, sticky=N+W)
-
-        # outtext = outmessage(15)
-        # question = Button(frame1d, text='?', justify=RIGHT,command=lambda i=outtext, j=frame0,
-        #     k='MEGARA ETC Help': message(i,j,k))
-        # question.grid(row=row,column=2, sticky=E)
-
         textolgui,textol = outtextoutl(fluxt_val,snline_all,snline_fibre,snline_pspp,snline_1_aa,sourcet_val,snline_seeing,
           snline_1,snline_spaxel,snline_fibre1aa)
-        # output(textolgui, 1, frame1d, 5, 30, "12",1)
+
 
         if errind==0:       # ADDED FOR DJANGO
-            outtext=" "     # ADDED FOR DJANGO
+            outtext="No Warnings."     # ADDED FOR DJANGO
 
         # FOR DJANGO: This is for saving the output of calc() in the static folder.
         outputfilename="etc/static/etc/outputcalc.txt"
@@ -1205,14 +1186,19 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
             print >> f, textol
 
         # FOR DJANGO: Finally, return these outputs.
-        return {'outtext':outtext, 'texti':texti, 'textoc':textoc, 'textol':textol,\
-                'sourcespectrum':sourcespectrum, 'lamb':lamb, 'vph_val':vph_val}     # ADDED FOR DJANGO
+        return {'outtext' : outtext, 'texti' : texti, 'textoc' : textoc, 'textol' : textol,\
+                'sourcespectrum' : sourcespectrum, 'lamb' : lamb, 'vph_val' : vph_val,\
+                'fc' : fc, 'spect_val' : spect_val}     # ADDED FOR DJANGO
     # Avoiding computations in case of exception of errind
     else:
-        texti=" "       # ADDED FOR DJANGO
-        textoc=" "      # ADDED FOR DJANGO
-        textol=" "      # ADDED FOR DJANGO
-        outtext="** MEGARA ETC HELP "+outtext       # ADDED FOR DJANGO
+        spectdat = specttmplt_list[spect_list.index(spect_val)]
+        lamb, sourcespectrum = reading(spectdat,2)
+
+        texti = " "       # ADDED FOR DJANGO
+        textoc = " "      # ADDED FOR DJANGO
+        textol = " "      # ADDED FOR DJANGO
+        outtext = "** MEGARA ETC HELP "+outtext       # ADDED FOR DJANGO
         # return "\n** MEGARA ETC HELP **\n",outtext        # COMMENTED OUT FOR DJANGO
-        return {'outtext':outtext, 'texti':texti, 'textoc':textoc, 'textol':textol}     # ADDED FOR DJANGO
+        return {'outtext' : outtext, 'texti' : texti, 'textoc' : textoc, 'textol' : textol,\
+                'sourcespectrum' : sourcespectrum, 'lamb' : lamb}     # ADDED FOR DJANGO
         pass

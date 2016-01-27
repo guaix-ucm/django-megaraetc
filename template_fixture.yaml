@@ -1,0 +1,138 @@
+- fields: {name: Uniform, path: SPECTRA_0.1aa/uniform.dat}
+  model: etc.spectraltemplate
+  pk: 1
+- fields: {name: Elliptical, path: SPECTRA_0.1aa/Elliptical.dat}
+  model: etc.spectraltemplate
+  pk: 2
+- fields: {name: S0, path: SPECTRA_0.1aa/S0.dat}
+  model: etc.spectraltemplate
+  pk: 3
+- fields: {name: Sa, path: SPECTRA_0.1aa/Sa.dat}
+  model: etc.spectraltemplate
+  pk: 4
+- fields: {name: Sb, path: SPECTRA_0.1aa/Sb.dat}
+  model: etc.spectraltemplate
+  pk: 5
+- fields: {name: Sc, path: SPECTRA_0.1aa/Sc.dat}
+  model: etc.spectraltemplate
+  pk: 6
+- fields: {name: NGC1068, path: SPECTRA_0.1aa/NGC1068.dat}
+  model: etc.spectraltemplate
+  pk: 7
+- fields: {name: M21, path: SPECTRA_0.1aa/M21.dat}
+  model: etc.spectraltemplate
+  pk: 8
+- fields: {name: Starburst1, path: SPECTRA_0.1aa/Starburst1.dat}
+  model: etc.spectraltemplate
+  pk: 9
+- fields: {name: Starburst2, path: SPECTRA_0.1aa/Starburst2.dat}
+  model: etc.spectraltemplate
+  pk: 10
+- fields: {name: Starburst3, path: SPECTRA_0.1aa/Starburst3.dat}
+  model: etc.spectraltemplate
+  pk: 11
+- fields: {name: Starburst4, path: SPECTRA_0.1aa/Starburst4.dat}
+  model: etc.spectraltemplate
+  pk: 12
+- fields: {name: Starburst5, path: SPECTRA_0.1aa/Starburst5.dat}
+  model: etc.spectraltemplate
+  pk: 13
+- fields: {name: Starburst6, path: SPECTRA_0.1aa/Starburst6.dat}
+  model: etc.spectraltemplate
+  pk: 14
+- fields: {name: Bulge, path: SPECTRA_0.1aa/Bulge.dat}
+  model: etc.spectraltemplate
+  pk: 15
+- fields: {name: Liner, path: SPECTRA_0.1aa/Liner.dat}
+  model: etc.spectraltemplate
+  pk: 16
+- fields: {name: QSO, path: SPECTRA_0.1aa/QSO.dat}
+  model: etc.spectraltemplate
+  pk: 17
+- fields: {name: Sy1, path: SPECTRA_0.1aa/Sy1.dat}
+  model: etc.spectraltemplate
+  pk: 18
+- fields: {name: Sy2, path: SPECTRA_0.1aa/Sy2.dat}
+  model: etc.spectraltemplate
+  pk: 19
+- fields: {name: Orion, path: SPECTRA_0.1aa/Orion.dat}
+  model: etc.spectraltemplate
+  pk: 20
+- fields: {name: PN, path: SPECTRA_0.1aa/PN.dat}
+  model: etc.spectraltemplate
+  pk: 21
+- fields: {name: O5 V, path: SPECTRA_0.1aa/O5V.dat}
+  model: etc.spectraltemplate
+  pk: 22
+- fields: {name: O7 V, path: SPECTRA_0.1aa/O7V.dat}
+  model: etc.spectraltemplate
+  pk: 23
+- fields: {name: O9 V, path: SPECTRA_0.1aa/O9V.dat}
+  model: etc.spectraltemplate
+  pk: 24
+- fields: {name: B0 V, path: SPECTRA_0.1aa/B0V.dat}
+  model: etc.spectraltemplate
+  pk: 25
+- fields: {name: B1 V, path: SPECTRA_0.1aa/B1V.dat}
+  model: etc.spectraltemplate
+  pk: 26
+- fields: {name: B3 V, path: SPECTRA_0.1aa/B3V.dat}
+  model: etc.spectraltemplate
+  pk: 27
+- fields: {name: B5 V, path: SPECTRA_0.1aa/B5V.dat}
+  model: etc.spectraltemplate
+  pk: 28
+- fields: {name: B8 V, path: SPECTRA_0.1aa/B8V.dat}
+  model: etc.spectraltemplate
+  pk: 29
+- fields: {name: A1 V, path: SPECTRA_0.1aa/A1V.dat}
+  model: etc.spectraltemplate
+  pk: 30
+- fields: {name: A3 V, path: SPECTRA_0.1aa/A3V.dat}
+  model: etc.spectraltemplate
+  pk: 31
+- fields: {name: A5 V, path: SPECTRA_0.1aa/A5V.dat}
+  model: etc.spectraltemplate
+  pk: 32
+- fields: {name: F0 V, path: SPECTRA_0.1aa/F0V.dat}
+  model: etc.spectraltemplate
+  pk: 33
+- fields: {name: F2 V, path: SPECTRA_0.1aa/F2V.dat}
+  model: etc.spectraltemplate
+  pk: 34
+- fields: {name: F5 V, path: SPECTRA_0.1aa/F5V.dat}
+  model: etc.spectraltemplate
+  pk: 35
+- fields: {name: F8 V, path: SPECTRA_0.1aa/F8V.dat}
+  model: etc.spectraltemplate
+  pk: 36
+- fields: {name: G2 V, path: SPECTRA_0.1aa/G2V.dat}
+  model: etc.spectraltemplate
+  pk: 37
+- fields: {name: G5 I, path: SPECTRA_0.1aa/G5I.dat}
+  model: etc.spectraltemplate
+  pk: 38
+- fields: {name: G5 V, path: SPECTRA_0.1aa/G5V.dat}
+  model: etc.spectraltemplate
+  pk: 39
+- fields: {name: G8 V, path: SPECTRA_0.1aa/G8V.dat}
+  model: etc.spectraltemplate
+  pk: 40
+- fields: {name: K0 V, path: SPECTRA_0.1aa/K0V.dat}
+  model: etc.spectraltemplate
+  pk: 41
+- fields: {name: K4 V, path: SPECTRA_0.1aa/K4V.dat}
+  model: etc.spectraltemplate
+  pk: 42
+- fields: {name: K7 V, path: SPECTRA_0.1aa/K7V.dat}
+  model: etc.spectraltemplate
+  pk: 43
+- fields: {name: M2 V, path: SPECTRA_0.1aa/M2V.dat}
+  model: etc.spectraltemplate
+  pk: 44
+- fields: {name: M4 V, path: SPECTRA_0.1aa/M4V.dat}
+  model: etc.spectraltemplate
+  pk: 45
+- fields: {name: M6 V, path: SPECTRA_0.1aa/M6V.dat}
+  model: etc.spectraltemplate
+  pk: 46

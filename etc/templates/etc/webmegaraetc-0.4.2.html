@@ -8,9 +8,9 @@
 <HEAD>
     <TITLE>MEGARA Online Exposure Time Calculator</TITLE>
 <!--LOAD CSS file-->
-    <LINK HREF="{% static 'etc/webmegaraetc-0.4.1.css' %}" REL="stylesheet" TYPE="text/css" />
+    <LINK HREF="{% static 'etc/webmegaraetc-0.4.2.css' %}" REL="stylesheet" TYPE="text/css" />
 <!--LOAD javascript file-->
-    <SCRIPT SRC="{% static 'etc/webmegaraetc-0.4.1.js' %}"></SCRIPT>
+    <SCRIPT SRC="{% static 'etc/webmegaraetc-0.4.2.js' %}"></SCRIPT>
 <!--ADD this chunk for doing onload submit-->
     <!--<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>-->
     <script type="text/javascript" src="{% static 'etc/jquery.min.js' %}"></script>
@@ -35,7 +35,7 @@
                     <TD class="maintitletd">
                         MEGARA Online<BR />
                         Exposure Time Calculator <BR />
-                        (v0.4.1)
+                        (v0.4.2)
                     </TD>
                     <TD class="megaralogotd">
                         <IMG SRC="{% static 'etc/images/megara_logo.gif' %}" WIDTH=150px />
@@ -51,8 +51,8 @@
             <FORM id="myform" action="{% url 'etc:results' %}" method="get" target="my_iframe">
             <TABLE id="tabletarget">
                 <TR id="TRtarget">
-                    <TD class="tdstype">Source type:<BR /><BR /><FONT id="sizet">Size:</FONT></TD>
-                    <TD WIDTH=25% ALIGN="left" valign="top">
+                    <TD class="tdstype" valign="center">Source type:<BR /><BR /><FONT id="sizet">Size:</FONT></TD>
+                    <TD WIDTH=30% ALIGN="left" valign="top">
                         {{ form1.stype }}
 
                         {{ form1.size }}
@@ -61,19 +61,23 @@
                             <INPUT TYPE="BUTTON" VALUE="?">
                         </a>
                     </TD>
+
                     <TD WIDTH=2% ALIGN="center">
+                        <!--- This is a buffer --->
                     </TD>
+
                     <TD WIDTH=25% ALIGN="right" valign="top">
                         Continuum band:
                     </TD>
-                    <TD WIDTH=16% valign="top">
+                    <TD WIDTH=30% valign="top">
                         {{ form1.pfilter }}
                     </TD>
-                    <TD WIDTH=5% ALIGN="center">
+                    <TD WIDTH=20% ALIGN="center">
+
                     </TD>
                 </TR>
                 <TR id="TRtarget">
-                    <TD class="inputfluxtd">
+                    <TD class="inputfluxtd" valign="top">
                         Input flux:
                     </TD>
                     <TD valign="top">
@@ -81,7 +85,7 @@
                     </TD>
                     <TD>
                     </TD>
-                    <TD>
+                    <TD ALIGN="left" valign="center" >
                         {{ form1.contmagflux }}
                     </TD>
                     <TD valign="top" style="padding:3px 0 0 0">
@@ -217,28 +221,55 @@
             <CENTER><P>Observational Setup</P></CENTER>
             <TABLE width=100% border=0>
                 <TR>
-                    <TD WIDTH=20% ALIGN="right">
-                        Exptime (sec):
+                    <TD WIDTH="20%" ALIGN="right">
+                        Num. shots:
                     </TD>
-                    <TD WIDTH=2% ALIGN="left">
-                        {{ form4.exptime }}
+                    <TD WIDTH="2%" ALIGN="left">
+                        {{ form4.numshot }}
                     </TD>
-                    <TD WIDTH=20% ALIGN="right">
+                    <TD WIDTH="1%" >
+                        <!--- This is a buffer --->
+                    </TD>
+                    <TD WIDTH="15%" >
+                        <!--- This is a buffer --->
+                    </TD>
+                    <TD WIDTH="1%" >
+                        <!--- This is a buffer --->
+                    </TD>
+                    <TD WIDTH="1%" >
+                        <!--- This is a buffer --->
+                    </TD>
+	            </TR>
+                <TR>
+                    <TD ALIGN="right">
+                        Exptime per shot (sec):
+                    </TD>
+                    <TD ALIGN="left">
+                        {{ form4.exptimepshot }}
+                    </TD>
+                    <TD>
+
+                    </TD>
+                    <TD ALIGN="right">
                         <FONT ID="greylineap">Line aperture: </FONT>
                     </TD>
-                    <TD WIDTH=17% ALIGN="left">
+                    <TD ALIGN="left">
                         {{ form4.lineap }}
+                    </TD>
+                    <TD>
                         <a href="Javascript:newPopup(' {% static 'etc/help/lineaperture.txt' %} ');">
                             <INPUT TYPE="BUTTON" VALUE="?" />
                         </a>
                     </TD>
                 </TR>
                 <TR>
-                    <TD ALIGN="right" valign="top" style="padding:3 0 0 0" >
+                    <TD ALIGN="right" valign="top" style="padding:7 0 0 0" >
                         (*)No. of sky fibers:
                     </TD>
                     <TD ALIGN="left">
                         {{ form4.nfibers }}
+                    </TD>
+                    <TD>
                         <a href="Javascript:newPopup(' {% static 'etc/help/skyfiber.txt' %} ');">
                             <INPUT TYPE="BUTTON" VALUE="?" />
                         </a>
@@ -248,6 +279,8 @@
                     </TD>
                     <TD ALIGN="left">
                         {{ form4.contap }}
+                    </TD>
+                    <TD>
                         <a href="Javascript:newPopup(' {% static 'etc/help/continuumaperture.txt' %} ');">
                             <INPUT TYPE="BUTTON" VALUE="?" />
                         </a>
@@ -328,16 +361,19 @@
             <iframe id="my_iframe" name="my_iframe" src="{% url 'etc:results' %}">
             </iframe>
         </div>
+
         <HR>
-        MEGARA Online Exposure Time Calculator version 0.4.1<BR />
+        MEGARA Online Exposure Time Calculator version 0.4.2<BR />
         ported to DJANGO version 1.8.6 by Alexandre Y. K. BOUQUIN<BR />
+
         <div style="float:right">
-            Last modified on:
+            Released on: Monday, 01/31/2000. Last modified on:
             <SCRIPT LANGUAGE="JavaScript">
             document.write(document.lastModified);
             </SCRIPT>
         </div>
     </DIV>
+
 <!--CLOSE WRAPPER-->
 </DIV>
 </BODY>

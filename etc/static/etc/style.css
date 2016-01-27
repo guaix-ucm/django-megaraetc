@@ -83,13 +83,13 @@ p {
 }
 
 #result_content {
-    font
     width: 100%;
     font-size: 15pt;
     margin: 0 auto;
 }
 
 #result_header {
+    color: red;
     text-align: left;
     vertical-align: top;
 }

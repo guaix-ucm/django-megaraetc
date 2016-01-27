@@ -3,9 +3,9 @@
 The SNRs of the line input flux distribution expected for the input observational and instrumental setup, and for the input atmospheric conditions are provided.
 
 In case the input source is punctual, the provided SNRs are for(*1):
- * per arcsec and per Armstrong in the detector(*2);
+ * per arcsec and per Angstrom in the detector(*2);
  * in one fibre, in the selected line spectral aperture(*3);
- * in one fibre per Armstrong(*2);
+ * in one fibre per Angstrom(*2);
  * per voxel(*4,*5);
  * per detector pixel(*6);
  * the total source area, in the selected line spectral aperture(*3).
@@ -15,7 +15,7 @@ In case the input source is punctual, the provided SNRs are for(*1):
  * for 1 arcsec**2, in the selected line spectral aperture(*).
  
  Note: (*1) Considering that all the line flux is completely enclosed into the FWHM of the line.
-         (*2) Assuming a spectral aperture of 1 Armstrong.
+         (*2) Assuming a spectral aperture of 1 Angstrom.
          (*3) Assuming the selected spectral apertures for line and continuum subtraction indicated as inputs. If you want to know exactly the SNR in 1 line FWHM, set the spectral apertures of line to 1 (i.e., to one line FWHM).
          (*4) Assuming one spectral FWHM as spectral aperture (i.e., the FWHM of the selected VPH).
          (*5) A voxel is the minimum spatial and spectral resolution element sampled. In our case, a voxel is the projection of the whole fibre (minimum spatial resolution element) into the FWHM of the VPH in the spectral direction (minimum spectral resolution element according to the Nyquist-Shanon sampling theorem). The FWHM of all VPHs in MEGARA is projected onto 3.6 spectral pixels in LCB/MOS and onto 2.5 pixels by design.

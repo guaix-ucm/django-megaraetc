@@ -2,14 +2,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def plot_and_save(x, y, label):
+def plot_and_save2(x, y, label):
 
-    output = "etc/static/etc/plot_test.png"
+    output = "etc/static/etc/plot_test2.png"
     # NEED TO REMOVE THE CANVAS FIRST OR IT OVERPLOTS
     plt.clf()
 
     plt.xlabel("Wavelength Angstroms")
-    plt.ylabel("Flux (integrated area normalized to 1)")
+    plt.ylabel("Source Flux")
 
     xmin = min(x)
     xmax = max(x)
@@ -19,7 +19,7 @@ def plot_and_save(x, y, label):
     plt.xlim(xmin, xmax)
     plt.ylim(ymin, ymax)
 
-    plt.plot(x, y, '-r', label=label)
+    plt.plot(x, y, '-b', label=label)
     plt.legend()
     plt.savefig(output, format='png', dpi=72)
     return output
