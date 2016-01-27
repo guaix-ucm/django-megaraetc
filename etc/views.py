@@ -12,6 +12,7 @@ from justcalc import calc
 from plot1 import plot_and_save
 from plot2 import plot_and_save2
 
+import numpy
 
 def compute5(request):
     sourcet_val = request.GET['stype']

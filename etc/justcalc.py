@@ -17,7 +17,7 @@ from .models import SpectralTemplate, VPHSetup
 
 ####################
 def reading(filename, skipline):
-    alldata = pkgutil.get_data('megara.etc', "data/%s" % filename)
+    alldata = pkgutil.get_data('etc', "data/%s" % filename)
     psfile = StringIO(alldata)
     return numpy.loadtxt(psfile, unpack=True)
 
