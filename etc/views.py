@@ -6,7 +6,7 @@ from .forms import TargetForm, InstrumentForm
 from .models import PhotometricFilter
 from .models import SpectralTemplate, VPHSetup
 
-from obsolete.tkgui import *
+# from obsolete.tkgui import *
 
 from justcalc import calc
 from plot1 import plot_and_save

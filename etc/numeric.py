@@ -198,7 +198,7 @@ def specpar(om_val, xit, disp, ps, nfibres, nfibresy, areafibre, rfibre,  deltab
         else:    
             omegasource = areasource    
 
-        npixx = deltab / disp    
+        npixx = deltab / disp  # lambda range of vph (in angstroms) / (angstrom per pixel)
         npixy = 2. * rfibre / ps    
         omegaskysource = areafibre    
         nfib = 0. # Default value
