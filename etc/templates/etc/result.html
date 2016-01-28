@@ -14,21 +14,24 @@
 
 <!--<p>RESULTS</p>-->
         <div id="result_header">
-            {{ outtext|linebreaksbr }} <BR /><BR />
+            <img id="img_plot1" src="{% static 'etc/plot_test.png' %}" />
+            <img id="img_plot1" src="{% static 'etc/plot_test2.png' %}" /><BR /><BR />
         </div>
         <div id="result_left">
-            {{ textcout|linebreaksbr }}
+            {{ outtext|linebreaksbr }} <BR /><BR />
+            {{ textcout|linebreaksbr }}<BR /><BR />
         </div>
         <div id="result_center">
+            <BR /><BR />
             {{ textlout|linebreaksbr }}
+            <BR /><BR />
         </div>
         <div id="result_right">
-            PLOTS:<BR>
-            <img id="img_plot1" src="{% static 'etc/plot_test.png' %}" /><BR /><BR />
-            <img id="img_plot1" src="{% static 'etc/plot_test2.png' %}" />
+            <BR /><BR />
+            {{ textinput|linebreaksbr }}
+            <BR /><BR />
         </div>
         <div id="result_bottom">
-            {{ textinput|linebreaksbr }}
         </div>
     </div>
     <!---->

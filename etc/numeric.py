@@ -405,7 +405,7 @@ def signal(farcs, dlambda, lambdaeff, eff, st, omega, expt, ep, wv):
         # Integrate in range to derive value    
         integ = tvalue * dlambda
 
-    return integ            
+    return integ, total
 
 # ********************************
 # Function linesignal: Number of photons from the source if input flux is a line

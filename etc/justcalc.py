@@ -126,28 +126,28 @@ def outtextinp(om_val, bandc_val, sourcet_val, mag_val, netflux, size_val,
                nfwhmline_val, cnfwhmline_val, resolvedline_val, bandsky):
 
     if sourcet_val == "P":
-        text = '* Source type: Point\n  Continuum: %s=%5.3f mag\n' % (bandc_val,mag_val)
-        text = text + '  Flux =%7.3e cgs\n' % (netflux)
+        text = '* Source type: Point\n  Continuum: %s = %5.3f mag\n' % (bandc_val,mag_val)
+        text = text + '  Continuum Flux = %7.3e cgs\n' % (netflux)
     else:
-        text = '* Source type: Extended\n  Continuum: V=%5.3f mag/arcsec**2\n' % (mag_val)
-        text = text + '  Flux =%7.3e cgs\n' % (netflux)
-        text = text + '  Size=%5.2f arcsec**2\n' % (size_val)
+        text = '* Source type: Extended\n  Continuum: V = %5.3f mag/arcsec**2\n' % (mag_val)
+        text = text + '  Flux = %7.3e cgs\n' % (netflux)
+        text = text + '  Size = %5.2f arcsec**2\n' % (size_val)
 
     if seeingx >= (2. * math.sqrt (size_val / pi)) and sourcet_val == "E":
         text = text + '  ** SEEING-DOMINATED ** \n'
 
     if fluxt_val == "L":
-        text =  text + '  Line: Lambda=%7.1f AA\n  Flux =%7.3e cgs\n  FWHM=%3.1f AA\n' % (wline_val, fline_val, fwhmline_val)
+        text =  text + '  Line: Lambda = %7.1f AA\n  Line: Flux = %7.3e cgs\n  Line: FWHM = %3.1f AA\n' % (wline_val, fline_val, fwhmline_val)
         if resolvedline_val == "N":
             text = text + '  ** Non-resolved line **\n  ** Line FWHM set by VPH **\n'
 
 
-    text = text + '* Instrument: Obs. Mode=%3s\n' % (om_val)
-    text = text + '  VPH=%10s\n' % (vph_val)
+    text = text + '* Instrument: \n  Obs. Mode = %3s\n' % (om_val)
+    text = text + '  VPH = %10s\n' % (vph_val)
 
-    text = text + '* Sky: Moon=%6s\n  Airmass: X=%3.2f\n  Seeing(@X=1)=%4.2f\n' % (moon_val, airmass_val, seeing_zenith)
-    text = text + '  Sky-flux(%s,@X)=%7.3e cgs\n  Seeing(@X)=%4.2f\n' % (bandsky, fsky, seeingx)
-    text = text + '* Observation: Num. of shots=%6i\n Exptime/shot=%7.1f\n Total Exptime=%7.1f\n NP_Dark=%6i\n  Sky-bundles=%i\n' % (numshot_val, exptimepshot_val, exptime_val, npdark_val, nsbundles_val)
+    text = text + '* Sky: \n  Moon = %6s\n  Airmass: X = %3.2f\n  Seeing(@X=1) = %4.2f\n' % (moon_val, airmass_val, seeing_zenith)
+    text = text + '  Sky-flux(%s,@X) = %7.3e cgs\n  Seeing(@X) = %4.2f\n' % (bandsky, fsky, seeingx)
+    text = text + '* Observation: \n Num. of shots = %6i\n Exptime/shot = %7.1f\n Total Exptime = %7.1f\n NP_Dark = %6i\n  Sky-bundles = %i\n' % (numshot_val, exptimepshot_val, exptime_val, npdark_val, nsbundles_val)
 
     if fluxt_val == "L":
         text =  text + '  Spectral apertures:\n    For line=%2i\n    For continuum=%2i\n' % (nfwhmline_val, cnfwhmline_val)
@@ -231,11 +231,11 @@ def outtextoutl(fluxt_val,snline_all,snline_fibre,snline_pspp,snline_1_aa,source
 
         # Output in 1 arcsec**2 (only if source is extended, different from previous one)
         # In 1 AA and 1 arcsec in spatial direction
-        text = '* S/N per arcsec per AA= %4.2f\n' % (snline_1_aa)
+        text = '* S/N per arcsec per AA = %4.2f\n' % (snline_1_aa)
 
         # Output in one fibre, the whole line
-        text = text + '* S/N in 1 fibre (in aperture)= %4.2f\n' % (snline_fibre)
-        text = text + '* S/N in 1 fibre (in 1 AA)= %4.2f\n' % (snline_fibre1aa)
+        text = text + '* S/N in 1 fibre (in aperture) = %4.2f\n' % (snline_fibre)
+        text = text + '* S/N in 1 fibre (in 1 AA) = %4.2f\n' % (snline_fibre1aa)
 
         # Output per voxel: in one spectral FWHM * dimension of fibre in spatial direction
         text = text + '* S/N per voxel = %4.2f\n' % (snline_spaxel)  # OJO: el nombre de esta variable no parece apropiado (NCL's comment)
@@ -244,7 +244,7 @@ def outtextoutl(fluxt_val,snline_all,snline_fibre,snline_pspp,snline_1_aa,source
         text = text + '* S/N per detector pixel = %4.2f\n' % (snline_pspp)
 
         # Output in all source area in the whole line (considering FWHM of line)
-        text = text + '* S/N total (in aperture)= %4.2f\n' % (snline_all)
+        text = text + '* S/N total (in aperture) = %4.2f\n' % (snline_all)
 
         # For the whole line, if extended source:
         if sourcet_val == "E":
@@ -909,10 +909,10 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
             npixsky = (omegasky / omegaskysource) * npix
 
             # Source continuum signal in defined spectral and spatial resolution element
-            signalcont = signal(fc, deltalambda, lambdaeff, effsys, stel, omegasource, exptime_val, enph, lamb)
+            signalcont, totalcont = signal(fc, deltalambda, lambdaeff, effsys, stel, omegasource, exptime_val, enph, lamb)
 
             # Sky signal in defined spectral and spatial resolution element
-            signalsky = signal(fs, deltalambda, lambdaeff, effsys, stel, omegaskysource, exptime_val, enph, lamb)
+            signalsky, totalsky = signal(fs, deltalambda, lambdaeff, effsys, stel, omegaskysource, exptime_val, enph, lamb)
 
             # Dark signal
             signaldark = dark(exptime_val, dc, npix)
@@ -925,7 +925,7 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
 
             # Noise due to sky substraction
             # Sky signal *MEASURED* in defined spectral and spatial resolution element
-            signalskymeasured = signal(fs, deltalambda,  lambdaeff, effsys, stel, omegasky, exptime_val, enph, lamb)
+            signalskymeasured, totalskymeasured = signal(fs, deltalambda,  lambdaeff, effsys, stel, omegasky, exptime_val, enph, lamb)
             ronoiseskymeasured = readoutnoise(npixsky, ron)
             signaldarkskymeasured = dark(exptime_val, dc, npixsky)
             noisedarksqskymeasured = darknoisesq(npixsky, npdark_val, exptime_val, dc, ron)
@@ -937,6 +937,12 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
 
             # Signal-to-noise of continuum
             sncont = signalcont / noisecont
+            # TEST TEST TEST
+            sncont_total = []
+            for idxcont, valcont in enumerate(totalcont):
+                snval = totalcont[idxcont] / noisecont
+                sncont_total.append(snval)
+
 
             if xit == 0: # P2SP (per 2 spectral pixels), All area
                 sncont_p2sp_all = sncont
@@ -955,15 +961,27 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
                 nfib1def = nfib1
             elif xit == 7: # 1AA, 1 arcsec2
                 sncont_1aa_1 = sncont
+                print 'xit=7 :', sncont
             elif xit == 8: # Bandwidth, 1 arcsec2
                 sncont_band_1 = sncont
+                print 'xit=8 :', sncont
             elif xit == 9: # P2SP, 1 fibre
                 sncont_p2sp_fibre = sncont
+                print 'xit=9 :', sncont_p2sp_fibre
                 # PSP (per spectral pixel), per spatial pixel
-                sncont_psp_pspp = sncont / numpy.sqrt(16.)
+                sncont_psp_pspp = sncont / 4  #numpy.sqrt(16.)
+                print 'xit=9 /4 :', sncont_psp_pspp
+                totalcont_test = totalcont / 4
+                totalsky_test = totalsky / 4
+
+                totalsn_test = []
+                for idxsn, valsn in enumerate(sncont_total):
+                    divsn = sncont_total[idxsn] / 4
+                    totalsn_test.append(divsn)
+
             elif xit == 10: # 1AA, 1 fibre
                 sncont_1aa_fibre = sncont
-                print sncont_1aa_fibre
+                print 'xit=10 :', sncont_1aa_fibre
             elif xit == 11: # Bandwidth, 1 fibre
                 sncont_band_fibre = sncont
 
@@ -1175,7 +1193,8 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
 
 
         if errind==0:       # ADDED FOR DJANGO
-            outtext="No Warnings."     # ADDED FOR DJANGO
+            # outtext="No Warnings."     # ADDED FOR DJANGO
+            outtext = ""
 
         # FOR DJANGO: This is for saving the output of calc() in the static folder.
         outputfilename="etc/static/etc/outputcalc.txt"
@@ -1187,8 +1206,10 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
 
         # FOR DJANGO: Finally, return these outputs.
         return {'outtext' : outtext, 'texti' : texti, 'textoc' : textoc, 'textol' : textol,\
-                'sourcespectrum' : sourcespectrum, 'lamb' : lamb, 'vph_val' : vph_val,\
-                'fc' : fc, 'spect_val' : spect_val}     # ADDED FOR DJANGO
+                'sourcespectrum' : sourcespectrum, 'lamb' : lamb,\
+                'vph_val' : vph_val, 'spect_val' : spect_val, 'bandc_val' : bandc_val,\
+                'fc' : fc, 'totalcont_test' : totalcont_test, 'totalsky_test' : totalsky_test,\
+                'totalsn_test' : totalsn_test}     # ADDED FOR DJANGO
     # Avoiding computations in case of exception of errind
     else:
         spectdat = specttmplt_list[spect_list.index(spect_val)]

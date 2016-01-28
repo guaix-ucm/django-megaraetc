@@ -80,42 +80,56 @@ p {
 #result_wrapper {
     width: 100%;
     margin: 10 auto;
+    text-align: center;
 }
 
 #result_content {
-    width: 100%;
+    width: 951px;
     font-size: 15pt;
     margin: 0 auto;
+    padding: auto;
+    text-align: center;
 }
 
 #result_header {
+    width: 90%;
+    display: inline-block;
     color: red;
     text-align: left;
     vertical-align: top;
+    margin: 0 auto;
+    padding: auto;
+    border-style: groove;
 }
 
 #result_left {
+    width: 30%;
     display: inline-block;
     text-align: left;
     vertical-align: top;
     margin: 0 auto;
-    padding: auto;
+    /*padding: auto;*/
+    border-style: groove;
 }
 
 #result_center {
+    width: 30%;
     display: inline-block;
     text-align: left;
     vertical-align: top;
     margin: 0 auto;
-    padding: auto;
+    /*padding: auto;*/
+    border-style: groove;
 }
 
 #result_right {
+    width: 30%;
     display: inline-block;
-    text-align: center;
+    text-align: left;
     vertical-align: top;
     margin: 0 auto;
-    padding: auto;
+    /*padding: auto;*/
+    border-style: groove;
 }
 
 #result_bottom {
@@ -123,9 +137,9 @@ p {
     vertical-align: middle;
     width:100%;
     margin: 50 auto;
-    padding: 10 10 10 10;
+    /*padding: 10 10 10 10;*/
 }
 
 #img_plot1 {
-    width: 300px;
+    width: 400px;
 }

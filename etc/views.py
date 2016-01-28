@@ -9,8 +9,7 @@ from .models import SpectralTemplate, VPHSetup
 # from obsolete.tkgui import *
 
 from justcalc import calc
-from plot1 import plot_and_save
-from plot2 import plot_and_save2
+from plot1 import plot_and_save, plot_and_save2
 
 import numpy
 
@@ -190,7 +189,7 @@ def etc_do(request):
         #
         tocheck = str(outputofcalc['outtext'])
         if not tocheck:
-            outtextstring = "No warning."
+            outtextstring = ""  #No warning.
         else:
             outtextstring = tocheck
 
@@ -202,25 +201,33 @@ def etc_do(request):
         queryspec = SpectralTemplate.objects.filter(pk=spec).values()
         entry_spec_name = queryspec[0]['name']
 
-        if vph_val != '-empty-':
+        if not tocheck:
             x = outputofcalc['lamb']
-            y = outputofcalc['sourcespectrum']
+            y = outputofcalc['fc']
             label = entry_spec_name
             # x2 = [0,1,2]
             # y2 = [0,1,2]
             x2 = outputofcalc['lamb']
-            y2 = outputofcalc['fc']
+            y2 = outputofcalc['totalcont_test']
+            x2b = outputofcalc['lamb']
+            y2b = outputofcalc['totalsn_test']
             label2 = entry_spec_name
+            label2b = vph_val
+            label2c = outputofcalc['bandc_val']
         else:
             x = numpy.arange(1, 100, 1)
             y = numpy.arange(1, 100, 1)
             x2 = numpy.arange(1, 100, 1)
             y2 = numpy.arange(1, 100, 1)
+            x2b = numpy.arange(1, 100, 1)
+            y2b = numpy.arange(1, 100, 1)
 
             label = "none"
             label2 = "none"
+            label2b = "none"
+            label2c = "none"
         graphic = plot_and_save(x, y, label)
-        graphic2 = plot_and_save2(x2, y2, label2)
+        graphic2 = plot_and_save2(x2, y2, x2b, y2b, label2, label2b, label2c)
 
         inputstring = str(outputofcalc['texti'])
         coutputstring = str(outputofcalc['textoc'])
