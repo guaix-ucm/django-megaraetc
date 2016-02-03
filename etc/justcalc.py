@@ -970,14 +970,15 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
                 print 'xit=9 :', sncont_p2sp_fibre
                 # PSP (per spectral pixel), per spatial pixel
                 sncont_psp_pspp = sncont / 4  #numpy.sqrt(16.)
-                print 'xit=9 /4 :', sncont_psp_pspp
-                totalcont_test = totalcont / 4
-                totalsky_test = totalsky / 4
 
-                totalsn_test = []
-                for idxsn, valsn in enumerate(sncont_total):
-                    divsn = sncont_total[idxsn] / 4
-                    totalsn_test.append(divsn)
+                # print 'xit=9 /4 :', sncont_psp_pspp
+                # totalcont_test = totalcont / 4
+                # totalsky_test = totalsky / 4
+
+                # totalsn_test = []
+                # for idxsn, valsn in enumerate(sncont_total):
+                #     divsn = sncont_total[idxsn] / 4
+                #     totalsn_test.append(divsn)
 
             elif xit == 10: # 1AA, 1 fibre
                 sncont_1aa_fibre = sncont
@@ -987,6 +988,56 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
 
         # End of FOR loop for computations
         pass
+
+        # FOR COMPUTING SNR per detector pixel at each lamb (not just lambdaeff)
+        # we need to recompute the SNR as above but just for the case of SNR per detector pixel
+        # and replacing in the function signal(), lambdaeff by lamb.
+        # Then,
+        xit=9
+        # Deriving spectroscopic parameters for each case:
+        deltalambda, omegasource, npixx, npixy, nfib, nfib1, omegaskysource, omegasource = specpar(om_val, xit, disp, ps,
+         nfibres, nfibresy, areafibre, rfibre,  deltab, areasource, diamsource, areaseeing, seeingx)
+
+        # Number of pixels in detector under consideration: just counting the factor in area
+        # when we consider the used sky minibundles
+        npix = npixx * npixy
+        npixsky = (omegasky / omegaskysource) * npix
+
+        # Source continuum signal in defined spectral and spatial resolution element
+        signalcont, totalcont = signal(fc, deltalambda, lamb, effsys, stel, omegasource, exptime_val, enph, lamb)
+
+        # Sky signal in defined spectral and spatial resolution element
+        signalsky, totalsky = signal(fs, deltalambda, lamb, effsys, stel, omegaskysource, exptime_val, enph, lamb)
+
+        # Dark signal
+        signaldark = dark(exptime_val, dc, npix)
+
+        # Noise due to dark measurement to the square
+        noisedarksq = darknoisesq(npix, npdark_val, exptime_val, dc, ron)
+
+        # RON
+        ronoise = readoutnoise(npix, ron)
+
+        # Noise due to sky substraction
+        # Sky signal *MEASURED* in defined spectral and spatial resolution element
+        signalskymeasured, totalskymeasured = signal(fs, deltalambda,  lamb, effsys, stel, omegasky, exptime_val, enph, lamb)
+        ronoiseskymeasured = readoutnoise(npixsky, ron)
+        signaldarkskymeasured = dark(exptime_val, dc, npixsky)
+        noisedarksqskymeasured = darknoisesq(npixsky, npdark_val, exptime_val, dc, ron)
+
+        noiseskysq = (omegaskysource / omegasky)**2 * (signalskymeasured + ronoiseskymeasured + signaldarkskymeasured + noisedarksqskymeasured)
+
+        # Source continuum noise in defined spectral and spatial resolution element
+        noisecont_psp_pspp = []
+        totalsn_psp_pspp = []
+        for idxno, valno in enumerate(signalcont):
+            noisecont_val = math.sqrt(signalcont[idxno] + signalsky[idxno] + signaldark + ronoise + noisedarksq + noiseskysq[idxno])
+            noisecont_psp_pspp.append(noisecont_val)
+            # Signal-to-noise of continuum
+            sncont_val = signalcont[idxno] / (noisecont_val*4)
+            totalsn_psp_pspp.append(sncont_val)
+        ### END COMPUTATION OF SNR_PSP_PSPP
+
 
         ###################
         # In case of line #
@@ -1015,7 +1066,7 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
                 # Continuum signal in defined spatial resolution element, in deltalambda.
                 # (If no. of line FWHMs selected is deltalambda to derive the line signal).
                 # Extract continuum at the wavelength.
-                ind = numpy.where(lamb ==  wline_val)
+                ind = numpy.where(lamb == wline_val)
                 contatline= fc[ind]
 
                 signalcont_line = linesignal(contatline, deltalambda, effsys, stel, omegasource,
@@ -1208,8 +1259,8 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
         return {'outtext' : outtext, 'texti' : texti, 'textoc' : textoc, 'textol' : textol,\
                 'sourcespectrum' : sourcespectrum, 'lamb' : lamb,\
                 'vph_val' : vph_val, 'spect_val' : spect_val, 'bandc_val' : bandc_val,\
-                'fc' : fc, 'totalcont_test' : totalcont_test, 'totalsky_test' : totalsky_test,\
-                'totalsn_test' : totalsn_test}     # ADDED FOR DJANGO
+                'fc' : fc,\
+                'totalsn_psp_pspp' : totalsn_psp_pspp}     # ADDED FOR DJANGO
     # Avoiding computations in case of exception of errind
     else:
         spectdat = specttmplt_list[spect_list.index(spect_val)]

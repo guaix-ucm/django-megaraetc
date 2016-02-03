@@ -4,15 +4,6 @@
 
 <div id="result_wrapper">
     <div id="result_content">
-<!--<p>Method: {{ request.method }}</p>-->
-<!--<p>GET Input parameters</p>-->
-<!--<ul>-->
-<!--{% for key, val in request.GET.items %}-->
-    <!--<li>{{ key }} = {{ val }}</li>-->
-<!--{% endfor %}-->
-<!--</ul>-->
-
-<!--<p>RESULTS</p>-->
         <div id="result_header">
             <img id="img_plot1" src="{% static 'etc/plot_test.png' %}" />
             <img id="img_plot1" src="{% static 'etc/plot_test2.png' %}" /><BR /><BR />
@@ -35,7 +26,7 @@
         </div>
     </div>
     <!---->
-</div>
+</div><!-- CLOSING WRAPPER -->
 
 
 
@@ -71,8 +62,15 @@ COMPARE GET PARAM WITH INPUT PARAM!
 </ul>
 {% endcomment %}
 
+<!--<p>Method: {{ request.method }}</p>-->
+<!--<p>GET Input parameters</p>-->
+<!--<ul>-->
+<!--{% for key, val in request.GET.items %}-->
+    <!--<li>{{ key }} = {{ val }}</li>-->
+<!--{% endfor %}-->
+<!--</ul>-->
 
-
+<!--<p>RESULTS</p>-->
 
 
 {% comment "Optional note" %}
