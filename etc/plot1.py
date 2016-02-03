@@ -24,25 +24,25 @@ def plot_and_save(x, y, label1):
     plt.savefig(output, format='png', dpi=72)
     return output
 
-def plot_and_save2(x, y, x2, y2, label, label2, label3):
+def plot_and_save2(x2, y2, label, label2, label3):
 
     output = "etc/static/etc/plot_test2.png"
     # NEED TO REMOVE THE CANVAS FIRST OR IT OVERPLOTS
     plt.clf()
 
     plt.xlabel("Wavelength Angstroms")
-    plt.ylabel("SNR per detector pixel per AA")
+    plt.ylabel("SNR per detector pixel")
 
-    filtx, filty, filty2 = ([] for i in range(3))
+    filtx2, filty, filty2 = ([] for i in range(3))
 
-    for idx, val in enumerate(y):
+    for idx, val in enumerate(y2):
         if val != 0:
-            filtx.append(x[idx])
-            filty.append(y[idx])
+            filtx2.append(x2[idx])
+            # filty.append(y[idx])
             filty2.append(y2[idx])
 
-    xmin = min(filtx)
-    xmax = max(filtx)
+    xmin = min(filtx2)
+    xmax = max(filtx2)
     ymin = min(filty2)
     ymax = max(filty2)
     diffx = xmax - xmin
@@ -52,7 +52,7 @@ def plot_and_save2(x, y, x2, y2, label, label2, label3):
     plt.ylim(ymin, ymax)
 
     # plt.plot(filtx, filty, '-b', label='continuum signal')
-    plt.plot(filtx, filty2, '-r', label='total snr')
+    plt.plot(filtx2, filty2, '-r', label='total snr')
     string1 = "Source spectrum: "+label
     string2 = "VPH: "+label2
     string3 = "Phot. band: "+label3

@@ -207,10 +207,10 @@ def etc_do(request):
             label = entry_spec_name
             # x2 = [0,1,2]
             # y2 = [0,1,2]
-            x2 = outputofcalc['lamb']
-            y2 = outputofcalc['totalcont_test']
+            # x2 = outputofcalc['lamb']
+            # y2 = outputofcalc['totalcont_test']
             x2b = outputofcalc['lamb']
-            y2b = outputofcalc['totalsn_test']
+            y2b = outputofcalc['totalsn_psp_pspp']
             label2 = entry_spec_name
             label2b = vph_val
             label2c = outputofcalc['bandc_val']
@@ -227,7 +227,7 @@ def etc_do(request):
             label2b = "none"
             label2c = "none"
         graphic = plot_and_save(x, y, label)
-        graphic2 = plot_and_save2(x2, y2, x2b, y2b, label2, label2b, label2c)
+        graphic2 = plot_and_save2(x2b, y2b, label2, label2b, label2c)
 
         inputstring = str(outputofcalc['texti'])
         coutputstring = str(outputofcalc['textoc'])
