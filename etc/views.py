@@ -102,15 +102,15 @@ def compute5(request):
         moon_val = request.GET['moonph']
         airmass_val = float(request.GET['airmass'])
         seeing_val = float(request.GET['seeing'])
-        numshot_val = float(request.GET['numshot'])
-        exptimepshot_val = float(request.GET['exptimepshot'])
+        numframes_val = float(request.GET['numframes'])
+        exptimepframe_val = float(request.GET['exptimepframe'])
         nsbundles_val = int(request.GET['nfibers'])
 
         outputofcalc = calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
                             fline_val,wline_val,nfwhmline_val,cnfwhmline_val,
                             fwhmline_val,resolvedline_val,spect_val,bandc_val,\
                             om_val,vph_val,moon_val,airmass_val,seeing_val,\
-                            numshot_val,exptimepshot_val,nsbundles_val)
+                            numframes_val,exptimepframe_val,nsbundles_val)
 
 
     # cleanstring = string1.replace("\'", '\n')
@@ -204,14 +204,21 @@ def etc_do(request):
         if not tocheck:
             x = outputofcalc['lamb']
             y = outputofcalc['fc']
-            label = entry_spec_name
-            # x2 = [0,1,2]
-            # y2 = [0,1,2]
-            # x2 = outputofcalc['lamb']
-            # y2 = outputofcalc['totalcont_test']
-            x2b = outputofcalc['lamb']
-            y2b = outputofcalc['totalsn_psp_pspp']
-            label2 = entry_spec_name
+            label1 = entry_spec_name
+            label2 = outputofcalc['mag_val']
+            label3 = outputofcalc['bandc_val']
+
+            x2 = outputofcalc['lamb']
+            y2 = outputofcalc['pframesn_psp_asp']
+            x2b = x2
+            y2b = outputofcalc['allframesn_psp_asp']
+            x2c = x2
+            y2c = outputofcalc['pframesn_psp_asp_all']
+            x2d = x2
+            y2d = outputofcalc['allframesn_psp_asp_all']
+
+
+            label2a = entry_spec_name
             label2b = vph_val
             label2c = outputofcalc['bandc_val']
         else:
@@ -221,13 +228,21 @@ def etc_do(request):
             y2 = numpy.arange(1, 100, 1)
             x2b = numpy.arange(1, 100, 1)
             y2b = numpy.arange(1, 100, 1)
+            x2c = numpy.arange(1, 100, 1)
+            y2c = numpy.arange(1, 100, 1)
+            x2d = numpy.arange(1, 100, 1)
+            y2d = numpy.arange(1, 100, 1)
 
-            label = "none"
-            label2 = "none"
+
+
+            label1 = "none"
+            label2 = 20.0   # Float
+            label3 = "none"
+            label2a = "none"
             label2b = "none"
             label2c = "none"
-        graphic = plot_and_save(x, y, label)
-        graphic2 = plot_and_save2(x2b, y2b, label2, label2b, label2c)
+        graphic = plot_and_save(x, y, label1, label2, label3)
+        graphic2 = plot_and_save2(x2, y2, x2b, y2b, x2c, y2c, x2d, y2d, label2a, label2b, label2c)
 
         inputstring = str(outputofcalc['texti'])
         coutputstring = str(outputofcalc['textoc'])
