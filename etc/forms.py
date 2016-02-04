@@ -76,8 +76,8 @@ class AtmosphericConditionsForm(forms.Form):
     seeing = forms.FloatField(label="Seeing", initial=0.5, min_value=0.0, max_value=5, widget=forms.TextInput(attrs={'size':'7'}))
 
 class ObservationalSetupForm(forms.Form):
-    numshot = forms.IntegerField(label="Num. Exp.", initial=1, min_value=1, widget=forms.TextInput(attrs={'size':'7'}))
-    exptimepshot = forms.FloatField(label="Exptime per shot(sec)", initial=3600.0, min_value=1.0, widget=forms.TextInput(attrs={'size':'7'}))
+    numframes = forms.IntegerField(label="Num. Exp.", initial=1, min_value=1, widget=forms.TextInput(attrs={'size':'7'}))
+    exptimepframe = forms.FloatField(label="Exptime per frame (sec)", initial=3600.0, min_value=1.0, widget=forms.TextInput(attrs={'size':'7'}))
     nfibers = forms.IntegerField(label="(*)No. of sky fibers", initial=100, min_value=0, max_value=3600, widget=forms.TextInput(attrs={'size':'6'}))
     lineap = forms.FloatField(label="Line aperture", initial=1.0, widget=forms.TextInput(attrs={'size':'5','disabled':'true'}))
     contap = forms.FloatField(label="Continuum aperture", initial=1.0, widget=forms.TextInput(attrs={'size':'5','disabled':'true'}))

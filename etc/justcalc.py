@@ -106,9 +106,9 @@ def outmessage(textcode):
     elif textcode == 112:
         outtext = "** WARNING **\nThe object is wider than the MEGARA field of view."
     elif textcode == 113:
-        outtext = "** WARNING **\nThe number of shots must be at least 1."
+        outtext = "** WARNING **\nThe number of frames must be at least 1."
     elif textcode == 114:
-        outtext = "** WARNING **\nExptime per shot value must be 0 < Exptime <1e6"
+        outtext = "** WARNING **\nExptime per frame value must be 0 < Exptime per frame <1e6"
     elif textcode == 115:
         outtext = ""
     else:
@@ -121,8 +121,8 @@ def outmessage(textcode):
 
 def outtextinp(om_val, bandc_val, sourcet_val, mag_val, netflux, size_val,
                seeingx, pi, fluxt_val, wline_val, fline_val, fwhmline_val,
-               vph_val, moon_val, airmass_val, seeing_zenith, fsky, numshot_val,
-               exptimepshot_val, exptime_val, npdark_val, nsbundles_val,
+               vph_val, moon_val, airmass_val, seeing_zenith, fsky, numframe_val,
+               exptimepframe_val, exptime_val, npdark_val, nsbundles_val,
                nfwhmline_val, cnfwhmline_val, resolvedline_val, bandsky):
 
     if sourcet_val == "P":
@@ -147,7 +147,7 @@ def outtextinp(om_val, bandc_val, sourcet_val, mag_val, netflux, size_val,
 
     text = text + '* Sky: \n  Moon = %6s\n  Airmass: X = %3.2f\n  Seeing(@X=1) = %4.2f\n' % (moon_val, airmass_val, seeing_zenith)
     text = text + '  Sky-flux(%s,@X) = %7.3e cgs\n  Seeing(@X) = %4.2f\n' % (bandsky, fsky, seeingx)
-    text = text + '* Observation: \n Num. of shots = %6i\n Exptime/shot = %7.1f\n Total Exptime = %7.1f\n NP_Dark = %6i\n  Sky-bundles = %i\n' % (numshot_val, exptimepshot_val, exptime_val, npdark_val, nsbundles_val)
+    text = text + '* Observation: \n Num. of frames = %6i\n Exptime/frame = %7.1f\n Total Exptime = %7.1f\n NP_Dark = %6i\n  Sky-bundles = %i\n' % (numframe_val, exptimepframe_val, exptime_val, npdark_val, nsbundles_val)
 
     if fluxt_val == "L":
         text =  text + '  Spectral apertures:\n    For line=%2i\n    For continuum=%2i\n' % (nfwhmline_val, cnfwhmline_val)
@@ -176,39 +176,75 @@ def outtextinp(om_val, bandc_val, sourcet_val, mag_val, netflux, size_val,
 # ********************************
 # Function to create the text for giving final output for continuum.
 
-def outtextoutc(sourcet_val,nfibres, nfib, nfib1, sncont_p2sp_all, sncont_1aa_all,
-   sncont_band_all,sncont_p2sp_fibre,sncont_1aa_fibre,
-   sncont_band_fibre,sncont_p2sp_seeing, sncont_1aa_seeing, sncont_band_seeing,sncont_p2sp_1, sncont_1aa_1,
-   sncont_band_1,sncont_psp_pspp):
+def outtextoutc(sourcet_val,nfibres, nfib, nfib1,\
+                sncont_p2sp_all, tsncont_p2sp_all,\
+                sncont_1aa_all, tsncont_1aa_all,\
+                sncont_band_all, tsncont_band_all,\
+                sncont_p2sp_fibre, tsncont_p2sp_fibre,\
+                sncont_1aa_fibre, tsncont_1aa_fibre,\
+                sncont_band_fibre, tsncont_band_fibre,\
+                sncont_p2sp_seeing, tsncont_p2sp_seeing,\
+                sncont_1aa_seeing, tsncont_1aa_seeing,\
+                sncont_band_seeing, tsncont_band_seeing,\
+                sncont_p2sp_1, tsncont_p2sp_1,\
+                sncont_1aa_1, tsncont_1aa_1,\
+                sncont_band_1, tsncont_band_1,\
+                sncont_psp_pspp,tsncont_psp_pspp,\
+                lambdaeff):
 
     # Output in one fibre
-    text = '* S/N per fibre:\n'
-    text = text + '    %7.4f in one spectral FWHM (voxel)\n    %4.2f per AA\n    %4.2f collapsed spectrum (spaxel)\n' % (sncont_p2sp_fibre, sncont_1aa_fibre, sncont_band_fibre)
-
+    text = '* SNR per fibre:\n'
     # Output per spectral and spatial pixel
-    text = text + '* S/N per detector pixel: %4.2f\n' % (sncont_psp_pspp)
+    text = text + '%4.2f // %4.2f per detector pixel\n' % (sncont_psp_pspp, tsncont_psp_pspp)
+    # Output per spectral pixel
+    text = text + '%4.2f // %4.2f per spectral pixel\n' % (sncont_psp_pspp*2, tsncont_psp_pspp*2)
+    text = text + '%4.2f // %4.2f in one spectral FWHM (voxel)\n  ' \
+                  '%4.2f // %4.2f per AA\n' \
+                  % (sncont_p2sp_fibre, tsncont_p2sp_fibre,\
+                     sncont_1aa_fibre, tsncont_1aa_fibre)
+                     # sncont_band_fibre, tsncont_band_fibre)
+                  # '%4.2f // %4.2f collapsed spectrum (spaxel)\n' \
+
 
     # Output in all spectrum
-    text = text + '* S/N in total source area:\n  (no. of fibres~%5.1f)\n' % nfibres
-    text = text + '    %4.2f in one spectral FWHM\n    %4.2f per AA\n    %4.2f collapsed spectrum (spaxel)\n' % (sncont_p2sp_all, sncont_1aa_all, sncont_band_all)
+    text = text + '\n * SNR in total source area:\n  (no. of fibres~%5.1f)\n' % nfibres
+    text = text + '%4.2f // %4.2f in one spectral pixel\n' \
+                  '%4.2f // %4.2f in one spectral FWHM\n' \
+                  '%4.2f // %4.2f per AA\n' \
+                  % (sncont_p2sp_all/2, tsncont_p2sp_all/2,\
+                      sncont_p2sp_all, tsncont_p2sp_all,\
+                     sncont_1aa_all, tsncont_1aa_all)
+                     # sncont_band_all, tsncont_band_all)
 
     # Output in 1 FWHM (only if source is extended, different from previous one)
     if sourcet_val == "E":
-        text = text + '* S/N in 1 seeing:\n'
+        text = text + '\n * SNR in 1 seeing:\n'
         if nfib > 0.:
-            text = text + '  (no. of fibres~%5.1f)\n' % nfib
-        text = text + '    %4.2f in one spectral FWHM\n    %4.2f per AA\n    %4.2f collapsed spectrum (spaxel)\n' % (sncont_p2sp_seeing, sncont_1aa_seeing, sncont_band_seeing)
+            text = text + '(no. of fibres~%5.1f)\n' % nfib
+        text = text + '%4.2f // %4.2f in one spectral FWHM\n' \
+                      '%4.2f // %4.2f per AA\n' \
+                      '%4.2f // %4.2f collapsed spectrum (spaxel)\n' \
+                      % (sncont_p2sp_seeing, tsncont_p2sp_seeing,\
+                         sncont_1aa_seeing, tsncont_1aa_seeing,\
+                         sncont_band_seeing, tsncont_band_seeing)
 
     # Output in 1 arcsec**2 (only if source is extended, different from previous one)
     if sourcet_val == "E":
-        text = text + '* S/N in 1 arcsec**2:\n'
+        text = text + '\n* SNR in 1 arcsec**2:\n'
 
         if nfib1 > 0.:
-            text = text + '    %4.2f in one spectral FWHM\n    %4.2f per AA\n    %4.2f collapsed spectrum (spaxel)\n' % (sncont_p2sp_1, sncont_1aa_1, sncont_band_1)
+            text = text + '%4.2f // %4.2f in one spectral FWHM\n' \
+                          '%4.2f // %4.2f per AA\n    ' \
+                          '%4.2f // %4.2f collapsed spectrum (spaxel)\n' \
+                          % (sncont_p2sp_1, tsncont_p2sp_1,\
+                             sncont_1aa_1, tsncont_1aa_1,\
+                             sncont_band_1, tsncont_band_1)
 
     # Adding blank spaces, to overwrite previous outputs
     textfile = text
-    textfile = " OUTPUT CONTINUUM SNR:\n" + textfile
+    textfile = "OUTPUT CONTINUUM SNR \n"+\
+               "(at "+ str(lambdaeff) +" AA)\n" \
+               "(of frame // of total)\n" + textfile
 
     if (sourcet_val == "P"):
         text = text + "\n\n\n\n\n\n\n\n"
@@ -231,25 +267,25 @@ def outtextoutl(fluxt_val,snline_all,snline_fibre,snline_pspp,snline_1_aa,source
 
         # Output in 1 arcsec**2 (only if source is extended, different from previous one)
         # In 1 AA and 1 arcsec in spatial direction
-        text = '* S/N per arcsec per AA = %4.2f\n' % (snline_1_aa)
+        text = '* SNR per arcsec per AA = %4.2f\n' % (snline_1_aa)
 
         # Output in one fibre, the whole line
-        text = text + '* S/N in 1 fibre (in aperture) = %4.2f\n' % (snline_fibre)
-        text = text + '* S/N in 1 fibre (in 1 AA) = %4.2f\n' % (snline_fibre1aa)
+        text = text + '* SNR in 1 fibre (in aperture) = %4.2f\n' % (snline_fibre)
+        text = text + '* SNR in 1 fibre (in 1 AA) = %4.2f\n' % (snline_fibre1aa)
 
         # Output per voxel: in one spectral FWHM * dimension of fibre in spatial direction
-        text = text + '* S/N per voxel = %4.2f\n' % (snline_spaxel)  # OJO: el nombre de esta variable no parece apropiado (NCL's comment)
+        text = text + '* SNR per voxel = %4.2f\n' % (snline_spaxel)  # OJO: el nombre de esta variable no parece apropiado (NCL's comment)
 
         # Output per spatial pixel
-        text = text + '* S/N per detector pixel = %4.2f\n' % (snline_pspp)
+        text = text + '* SNR per detector pixel = %4.2f\n' % (snline_pspp)
 
         # Output in all source area in the whole line (considering FWHM of line)
-        text = text + '* S/N total (in aperture) = %4.2f\n' % (snline_all)
+        text = text + '* SNR total (in aperture) = %4.2f\n' % (snline_all)
 
         # For the whole line, if extended source:
         if sourcet_val == "E":
-            text = text + '* S/N in 1 seeing = %4.2f\n' % (snline_seeing)
-            text = text + '* S/N in 1 arcsec**2 = %4.2f\n' % (snline_1)
+            text = text + '* SNR in 1 seeing = %4.2f\n' % (snline_seeing)
+            text = text + '* SNR in 1 arcsec**2 = %4.2f\n' % (snline_1)
 
         textfile = text
         textfile =  " OUTPUT LINE SNR: \n" + textfile
@@ -453,7 +489,7 @@ tatm = numpy.array(tatm)
 def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
          fline_val,wline_val,nfwhmline_val,cnfwhmline_val,\
          fwhmline_val,resolvedline_val,spect_val,bandc_val,\
-         om_val,vph_val,moon_val,airmass_val,seeing_val,numshot_val,exptimepshot_val,\
+         om_val,vph_val,moon_val,airmass_val,seeing_val,numframe_val,exptimepframe_val,\
          nsbundles_val):
 
     global texti, textoc, textol
@@ -545,22 +581,22 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
         outtext = outmessage(108)
         errind = warn(outtext,frame0,'MEGARA ETC Warning')
 
-    # Number of shot
-    numshot_val = isafloat(numshot_val,1)
-    if numshot_val <= 0:
-        numshot_val = 1
+    # Number of frame
+    numframe_val = isafloat(numframe_val,1)
+    if numframe_val <= 0:
+        numframe_val = 1
         outtext = outmessage(113)
         errind = warn(outtext,frame0,'MEGARA ETC Warning')
 
-    # Exptime per shot
-    exptimepshot_val = isafloat(exptimepshot_val,1)
-    if exptimepshot_val <= 0.0 or exptimepshot_val >= 1.e6:
-        exptimepshot_val = 3600.
+    # Exptime per frame
+    exptimepframe_val = isafloat(exptimepframe_val,1)
+    if exptimepframe_val <= 0.0 or exptimepframe_val >= 1.e6:
+        exptimepframe_val = 3600.
         outtext = outmessage(114)
         errind = warn(outtext,frame0,'MEGARA ETC Warning')
 
     # Exptime
-    exptime_val = numshot_val * exptimepshot_val
+    exptime_val = numframe_val * exptimepframe_val
     # exptime_val = exptime_entry.get()
     exptime_val = isafloat(exptime_val,3600.0)
     if exptime_val <= 0.0 or exptime_val >= 1.e6:
@@ -895,7 +931,7 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
         omegasky = nfibresky * areafibre
 
         # Different spatial and resolution elements to consider, depending on whether the source is punctual or extended.
-        # Starting FOR loop for computations
+        # Starting FOR loop for computations of SNR per frame
         items = range(12)
         for xit in items:
 
@@ -909,26 +945,26 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
             npixsky = (omegasky / omegaskysource) * npix
 
             # Source continuum signal in defined spectral and spatial resolution element
-            signalcont, totalcont = signal(fc, deltalambda, lambdaeff, effsys, stel, omegasource, exptime_val, enph, lamb)
+            signalcont = signal(fc, deltalambda, lambdaeff, effsys, stel, omegasource, exptimepframe_val, enph, lamb)
 
             # Sky signal in defined spectral and spatial resolution element
-            signalsky, totalsky = signal(fs, deltalambda, lambdaeff, effsys, stel, omegaskysource, exptime_val, enph, lamb)
+            signalsky = signal(fs, deltalambda, lambdaeff, effsys, stel, omegaskysource, exptimepframe_val, enph, lamb)
 
             # Dark signal
-            signaldark = dark(exptime_val, dc, npix)
+            signaldark = dark(exptimepframe_val, dc, npix)
 
             # Noise due to dark measurement to the square
-            noisedarksq = darknoisesq(npix, npdark_val, exptime_val, dc, ron)
+            noisedarksq = darknoisesq(npix, npdark_val, exptimepframe_val, dc, ron)
 
             # RON
             ronoise = readoutnoise(npix, ron)
 
             # Noise due to sky substraction
             # Sky signal *MEASURED* in defined spectral and spatial resolution element
-            signalskymeasured, totalskymeasured = signal(fs, deltalambda,  lambdaeff, effsys, stel, omegasky, exptime_val, enph, lamb)
+            signalskymeasured = signal(fs, deltalambda,  lambdaeff, effsys, stel, omegasky, exptimepframe_val, enph, lamb)
             ronoiseskymeasured = readoutnoise(npixsky, ron)
             signaldarkskymeasured = dark(exptime_val, dc, npixsky)
-            noisedarksqskymeasured = darknoisesq(npixsky, npdark_val, exptime_val, dc, ron)
+            noisedarksqskymeasured = darknoisesq(npixsky, npdark_val, exptimepframe_val, dc, ron)
 
             noiseskysq = (omegaskysource / omegasky)**2 * (signalskymeasured + ronoiseskymeasured + signaldarkskymeasured + noisedarksqskymeasured)
 
@@ -938,105 +974,131 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
             # Signal-to-noise of continuum
             sncont = signalcont / noisecont
             # TEST TEST TEST
-            sncont_total = []
-            for idxcont, valcont in enumerate(totalcont):
-                snval = totalcont[idxcont] / noisecont
-                sncont_total.append(snval)
-
 
             if xit == 0: # P2SP (per 2 spectral pixels), All area
                 sncont_p2sp_all = sncont
+                tsncont_p2sp_all = sncont * numpy.sqrt(numframe_val)
             elif xit == 1: # 1AA, All area
                 sncont_1aa_all = sncont
+                tsncont_1aa_all = sncont * numpy.sqrt(numframe_val)
             elif xit == 2: # Bandwidth, All area
                 sncont_band_all = sncont
+                tsncont_band_all = sncont * numpy.sqrt(numframe_val)
             elif xit == 3: # P2SP, seeing
                 sncont_p2sp_seeing = sncont
+                tsncont_p2sp_seeing = sncont * numpy.sqrt(numframe_val)
             elif xit == 4: # 1AA, seeing
                 sncont_1aa_seeing = sncont
+                tsncont_1aa_seeing = sncont * numpy.sqrt(numframe_val)
             elif xit == 5: # Bandwidth, seeing
                 sncont_band_seeing = sncont
+                tsncont_band_seeing = sncont * numpy.sqrt(numframe_val)
             elif xit == 6: # P2SP, 1 arcsec2
                 sncont_p2sp_1 = sncont
+                tsncont_p2sp_1 = sncont * numpy.sqrt(numframe_val)
                 nfib1def = nfib1
             elif xit == 7: # 1AA, 1 arcsec2
                 sncont_1aa_1 = sncont
+                tsncont_1aa_1 = sncont * numpy.sqrt(numframe_val)
                 print 'xit=7 :', sncont
             elif xit == 8: # Bandwidth, 1 arcsec2
                 sncont_band_1 = sncont
+                tsncont_band_1 = sncont * numpy.sqrt(numframe_val)
                 print 'xit=8 :', sncont
             elif xit == 9: # P2SP, 1 fibre
                 sncont_p2sp_fibre = sncont
+                tsncont_p2sp_fibre = sncont * numpy.sqrt(numframe_val)
                 print 'xit=9 :', sncont_p2sp_fibre
                 # PSP (per spectral pixel), per spatial pixel
                 sncont_psp_pspp = sncont / 4  #numpy.sqrt(16.)
-
-                # print 'xit=9 /4 :', sncont_psp_pspp
-                # totalcont_test = totalcont / 4
-                # totalsky_test = totalsky / 4
-
-                # totalsn_test = []
-                # for idxsn, valsn in enumerate(sncont_total):
-                #     divsn = sncont_total[idxsn] / 4
-                #     totalsn_test.append(divsn)
-
+                tsncont_psp_pspp = sncont * numpy.sqrt(numframe_val) / 4
+                # PSP (per spectral pixel), all spatial pixel
+                sncont_psp_asp = sncont_psp_pspp * 2
+                tsncont_psp_asp = tsncont_psp_pspp * 2
             elif xit == 10: # 1AA, 1 fibre
                 sncont_1aa_fibre = sncont
+                tsncont_1aa_fibre = sncont * numpy.sqrt(numframe_val)
                 print 'xit=10 :', sncont_1aa_fibre
             elif xit == 11: # Bandwidth, 1 fibre
                 sncont_band_fibre = sncont
-
-        # End of FOR loop for computations
+                tsncont_band_fibre = sncont * numpy.sqrt(numframe_val)
+        # End of FOR loop for computations of SNR per frame.
         pass
 
         # FOR COMPUTING SNR per detector pixel at each lamb (not just lambdaeff)
         # we need to recompute the SNR as above but just for the case of SNR per detector pixel
         # and replacing in the function signal(), lambdaeff by lamb.
-        # Then,
-        xit=9
-        # Deriving spectroscopic parameters for each case:
-        deltalambda, omegasource, npixx, npixy, nfib, nfib1, omegaskysource, omegasource = specpar(om_val, xit, disp, ps,
-         nfibres, nfibresy, areafibre, rfibre,  deltab, areasource, diamsource, areaseeing, seeingx)
+        # Then, for exptime per frame:
+        items = [9, 0]
+        for xit in items:
+            # Deriving spectroscopic parameters for each case:
+            deltalambda, omegasource, npixx, npixy, nfib, nfib1, omegaskysource, omegasource = specpar(om_val, xit, disp, ps,
+             nfibres, nfibresy, areafibre, rfibre,  deltab, areasource, diamsource, areaseeing, seeingx)
 
-        # Number of pixels in detector under consideration: just counting the factor in area
-        # when we consider the used sky minibundles
-        npix = npixx * npixy
-        npixsky = (omegasky / omegaskysource) * npix
+            # Number of pixels in detector under consideration: just counting the factor in area
+            # when we consider the used sky minibundles
+            npix = npixx * npixy
+            npixsky = (omegasky / omegaskysource) * npix
 
-        # Source continuum signal in defined spectral and spatial resolution element
-        signalcont, totalcont = signal(fc, deltalambda, lamb, effsys, stel, omegasource, exptime_val, enph, lamb)
+            # Source continuum signal in defined spectral and spatial resolution element
+            signalcont = signal(fc, deltalambda, lamb, effsys, stel, omegasource, exptimepframe_val, enph, lamb)
 
-        # Sky signal in defined spectral and spatial resolution element
-        signalsky, totalsky = signal(fs, deltalambda, lamb, effsys, stel, omegaskysource, exptime_val, enph, lamb)
+            # Sky signal in defined spectral and spatial resolution element
+            signalsky = signal(fs, deltalambda, lamb, effsys, stel, omegaskysource, exptimepframe_val, enph, lamb)
 
-        # Dark signal
-        signaldark = dark(exptime_val, dc, npix)
+            # Dark signal
+            signaldark = dark(exptime_val, dc, npix)
 
-        # Noise due to dark measurement to the square
-        noisedarksq = darknoisesq(npix, npdark_val, exptime_val, dc, ron)
+            # Noise due to dark measurement to the square
+            noisedarksq = darknoisesq(npix, npdark_val, exptimepframe_val, dc, ron)
 
-        # RON
-        ronoise = readoutnoise(npix, ron)
+            # RON
+            ronoise = readoutnoise(npix, ron)
 
-        # Noise due to sky substraction
-        # Sky signal *MEASURED* in defined spectral and spatial resolution element
-        signalskymeasured, totalskymeasured = signal(fs, deltalambda,  lamb, effsys, stel, omegasky, exptime_val, enph, lamb)
-        ronoiseskymeasured = readoutnoise(npixsky, ron)
-        signaldarkskymeasured = dark(exptime_val, dc, npixsky)
-        noisedarksqskymeasured = darknoisesq(npixsky, npdark_val, exptime_val, dc, ron)
+            # Noise due to sky substraction
+            # Sky signal *MEASURED* in defined spectral and spatial resolution element
+            signalskymeasured = signal(fs, deltalambda,  lamb, effsys, stel, omegasky, exptimepframe_val, enph, lamb)
+            ronoiseskymeasured = readoutnoise(npixsky, ron)
+            signaldarkskymeasured = dark(exptimepframe_val, dc, npixsky)
+            noisedarksqskymeasured = darknoisesq(npixsky, npdark_val, exptimepframe_val, dc, ron)
 
-        noiseskysq = (omegaskysource / omegasky)**2 * (signalskymeasured + ronoiseskymeasured + signaldarkskymeasured + noisedarksqskymeasured)
+            noiseskysq = (omegaskysource / omegasky)**2 * (signalskymeasured + ronoiseskymeasured + signaldarkskymeasured + noisedarksqskymeasured)
 
-        # Source continuum noise in defined spectral and spatial resolution element
-        noisecont_psp_pspp = []
-        totalsn_psp_pspp = []
-        for idxno, valno in enumerate(signalcont):
-            noisecont_val = math.sqrt(signalcont[idxno] + signalsky[idxno] + signaldark + ronoise + noisedarksq + noiseskysq[idxno])
-            noisecont_psp_pspp.append(noisecont_val)
-            # Signal-to-noise of continuum
-            sncont_val = signalcont[idxno] / (noisecont_val*4)
-            totalsn_psp_pspp.append(sncont_val)
-        ### END COMPUTATION OF SNR_PSP_PSPP
+            if xit == 9:
+                # Source continuum noise in defined spectral and spatial resolution element
+                noisecont_psp_asp = []
+                pframesn_psp_asp = []
+                allframesn_psp_asp = []
+                # pframesn_psp_asp_all = []    #SNR per frame per spectral pixel all source area
+                # allframesn_psp_asp_all = []  #SNR total per spectral pixel all source area
+                for idxno, valno in enumerate(signalcont):
+                    noisecont_val = math.sqrt(signalcont[idxno] + signalsky[idxno] + signaldark + ronoise + noisedarksq + noiseskysq[idxno])
+                    noisecont_psp_asp.append(noisecont_val)
+                    # Signal-to-noise of continuum
+                    # sncont_val = signalcont[idxno] / (noisecont_val*4)  #SNR per detector pixel
+                    sncont_val = signalcont[idxno] / (noisecont_val*2)  #SNR per spectral pixel
+                    pframesn_psp_asp.append(sncont_val)
+
+                    tsncont_val = sncont_val * numpy.sqrt(numframe_val) #total SNR per detector pixel
+                    allframesn_psp_asp.append(tsncont_val)
+            elif xit == 0:
+            # Source continuum noise in defined spectral and spatial resolution element
+                noisecont_psp_asp_all = []
+                pframesn_psp_asp_all = []    #SNR per frame per spectral pixel all source area
+                allframesn_psp_asp_all = []  #SNR total per spectral pixel all source area
+                for idxno, valno in enumerate(signalcont):
+                    noisecont_val = math.sqrt(signalcont[idxno] + signalsky[idxno] + signaldark + ronoise + noisedarksq + noiseskysq[idxno])
+                    noisecont_psp_asp_all.append(noisecont_val)
+                    # Signal-to-noise of continuum
+                    sncont_val = signalcont[idxno] / (noisecont_val*2)  #SNR per detector pixel
+                    pframesn_psp_asp_all.append(sncont_val)
+
+                    tsncont_val = sncont_val * numpy.sqrt(numframe_val) #total SNR per detector pixel
+                    allframesn_psp_asp_all.append(tsncont_val)
+
+
+
+        ### END COMPUTATION OF SNR_PSP_PSPP PER FRAME EXPTIME
 
 
         ###################
@@ -1225,16 +1287,27 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
         # Output of input parameters #
         ##############################
         textigui,texti = outtextinp(om_val,bandc_val,sourcet_val,mag_val,netflux,size_val,seeingx,pi,fluxt_val,wline_val,\
-         fline_val, fwhmline_val,vph_val,moon_val, airmass_val, seeing_zenith,fsky,numshot_val,exptimepshot_val,exptime_val,\
+         fline_val, fwhmline_val,vph_val,moon_val, airmass_val, seeing_zenith,fsky,numframe_val,exptimepframe_val,exptime_val,\
         npdark_val,nsbundles_val,nfwhmline_val, cnfwhmline_val,resolvedline_val, bandsky)
 
         #######################################
         # Output of continuum signal-to-noise #
         #######################################
-        textocgui,textoc = outtextoutc(sourcet_val,nfibres, nfib, nfib1def, sncont_p2sp_all, sncont_1aa_all,
-         sncont_band_all,sncont_p2sp_fibre,
-         sncont_1aa_fibre,sncont_band_fibre,sncont_p2sp_seeing, sncont_1aa_seeing, sncont_band_seeing,sncont_p2sp_1,
-         sncont_1aa_1, sncont_band_1,sncont_psp_pspp)
+        textocgui,textoc = outtextoutc(sourcet_val,nfibres, nfib, nfib1def,\
+                                       sncont_p2sp_all, tsncont_p2sp_all,\
+                                       sncont_1aa_all, tsncont_1aa_all,\
+                                       sncont_band_all, tsncont_band_all,\
+                                       sncont_p2sp_fibre, tsncont_p2sp_fibre,\
+                                       sncont_1aa_fibre, tsncont_1aa_fibre,\
+                                       sncont_band_fibre, tsncont_band_fibre,\
+                                       sncont_p2sp_seeing, tsncont_p2sp_seeing,\
+                                       sncont_1aa_seeing, tsncont_1aa_seeing,\
+                                       sncont_band_seeing, tsncont_band_seeing,\
+                                       sncont_p2sp_1, tsncont_p2sp_1,\
+                                       sncont_1aa_1, tsncont_1aa_1,\
+                                       sncont_band_1, tsncont_band_1,\
+                                       sncont_psp_pspp,tsncont_psp_pspp,\
+                                       lambdaeff)
 
         ############################################
         # Output of line+continuum signal-to-noise #
@@ -1258,9 +1331,13 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
         # FOR DJANGO: Finally, return these outputs.
         return {'outtext' : outtext, 'texti' : texti, 'textoc' : textoc, 'textol' : textol,\
                 'sourcespectrum' : sourcespectrum, 'lamb' : lamb,\
-                'vph_val' : vph_val, 'spect_val' : spect_val, 'bandc_val' : bandc_val,\
+                'vph_val' : vph_val, 'spect_val' : spect_val,\
+                'bandc_val' : bandc_val,'mag_val' : mag_val,\
                 'fc' : fc,\
-                'totalsn_psp_pspp' : totalsn_psp_pspp}     # ADDED FOR DJANGO
+                'pframesn_psp_asp' : pframesn_psp_asp,\
+                'allframesn_psp_asp' : allframesn_psp_asp,\
+                'pframesn_psp_asp_all' : pframesn_psp_asp_all,\
+                'allframesn_psp_asp_all' : allframesn_psp_asp_all}     # ADDED FOR DJANGO
     # Avoiding computations in case of exception of errind
     else:
         spectdat = specttmplt_list[spect_list.index(spect_val)]

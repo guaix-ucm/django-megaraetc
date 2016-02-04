@@ -224,10 +224,10 @@
             <TABLE width=100% border=0>
                 <TR>
                     <TD WIDTH="20%" ALIGN="right">
-                        Num. shots:
+                        Num. frames:
                     </TD>
                     <TD WIDTH="2%" ALIGN="left">
-                        {{ form4.numshot }}
+                        {{ form4.numframes }}
                     </TD>
                     <TD WIDTH="1%" >
                         <!--- This is a buffer --->
@@ -244,10 +244,10 @@
 	            </TR>
                 <TR>
                     <TD ALIGN="right">
-                        Exptime per shot (sec):
+                        Exptime per frame (sec):
                     </TD>
                     <TD ALIGN="left">
-                        {{ form4.exptimepshot }}
+                        {{ form4.exptimepframe }}
                     </TD>
                     <TD>
 
@@ -362,6 +362,7 @@
                 </TD>
             </TR>
         </TABLE>
+
         <div id="results">
             <iframe id="my_iframe" name="my_iframe" src="{% url 'etc:results' %}">
             </iframe>
@@ -369,10 +370,10 @@
 
         <HR>
         MEGARA Online Exposure Time Calculator version 0.4.2<BR />
-        ported to DJANGO version 1.8.6 by Alexandre Y. K. BOUQUIN<BR />
+        Report problems/bugs/requests to: Alexandre Y. K. BOUQUIN ( abouquin at fis.ucm.es )<BR />
 
         <div style="float:right">
-            Released on: Monday, 01/31/2000. Last modified on:
+            Released on: 01/31/2016. Last modified on:
             <SCRIPT LANGUAGE="JavaScript">
             document.write(document.lastModified);
             </SCRIPT>

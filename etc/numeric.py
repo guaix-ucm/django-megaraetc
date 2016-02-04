@@ -362,7 +362,7 @@ def signal(farcs, dlambda, lambdaeff, eff, st, omega, expt, ep, wv):
     wv = numpy.array(wv)
 
     # If Deltalambda high enough, integration with trapezoid rule is realistic 
-    if (dlambda > 1.0):
+    if (dlambda > 1.5):
 
         wv1 = numpy.array((math.ceil( wv1*10.))/10.)
         wv2 = numpy.array((math.ceil( wv2*10.))/10.)
@@ -405,7 +405,7 @@ def signal(farcs, dlambda, lambdaeff, eff, st, omega, expt, ep, wv):
         # Integrate in range to derive value    
         integ = tvalue * dlambda
 
-    return integ, total
+    return integ
 
 # ********************************
 # Function linesignal: Number of photons from the source if input flux is a line

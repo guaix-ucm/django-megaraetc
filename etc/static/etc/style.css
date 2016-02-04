@@ -79,16 +79,13 @@ p {
 
 #result_wrapper {
     width: 100%;
-    /*margin: 10 auto;*/
     text-align: center;
 }
 
 #result_content {
     width: 951px;
     font-size: 15pt;
-    display: inline-block;
-    margin: 0 auto;
-    padding: auto;
+    margin: 10 auto;
     text-align: center;
 }
 
@@ -98,18 +95,14 @@ p {
     color: red;
     text-align: center;
     vertical-align: top;
-    /*margin: 0 auto;*/
-    /*padding: auto;*/
     border-style: groove;
 }
 
 #result_left {
-    width: 30%;
+    width: 38%;
     display: inline-block;
     text-align: left;
     vertical-align: top;
-    margin: 0 auto;
-    /*padding: auto;*/
     border-style: groove;
     float: left;
 }
@@ -119,8 +112,6 @@ p {
     display: inline-block;
     text-align: left;
     vertical-align: top;
-    margin: 0 auto;
-    /*padding: auto;*/
     border-style: groove;
     float: none;
 }
@@ -130,8 +121,6 @@ p {
     display: inline-block;
     text-align: left;
     vertical-align: top;
-    margin: 0 auto;
-    /*padding: auto;*/
     border-style: groove;
     float: right;
 }
@@ -140,7 +129,7 @@ p {
     text-align: left;
     vertical-align: middle;
     width:100%;
-    margin: 50 auto;
+    margin: 0 auto;
     /*padding: 10 10 10 10;*/
 }
 
