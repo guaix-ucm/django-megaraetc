@@ -6,8 +6,6 @@ from .forms import TargetForm, InstrumentForm
 from .models import PhotometricFilter
 from .models import SpectralTemplate, VPHSetup
 
-# from obsolete.tkgui import *
-
 from justcalc import calc
 from plot1 import plot_and_save, plot_and_save2
 
@@ -22,18 +20,13 @@ def compute5(request):
     else:
         size_val = request.GET['size']
 
-    tocheck = request.GET['contmagflux']
-    if tocheck:
-        inputcontt_val = "M"
-    else:
-        inputcontt_val = request.GET['contmagflux']
-    if inputcontt_val == "M":
-        mag_val = request.GET['contmagval']
+    inputcontt_val = request.GET['contmagflux']
+    if inputcontt_val == 'M':
+        mag_val = float(request.GET['contmagval'])
         fc_val = 1e-16
-    else:
+    elif inputcontt_val == 'F':
         mag_val = 20.0
-        fc_val = request.GET['contfluxval']
-
+        fc_val = float(request.GET['contfluxval'])
 
     fluxt_val = request.GET['iflux']
     if fluxt_val == "C":
@@ -63,8 +56,8 @@ def compute5(request):
     pfilter = request.GET['pfilter']
     querybandc = PhotometricFilter.objects.filter(pk=pfilter).values()  # get row with the values at primary key
     bandc_val = querybandc[0]['name']
-    entry_filter_cwl = querybandc[0]['cwl']
-    entry_filter_width = querybandc[0]['path']
+    # entry_filter_cwl = querybandc[0]['cwl']
+    # entry_filter_width = querybandc[0]['path']
 
     om_val = request.GET['om_val']
     vph = request.GET['vph']
@@ -94,15 +87,15 @@ def compute5(request):
         entry_vph_lambdae = queryvph[0]['lambda_e']
         entry_vph_specconf = queryvph[0]['specconf']
 
-        vphfeatures = [entry_vph_fwhm,entry_vph_disp,entry_vph_deltab,entry_vph_lambdac,\
-                       entry_vph_relatedband,entry_vph_lambdab,entry_vph_lambdae,entry_vph_specconf]
+        # vphfeatures = [entry_vph_fwhm,entry_vph_disp,entry_vph_deltab,entry_vph_lambdac,\
+        #                entry_vph_relatedband,entry_vph_lambdab,entry_vph_lambdae,entry_vph_specconf]
         # filtercar2 = ["0","0",entry_vph_lambdab,entry_vph_lambdae]
 
         spec = request.GET['spectype']
         queryspec = SpectralTemplate.objects.filter(pk=spec).values()
         entry_spec_name = queryspec[0]['name']
-        entry_spec_path = queryspec[0]['path']
-        spectdat = [entry_spec_name,entry_spec_path]
+        # entry_spec_path = queryspec[0]['path']
+        # spectdat = [entry_spec_name,entry_spec_path]
         spect_val = entry_spec_name
 
         moon_val = request.GET['moonph']
@@ -168,7 +161,7 @@ def get_info(request):
                                              'form4': form4,
                                              })
 
-# LOAD THIS AFTER PUSHING "START" in index.html
+# LOADS THIS AFTER PUSHING "START" in index.html
 def etc_form(request):
     form1 = TargetForm()
     form2 = InstrumentForm()
@@ -188,7 +181,6 @@ def etc_form(request):
 #
 #
 def etc_do(request):
-    message = 'Nothing to see here'
     if request.method == 'GET':
         outputofcalc = compute5(request)
         #
