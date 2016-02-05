@@ -10,10 +10,6 @@ from .numeric import linesignal
 from .models import PhotometricFilter
 from .models import SpectralTemplate, VPHSetup
 
-# from plot1 import plot_and_save
-
-# from forms import *
-
 
 ####################
 def reading(filename, skipline):
@@ -189,7 +185,7 @@ def outtextoutc(sourcet_val,nfibres, nfib, nfib1,\
                 sncont_p2sp_1, tsncont_p2sp_1,\
                 sncont_1aa_1, tsncont_1aa_1,\
                 sncont_band_1, tsncont_band_1,\
-                sncont_psp_pspp,tsncont_psp_pspp,\
+                sncont_psp_pspp, tsncont_psp_pspp,\
                 lambdaeff):
 
     # Output in one fibre
@@ -243,7 +239,7 @@ def outtextoutc(sourcet_val,nfibres, nfib, nfib1,\
     # Adding blank spaces, to overwrite previous outputs
     textfile = text
     textfile = "OUTPUT CONTINUUM SNR \n"+\
-               "(at "+ str(lambdaeff) +" AA)\n" \
+               "(at lambda_c = "+ str(lambdaeff) +" AA)\n" \
                "(of frame // of total)\n" + textfile
 
     if (sourcet_val == "P"):
@@ -260,8 +256,12 @@ def outtextoutc(sourcet_val,nfibres, nfib, nfib1,\
 # ********************************
 # Function to create the text for giving final output for line output.
 
-def outtextoutl(fluxt_val,snline_all,snline_fibre,snline_pspp,snline_1_aa,sourcet_val,snline_seeing,snline_1,
-    snline_spaxel,snline_fibre1aa):
+def outtextoutl(fluxt_val,\
+                snline_all, snline_fibre,\
+                snline_pspp, snline_1_aa,\
+                sourcet_val, snline_seeing,\
+                snline_1, snline_spaxel,\
+                snline_fibre1aa):
 
     if fluxt_val == "L":
 
@@ -1293,7 +1293,7 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
         #######################################
         # Output of continuum signal-to-noise #
         #######################################
-        textocgui,textoc = outtextoutc(sourcet_val,nfibres, nfib, nfib1def,\
+        textocgui,textoc = outtextoutc(sourcet_val, nfibres, nfib, nfib1def,\
                                        sncont_p2sp_all, tsncont_p2sp_all,\
                                        sncont_1aa_all, tsncont_1aa_all,\
                                        sncont_band_all, tsncont_band_all,\
@@ -1312,8 +1312,12 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
         ############################################
         # Output of line+continuum signal-to-noise #
         ############################################
-        textolgui,textol = outtextoutl(fluxt_val,snline_all,snline_fibre,snline_pspp,snline_1_aa,sourcet_val,snline_seeing,
-          snline_1,snline_spaxel,snline_fibre1aa)
+        textolgui,textol = outtextoutl(fluxt_val,\
+                                       snline_all, snline_fibre,\
+                                       snline_pspp, snline_1_aa,\
+                                       sourcet_val,\
+                                       snline_seeing, snline_1,\
+                                       snline_spaxel, snline_fibre1aa)
 
 
         if errind==0:       # ADDED FOR DJANGO

@@ -5,8 +5,10 @@
 <div id="result_wrapper">
     <div id="result_content">
         <div id="result_header">
-            <img id="img_plot1" src="{% static 'etc/plot_test.png' %}" />
-            <img id="img_plot1" src="{% static 'etc/plot_test2.png' %}" /><BR /><BR />
+            <img id="img_plot1" src =" {{ graphic|linebreaksbr }} " >
+            <!--<img id="img_plot1" src="{% static 'etc/plot_test.png' %}" />-->
+            <!--<img id="img_plot1" src="{{ graphic|linebreaksbr }}" />-->
+            <img id="img_plot1" src=" {{ graphic2|linebreaksbr }} " /><BR /><BR />
         </div>
         <div id="result_left">
             {{ outtext|linebreaksbr }} <BR /><BR />
