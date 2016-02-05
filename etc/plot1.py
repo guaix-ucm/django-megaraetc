@@ -24,7 +24,7 @@ def plot_and_save(tempname, x, y, label1, label2, label3):
     text = string1 + '\n' + string2 + '\n' + string3
     plt.annotate(text, xy=(1.01, 0.4), xytext=(0, +7.5), fontsize=18,
     xycoords='axes fraction', textcoords='offset points',
-    bbox=dict(facecolor='white', alpha=0.8),
+    bbox=dict(edgecolor='none', facecolor='white', alpha=0.8),
     horizontalalignment='left', verticalalignment='middle')
 
     ### ADJUST THE PLOT
@@ -93,7 +93,7 @@ def plot_and_save2(tempname, x2, y2, x2b, y2b, x2c, y2c, x2d, y2d, label1, label
     text = string1 + '\n' + string2 + '\n' + string3
     plt.annotate(text, xy=(1.01, 0.4), xytext=(+0, +7.5), fontsize=18,
     xycoords='axes fraction', textcoords='offset points',
-    bbox=dict(facecolor='white', alpha=0.8),
+    bbox=dict(edgecolor='none', facecolor='white', alpha=0.8),
     horizontalalignment='left', verticalalignment='middle')
 
     ### ADJUST THE PLOT
