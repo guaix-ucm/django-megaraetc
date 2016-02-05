@@ -12,6 +12,8 @@ from justcalc import calc
 from plot1 import plot_and_save, plot_and_save2
 
 import numpy
+import os
+import tempfile
 
 def compute5(request):
     sourcet_val = request.GET['stype']
@@ -20,7 +22,11 @@ def compute5(request):
     else:
         size_val = request.GET['size']
 
-    inputcontt_val = request.GET['contmagflux']
+    tocheck = request.GET['contmagflux']
+    if tocheck:
+        inputcontt_val = "M"
+    else:
+        inputcontt_val = request.GET['contmagflux']
     if inputcontt_val == "M":
         mag_val = request.GET['contmagval']
         fc_val = 1e-16
@@ -241,8 +247,20 @@ def etc_do(request):
             label2a = "none"
             label2b = "none"
             label2c = "none"
-        graphic = plot_and_save(x, y, label1, label2, label3)
-        graphic2 = plot_and_save2(x2, y2, x2b, y2b, x2c, y2c, x2d, y2d, label2a, label2b, label2c)
+        # CREATE TEMPORARY FILE
+        temp = tempfile.NamedTemporaryFile(suffix=".png", prefix="temp", dir="etc/static/etc/tmp/", delete=False)
+        graphic = plot_and_save(temp.name, x, y, label1, label2, label3)
+        temp2 = tempfile.NamedTemporaryFile(suffix=".png", prefix="temp", dir="etc/static/etc/tmp/", delete=False)
+        graphic2 = plot_and_save2(temp2.name, x2, y2, x2b, y2b, x2c, y2c, x2d, y2d, label2a, label2b, label2c)
+
+        # RENAME FILE PATH
+        dirname, basename = os.path.split(graphic)
+        newpath = '/static/etc/tmp/'
+        graphic = os.path.join(newpath, basename)
+
+        dirname2, basename2 = os.path.split(graphic2)
+        newpath2 = '/static/etc/tmp/'
+        graphic2 = os.path.join(newpath2, basename2)
 
         inputstring = str(outputofcalc['texti'])
         coutputstring = str(outputofcalc['textoc'])
