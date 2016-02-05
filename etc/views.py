@@ -87,15 +87,15 @@ def compute5(request):
         entry_vph_lambdae = queryvph[0]['lambda_e']
         entry_vph_specconf = queryvph[0]['specconf']
 
-        vphfeatures = [entry_vph_fwhm,entry_vph_disp,entry_vph_deltab,entry_vph_lambdac,\
-                       entry_vph_relatedband,entry_vph_lambdab,entry_vph_lambdae,entry_vph_specconf]
+        # vphfeatures = [entry_vph_fwhm,entry_vph_disp,entry_vph_deltab,entry_vph_lambdac,\
+        #                entry_vph_relatedband,entry_vph_lambdab,entry_vph_lambdae,entry_vph_specconf]
         # filtercar2 = ["0","0",entry_vph_lambdab,entry_vph_lambdae]
 
         spec = request.GET['spectype']
         queryspec = SpectralTemplate.objects.filter(pk=spec).values()
         entry_spec_name = queryspec[0]['name']
-        entry_spec_path = queryspec[0]['path']
-        spectdat = [entry_spec_name,entry_spec_path]
+        # entry_spec_path = queryspec[0]['path']
+        # spectdat = [entry_spec_name,entry_spec_path]
         spect_val = entry_spec_name
 
         moon_val = request.GET['moonph']
