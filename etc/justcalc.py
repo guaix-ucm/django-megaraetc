@@ -194,7 +194,7 @@ def outtextoutc(sourcet_val,nfibres, nfib, nfib1,\
     text = text + '%4.2f // %4.2f per detector pixel\n' % (sncont_psp_pspp, tsncont_psp_pspp)
     # Output per spectral pixel
     text = text + '%4.2f // %4.2f per spectral pixel\n' % (sncont_psp_pspp*2, tsncont_psp_pspp*2)
-    text = text + '%4.2f // %4.2f in one spectral FWHM (voxel)\n  ' \
+    text = text + '%4.2f // %4.2f per spectral FWHM (voxel)\n  ' \
                   '%4.2f // %4.2f per AA\n' \
                   % (sncont_p2sp_fibre, tsncont_p2sp_fibre,\
                      sncont_1aa_fibre, tsncont_1aa_fibre)
@@ -204,8 +204,8 @@ def outtextoutc(sourcet_val,nfibres, nfib, nfib1,\
 
     # Output in all spectrum
     text = text + '\n * SNR in total source area:\n  (no. of fibres~%5.1f)\n' % nfibres
-    text = text + '%4.2f // %4.2f in one spectral pixel\n' \
-                  '%4.2f // %4.2f in one spectral FWHM\n' \
+    text = text + '%4.2f // %4.2f per spectral pixel\n' \
+                  '%4.2f // %4.2f per spectral FWHM\n' \
                   '%4.2f // %4.2f per AA\n' \
                   % (sncont_p2sp_all/2, tsncont_p2sp_all/2,\
                       sncont_p2sp_all, tsncont_p2sp_all,\
@@ -217,7 +217,7 @@ def outtextoutc(sourcet_val,nfibres, nfib, nfib1,\
         text = text + '\n * SNR in 1 seeing:\n'
         if nfib > 0.:
             text = text + '(no. of fibres~%5.1f)\n' % nfib
-        text = text + '%4.2f // %4.2f in one spectral FWHM\n' \
+        text = text + '%4.2f // %4.2f per spectral FWHM\n' \
                       '%4.2f // %4.2f per AA\n' \
                       '%4.2f // %4.2f collapsed spectrum (spaxel)\n' \
                       % (sncont_p2sp_seeing, tsncont_p2sp_seeing,\
@@ -229,7 +229,7 @@ def outtextoutc(sourcet_val,nfibres, nfib, nfib1,\
         text = text + '\n* SNR in 1 arcsec**2:\n'
 
         if nfib1 > 0.:
-            text = text + '%4.2f // %4.2f in one spectral FWHM\n' \
+            text = text + '%4.2f // %4.2f per spectral FWHM\n' \
                           '%4.2f // %4.2f per AA\n    ' \
                           '%4.2f // %4.2f collapsed spectrum (spaxel)\n' \
                           % (sncont_p2sp_1, tsncont_p2sp_1,\
