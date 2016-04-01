@@ -117,7 +117,7 @@ def outmessage(textcode):
 
 def outtextinp(om_val, bandc_val, sourcet_val, mag_val, netflux, size_val,
                seeingx, pi, fluxt_val, wline_val, fline_val, fwhmline_val,
-               vph_val, moon_val, airmass_val, seeing_zenith, fsky, numframe_val,
+               vph_val, skycond_val, moon_val, airmass_val, seeing_zenith, fsky, numframe_val,
                exptimepframe_val, exptime_val, npdark_val, nsbundles_val,
                nfwhmline_val, cnfwhmline_val, resolvedline_val, bandsky):
 
@@ -141,7 +141,7 @@ def outtextinp(om_val, bandc_val, sourcet_val, mag_val, netflux, size_val,
     text = text + '* Instrument: \n  Obs. Mode = %3s\n' % (om_val)
     text = text + '  VPH = %10s\n' % (vph_val)
 
-    text = text + '* Sky: \n  Moon = %6s\n  Airmass: X = %3.2f\n  Seeing(@X=1) = %4.2f\n' % (moon_val, airmass_val, seeing_zenith)
+    text = text + '* Sky: \n Condition = %15s \n Moon = %6s\n  Airmass: X = %3.2f\n  Seeing(@X=1) = %4.2f\n' % (skycond_val, moon_val, airmass_val, seeing_zenith)
     text = text + '  Sky-flux(%s,@X) = %7.3e cgs\n  Seeing(@X) = %4.2f\n' % (bandsky, fsky, seeingx)
     text = text + '* Observation: \n Num. of frames = %6i\n Exptime/frame = %7.1f\n Total Exptime = %7.1f\n NP_Dark = %6i\n  Sky-bundles = %i\n' % (numframe_val, exptimepframe_val, exptime_val, npdark_val, nsbundles_val)
 
@@ -483,13 +483,24 @@ tatmdat = "MEGARA_TRANSM_0.1aa/atmt_total_0.1aa.dat"
 lamb, tatm = reading(tatmdat,2)
 tatm = numpy.array(tatm)
 
+# Atmospheric conditions: (in magnitude)
+# Photometric = 10^(-0.4*0), Clear = 10^(-0.4*0.4), Spectroscopic = 10^(-0.4*1)
+skycond_list = ['Photometric', 'Clear', 'Spectroscopic']
+tcond = [1,             # Photometric
+         0.69183097091, # Clear
+         0.39810717055  # Spectroscopic
+         ]
+# tcond = [1,
+#          0.4,
+#          0
+#          ]
 
 #######
 # Compute results
-def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
-         fline_val,wline_val,nfwhmline_val,cnfwhmline_val,\
-         fwhmline_val,resolvedline_val,spect_val,bandc_val,\
-         om_val,vph_val,moon_val,airmass_val,seeing_val,numframe_val,exptimepframe_val,\
+def calc(sourcet_val, inputcontt_val, mag_val, fc_val, size_val, fluxt_val,\
+         fline_val, wline_val, nfwhmline_val, cnfwhmline_val,\
+         fwhmline_val, resolvedline_val, spect_val, bandc_val,\
+         om_val,vph_val, skycond_val, moon_val, airmass_val, seeing_val, numframe_val, exptimepframe_val,\
          nsbundles_val):
 
     global texti, textoc, textol
@@ -820,7 +831,8 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
         enpheff = hplanck * lightv / lambdaeffcm
 
         # System efficiency
-        effsys = tatm * tgtcinst
+        tcondmag = tcond[skycond_list.index(skycond_val)]
+        effsys = tatm * tgtcinst * tcondmag
 
         # Telescope collecting area (cm**2)
         stel = pi * ( (rt * 100.0)**2 )
@@ -1287,7 +1299,7 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
         # Output of input parameters #
         ##############################
         textigui,texti = outtextinp(om_val,bandc_val,sourcet_val,mag_val,netflux,size_val,seeingx,pi,fluxt_val,wline_val,\
-         fline_val, fwhmline_val,vph_val,moon_val, airmass_val, seeing_zenith,fsky,numframe_val,exptimepframe_val,exptime_val,\
+         fline_val, fwhmline_val,vph_val, skycond_val, moon_val, airmass_val, seeing_zenith,fsky,numframe_val,exptimepframe_val,exptime_val,\
         npdark_val,nsbundles_val,nfwhmline_val, cnfwhmline_val,resolvedline_val, bandsky)
 
         #######################################
@@ -1312,7 +1324,7 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
         ############################################
         # Output of line+continuum signal-to-noise #
         ############################################
-        textolgui,textol = outtextoutl(fluxt_val,\
+        textolgui, textol = outtextoutl(fluxt_val,\
                                        snline_all, snline_fibre,\
                                        snline_pspp, snline_1_aa,\
                                        sourcet_val,\
@@ -1325,7 +1337,7 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
             outtext = ""
 
         # FOR DJANGO: This is for saving the output of calc() in the static folder.
-        outputfilename="etc/static/etc/outputcalc.txt"
+        outputfilename = "etc/static/etc/outputcalc.txt"
         with open(outputfilename, 'w') as f:
             print >> f, outtext
             print >> f, texti
@@ -1333,15 +1345,50 @@ def calc(sourcet_val,inputcontt_val,mag_val,fc_val,size_val,fluxt_val,\
             print >> f, textol
 
         # FOR DJANGO: Finally, return these outputs.
+        # Order: input values, Output Cont., Output Line.
+        #
         return {'outtext' : outtext, 'texti' : texti, 'textoc' : textoc, 'textol' : textol,\
+                'om_val' : om_val, 'bandc_val' : bandc_val, 'sourcet_val' : sourcet_val,\
+                'mag_val' : mag_val, 'netflux' : netflux, 'size_val' : size_val,\
+                'seeingx' : seeingx, 'pi': pi, 'fluxt_val' : fluxt_val,\
+                'wline_val' : wline_val, 'fline_val' : fline_val, 'fwhmline_val' : fwhmline_val,\
+                'vph_val' : vph_val, 'skycond_val' : skycond_val, 'moon_val' : moon_val,\
+                'airmass_val' : airmass_val, 'seeing_zenith' : seeing_zenith,\
+                'fsky' : fsky, 'numframe_val' : numframe_val,\
+                'exptimepframe_val' : exptimepframe_val, 'exptime_val' : exptime_val,\
+                'npdark_val' : npdark_val, 'nsbundles_val' : nsbundles_val,\
+                'nfwhmline_val' : nfwhmline_val, 'cnfwhmline_val' : cnfwhmline_val,\
+                'resolvedline_val' : resolvedline_val, 'bandsky' : bandsky,\
+
                 'sourcespectrum' : sourcespectrum, 'lamb' : lamb,\
-                'vph_val' : vph_val, 'spect_val' : spect_val,\
-                'bandc_val' : bandc_val,'mag_val' : mag_val,\
+                'spect_val' : spect_val,\
                 'fc' : fc,\
                 'pframesn_psp_asp' : pframesn_psp_asp,\
                 'allframesn_psp_asp' : allframesn_psp_asp,\
                 'pframesn_psp_asp_all' : pframesn_psp_asp_all,\
-                'allframesn_psp_asp_all' : allframesn_psp_asp_all}     # ADDED FOR DJANGO
+                'allframesn_psp_asp_all' : allframesn_psp_asp_all,\
+
+                'nfibres' : nfibres, 'nfib' : nfib, 'nfib1def' : nfib1def,\
+                'sncont_p2sp_all' : sncont_p2sp_all, 'tsncont_p2sp_all' : tsncont_p2sp_all,\
+                'sncont_1aa_all' : sncont_1aa_all, 'tsncont_1aa_all' : tsncont_1aa_all,\
+                'sncont_band_all' : sncont_band_all, 'tsncont_band_all' : tsncont_band_all,\
+                'sncont_p2sp_fibre' : sncont_p2sp_fibre, 'tsncont_p2sp_fibre' : tsncont_p2sp_fibre,\
+                'sncont_1aa_fibre' : sncont_1aa_fibre, 'tsncont_1aa_fibre' : tsncont_1aa_fibre,\
+                'sncont_band_fibre' : sncont_band_fibre, 'tsncont_band_fibre' : tsncont_band_fibre,\
+                'sncont_p2sp_seeing' : sncont_p2sp_seeing, 'tsncont_p2sp_seeing' : tsncont_p2sp_seeing,\
+                'sncont_1aa_seeing' : sncont_1aa_seeing, 'tsncont_1aa_seeing' : tsncont_1aa_seeing,\
+                'sncont_band_seeing' : sncont_band_seeing, 'tsncont_band_seeing' : tsncont_band_seeing,\
+                'sncont_p2sp_1' : sncont_p2sp_1, 'tsncont_p2sp_1' : tsncont_p2sp_1,\
+                'sncont_1aa_1' : sncont_1aa_1, 'tsncont_1aa_1' : tsncont_1aa_1,\
+                'sncont_band_1' : sncont_band_1, 'tsncont_band_1' : tsncont_band_1,\
+                'sncont_psp_pspp' : sncont_psp_pspp, 'tsncont_psp_pspp' : tsncont_psp_pspp,\
+                'lambdaeff' : lambdaeff,\
+
+                'snline_all' : snline_all, 'snline_fibre' : snline_fibre,\
+                'snline_pspp' : snline_pspp, 'snline_1_aa' : snline_1_aa,\
+                'snline_seeing' : snline_seeing, 'snline_1' : snline_1,\
+                'snline_spaxel' : snline_spaxel, 'snline_fibre1aa': snline_fibre1aa
+                }     # ADDED FOR DJANGO
     # Avoiding computations in case of exception of errind
     else:
         spectdat = specttmplt_list[spect_list.index(spect_val)]
