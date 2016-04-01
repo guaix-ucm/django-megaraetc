@@ -17,6 +17,12 @@ OMODE = [
  ('MOS', 'MOS'),
 ]
 
+SKYCOND = [
+ ('Photometric', 'Photometric'),
+ ('Clear', 'Clear'),
+ ('Spectroscopic', 'Spectroscopic'),
+]
+
 MOONPH = [
  ('Bright', 'Bright'),
  ('Grey', 'Grey'),
@@ -71,6 +77,7 @@ class InstrumentForm(forms.Form):
     vph = forms.ChoiceField(label="VPH setup", initial=1, choices=vph_choice()) #, widget=forms.Select(attrs={'size':'3', 'style':'width:100px' }))
 
 class AtmosphericConditionsForm(forms.Form):
+    skycond = forms.ChoiceField(label="Sky condition", initial="Photometric", choices=SKYCOND)
     moonph = forms.ChoiceField(label="Moon phase", initial="Dark", choices=MOONPH)
     airmass = forms.FloatField(label="Airmass", initial=1.0, min_value=0.0, max_value=5, widget=forms.TextInput(attrs={'size':'7'}))
     seeing = forms.FloatField(label="Seeing", initial=0.5, min_value=0.0, max_value=5, widget=forms.TextInput(attrs={'size':'7'}))
