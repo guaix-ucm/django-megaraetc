@@ -96,7 +96,7 @@ def outmessage(textcode):
     elif textcode == 109:
         outtext = "** WARNING **\nExptime value must be 0 < Exptime <1e6"
     elif textcode == 110:
-        outtext = "** WARNING **\nNo. of sky mini-bundles must be 1 < No. bundles < 700"
+        outtext = "** WARNING **\nNo. of sky mini-bundles must be 1 <= No. bundles <= 89 (LCB) or 92 (MOS)"
     elif textcode == 111:
         outtext = "** WARNING **\nThe line wavelength is outside the VPH wavelength range."
     elif textcode == 112:
@@ -118,7 +118,7 @@ def outmessage(textcode):
 def outtextinp(om_val, bandc_val, sourcet_val, mag_val, netflux, size_val,
                seeingx, pi, fluxt_val, wline_val, fline_val, fwhmline_val,
                vph_val, skycond_val, moon_val, airmass_val, seeing_zenith, fsky, numframe_val,
-               exptimepframe_val, exptime_val, npdark_val, nsbundles_val,
+               exptimepframe_val, exptime_val, npdark_val, nsbundles_val, nsfib_val,
                nfwhmline_val, cnfwhmline_val, resolvedline_val, bandsky):
 
     if sourcet_val == "P":
@@ -141,16 +141,16 @@ def outtextinp(om_val, bandc_val, sourcet_val, mag_val, netflux, size_val,
     text = text + '* Instrument: \n  Obs. Mode = %3s\n' % (om_val)
     text = text + '  VPH = %10s\n' % (vph_val)
 
-    text = text + '* Sky: \n Condition = %15s \n Moon = %6s\n  Airmass: X = %3.2f\n  Seeing(@X=1) = %4.2f\n' % (skycond_val, moon_val, airmass_val, seeing_zenith)
+    text = text + '* Sky: \n  Condition = %15s \n  Moon = %6s\n  Airmass: X = %3.2f\n  Seeing(@X=1) = %4.2f\n' % (skycond_val, moon_val, airmass_val, seeing_zenith)
     text = text + '  Sky-flux(%s,@X) = %7.3e cgs\n  Seeing(@X) = %4.2f\n' % (bandsky, fsky, seeingx)
-    text = text + '* Observation: \n Num. of frames = %6i\n Exptime/frame = %7.1f\n Total Exptime = %7.1f\n NP_Dark = %6i\n  Sky-bundles = %i\n' % (numframe_val, exptimepframe_val, exptime_val, npdark_val, nsbundles_val)
+    text = text + '* Observation: \n  Num. of frames = %6i\n  Exptime/frame = %7.1f\n  Total Exptime = %7.1f\n  NP_Dark = %6i\n  Sky-bundles = %i, Fibers = %i\n' % (numframe_val, exptimepframe_val, exptime_val, npdark_val, nsbundles_val, nsfib_val)
 
     if fluxt_val == "L":
         text =  text + '  Spectral apertures:\n    For line=%2i\n    For continuum=%2i\n' % (nfwhmline_val, cnfwhmline_val)
 
     # Adding blank spaces, to overwrite previous outputs
     textfile = text
-    textfile= " INPUT PARAMETERS:\n " + textfile
+    textfile= " INPUT PARAMETERS:\n" + textfile
     # textfile = "**************************\n* MEGARA ETC OUTPUT FILE *\n**************************\n" + textfile      # FOR DJANGO
 
     if (sourcet_val == "P"):
@@ -191,11 +191,11 @@ def outtextoutc(sourcet_val,nfibres, nfib, nfib1,\
     # Output in one fibre
     text = '* SNR per fibre:\n'
     # Output per spectral and spatial pixel
-    text = text + '%4.2f // %4.2f per detector pixel\n' % (sncont_psp_pspp, tsncont_psp_pspp)
+    text = text + ' %4.2f // %4.2f per detector pixel\n' % (sncont_psp_pspp, tsncont_psp_pspp)
     # Output per spectral pixel
-    text = text + '%4.2f // %4.2f per spectral pixel\n' % (sncont_psp_pspp*2, tsncont_psp_pspp*2)
-    text = text + '%4.2f // %4.2f per spectral FWHM (voxel)\n  ' \
-                  '%4.2f // %4.2f per AA\n' \
+    text = text + ' %4.2f // %4.2f per spectral pixel\n' % (sncont_psp_pspp*2, tsncont_psp_pspp*2)
+    text = text + ' %4.2f // %4.2f per spectral FWHM (voxel)\n' \
+                  ' %4.2f // %4.2f per AA\n' \
                   % (sncont_p2sp_fibre, tsncont_p2sp_fibre,\
                      sncont_1aa_fibre, tsncont_1aa_fibre)
                      # sncont_band_fibre, tsncont_band_fibre)
@@ -204,9 +204,9 @@ def outtextoutc(sourcet_val,nfibres, nfib, nfib1,\
 
     # Output in all spectrum
     text = text + '\n * SNR in total source area:\n  (no. of fibres~%5.1f)\n' % nfibres
-    text = text + '%4.2f // %4.2f per spectral pixel\n' \
-                  '%4.2f // %4.2f per spectral FWHM\n' \
-                  '%4.2f // %4.2f per AA\n' \
+    text = text + ' %4.2f // %4.2f per spectral pixel\n' \
+                  ' %4.2f // %4.2f per spectral FWHM\n' \
+                  ' %4.2f // %4.2f per AA\n' \
                   % (sncont_p2sp_all/2, tsncont_p2sp_all/2,\
                       sncont_p2sp_all, tsncont_p2sp_all,\
                      sncont_1aa_all, tsncont_1aa_all)
@@ -214,12 +214,12 @@ def outtextoutc(sourcet_val,nfibres, nfib, nfib1,\
 
     # Output in 1 FWHM (only if source is extended, different from previous one)
     if sourcet_val == "E":
-        text = text + '\n * SNR in 1 seeing:\n'
+        text = text + '\n* SNR in 1 seeing:\n'
         if nfib > 0.:
-            text = text + '(no. of fibres~%5.1f)\n' % nfib
-        text = text + '%4.2f // %4.2f per spectral FWHM\n' \
-                      '%4.2f // %4.2f per AA\n' \
-                      '%4.2f // %4.2f collapsed spectrum (spaxel)\n' \
+            text = text + ' (no. of fibres~%5.1f)\n' % nfib
+        text = text + ' %4.2f // %4.2f per spectral FWHM\n' \
+                      ' %4.2f // %4.2f per AA\n' \
+                      ' %4.2f // %4.2f collapsed spectrum (spaxel)\n' \
                       % (sncont_p2sp_seeing, tsncont_p2sp_seeing,\
                          sncont_1aa_seeing, tsncont_1aa_seeing,\
                          sncont_band_seeing, tsncont_band_seeing)
@@ -229,18 +229,18 @@ def outtextoutc(sourcet_val,nfibres, nfib, nfib1,\
         text = text + '\n* SNR in 1 arcsec**2:\n'
 
         if nfib1 > 0.:
-            text = text + '%4.2f // %4.2f per spectral FWHM\n' \
-                          '%4.2f // %4.2f per AA\n    ' \
-                          '%4.2f // %4.2f collapsed spectrum (spaxel)\n' \
+            text = text + ' %4.2f // %4.2f per spectral FWHM\n' \
+                          ' %4.2f // %4.2f per AA\n    ' \
+                          ' %4.2f // %4.2f collapsed spectrum (spaxel)\n' \
                           % (sncont_p2sp_1, tsncont_p2sp_1,\
                              sncont_1aa_1, tsncont_1aa_1,\
                              sncont_band_1, tsncont_band_1)
 
     # Adding blank spaces, to overwrite previous outputs
     textfile = text
-    textfile = "OUTPUT CONTINUUM SNR \n"+\
-               "(at lambda_c = "+ str(lambdaeff) +" AA)\n" \
-               "(of frame // of total)\n" + textfile
+    textfile = " OUTPUT CONTINUUM SNR \n"+\
+               " (at lambda_c = "+ str(lambdaeff) +" AA)\n" \
+               " (of frame // of total)\n" + textfile
 
     if (sourcet_val == "P"):
         text = text + "\n\n\n\n\n\n\n\n"
@@ -619,9 +619,9 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, size_val, fluxt_val,\
     npdark_val = 65500.
 
     # Sky fibres
-    nsbundles_val = isafloat(nsbundles_val,100.0)
-    if nsbundles_val <= 0. or nsbundles_val > 700:
-        nsbundles_val = 100.
+    nsfib_val = isafloat(nsbundles_val*7,92.0) # convert from number of bundles to number of fibers
+    if nsfib_val <= 0. or nsfib_val > 644:
+        nsfib_val = 56.
         outtext = outmessage(110)
         errind = warn(outtext,frame0,'MEGARA ETC Warning')
 
@@ -938,7 +938,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, size_val, fluxt_val,\
         nfibresy = math.ceil( (2.0 * rsource) / (2. * afibre))
 
         # Area in which sky has been measured
-        nfibresky = nsbundles_val
+        nfibresky = nsfib_val
         nfibresky = math.ceil (nfibresky)
         omegasky = nfibresky * areafibre
 
@@ -1300,7 +1300,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, size_val, fluxt_val,\
         ##############################
         textigui,texti = outtextinp(om_val,bandc_val,sourcet_val,mag_val,netflux,size_val,seeingx,pi,fluxt_val,wline_val,\
          fline_val, fwhmline_val,vph_val, skycond_val, moon_val, airmass_val, seeing_zenith,fsky,numframe_val,exptimepframe_val,exptime_val,\
-        npdark_val,nsbundles_val,nfwhmline_val, cnfwhmline_val,resolvedline_val, bandsky)
+        npdark_val,nsbundles_val,nsfib_val,nfwhmline_val, cnfwhmline_val,resolvedline_val, bandsky)
 
         #######################################
         # Output of continuum signal-to-noise #
@@ -1356,7 +1356,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, size_val, fluxt_val,\
                 'airmass_val' : airmass_val, 'seeing_zenith' : seeing_zenith,\
                 'fsky' : fsky, 'numframe_val' : numframe_val,\
                 'exptimepframe_val' : exptimepframe_val, 'exptime_val' : exptime_val,\
-                'npdark_val' : npdark_val, 'nsbundles_val' : nsbundles_val,\
+                'npdark_val' : npdark_val, 'nsbundles_val' : nsbundles_val, 'nsfib_val' : nsfib_val,\
                 'nfwhmline_val' : nfwhmline_val, 'cnfwhmline_val' : cnfwhmline_val,\
                 'resolvedline_val' : resolvedline_val, 'bandsky' : bandsky,\
 

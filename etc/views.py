@@ -277,7 +277,7 @@ def etc_do(request):
             netflux_string = str(outputofcalc['netflux'])
             size_val_string = str(outputofcalc['size_val'])
             seeingx_string = str(outputofcalc['seeingx'])
-            fluxt_val_string = str(outputofcalc['fluxt_val'])
+            fluxt_val_string = outputofcalc['fluxt_val']
             wline_val_string = str(outputofcalc['wline_val'])
             fline_val_string = str(outputofcalc['fline_val'])
             fwhmline_val_string = str(outputofcalc['fwhmline_val'])
@@ -361,7 +361,7 @@ def etc_do(request):
                               '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_peraa.jpeg" /></td><td class="perframecolumn"> '+sncont_1aa_fibre_string+' </td><td> '+tsncont_1aa_fibre_string+'</td><td> per AA</td></tr>'+\
                               '<tr class="rowheight"><td> </td></tr>'+\
                               '<tr><td class="iconcolumn"> </td><th scope="col" colspan="2">* SNR in total source area:</th><th>(number of fibers = '+nfibres_string+')</th></tr>'+\
-                              '<tr><td class="iconcolumn"> </td><td class="perframecolumn">per frame</td><td class="allframecolumn">all frames</td></tr>'+\
+                              '<tr><td class="iconcolumn"> </td><td class="perframecolumn">per frame</td><td class="allframecolumn">all frames</td><td></td></tr>'+\
                               '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspp.jpeg" /></td><td> '+sncont_p2sp_all_string+' </td><td> '+tsncont_p2sp_all_string+'</td><td> per spectral pixel</td></tr>'+\
                               '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspfwhm.jpeg" /></td><td> '+sncont_pspfwhm_all_string+' </td><td> '+tsncont_pspfwhm_all_string+'</td><td> per spectral FWHM</td></tr>'+\
                               '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_peraa.jpeg" /></td><td> '+sncont_1aa_all_string+' </td><td> '+tsncont_1aa_all_string+'</td><td> per AA</td></tr>'+\
@@ -370,7 +370,7 @@ def etc_do(request):
                 tablecoutstring = tablecoutstring+\
                               '<table border=1>'+\
                               '<tr><th class="iconcolumn" scope="col"> </td><th scope="col" colspan="2">* SNR in one seeing:</th><th scope="col"></th></tr>'+\
-                              '<tr><th class="iconcolumn" scope="row"> </th><td class="perframecolumn">per frame</td><td class="allframecolumn">all frames</td></tr>'+\
+                              '<tr><th class="iconcolumn" scope="row"> </th><td class="perframecolumn">per frame</td><td class="allframecolumn">all frames</td><td></td></tr>'+\
                               '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspfwhm.jpeg" /></td><td> '+sncont_p2sp_seeing_string+' </td><td> '+tsncont_p2sp_seeing_string+'</td><td> per spectral FWHM</td></tr>'+\
                               '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_peraa.jpeg" /></td><td> '+sncont_1aa_seeing_string+' </td><td> '+tsncont_1aa_seeing_string+'</td><td> per AA</td></tr>'+\
                               '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_collapsed.jpeg" /></td><td> '+sncont_band_seeing_string+' </td><td> '+tsncont_band_seeing_string+'</td><td> per collapsed spectrum (spaxel)</td></tr>'+\
@@ -382,15 +382,22 @@ def etc_do(request):
                               '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_collapsed.jpeg" /></td><td> '+sncont_band_1_string+' </td><td> '+tsncont_band_1_string+'</td><td> per collapsed spectrum (spaxel)</td></tr>'+\
                               '</table><br />'
 
-            tableloutstring = '<table border=1>'+\
-                              '<tr><td>OUTPUT LINE SNR:</td><td></td></tr>'+\
-                              '<tr><td>* SNR per arcsec per AA = </td><td>'+ snline_1_aa_string +'</td></tr>'+\
-                              '<tr><td>* SNR in 1 fibre (in aperture) = </td><td>'+ snline_fibre_string +'</td></tr>'+\
-                              '<tr><td>* SNR in 1 fibre (in 1 AA) = </td><td>'+ snline_fibre1aa_string +'</td></tr>'+\
-                              '<tr><td>* SNR per voxel = </td><td>'+ snline_spaxel_string +'</td></tr>'+\
-                              '<tr><td>* SNR per detector pixel = </td><td>'+ snline_pspp_string +'</td></tr>'+\
-                              '<tr><td>* SNR total (in aperture) = </td><td>'+ snline_all_string +'</td></tr>'+\
-                              '</table><br />'
+            if fluxt_val_string == 'L':
+                tableloutstring = 'OUTPUT LINE SNR:'+fluxt_val_string+\
+                                  '<br />(at lambda_line = '+wline_val_string+' AA)'+\
+                                  '<table border=1>'+\
+                                  '<tr><th class="iconcolumn" scope="row"> </th><td class="perframecolumn">per frame</td><td class="allframecolumn">all frames</td><td></td></tr>'+\
+                                  '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pdp.jpeg" /></td><td class="perframecolumn"> '+ snline_pspp_string +'</td><td> '+tsncont_psp_pspp_string+'</td><td> per detector pixel</td></tr>'+\
+                                  '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspfwhm.jpeg" /></td><td class="perframecolumn"> '+ snline_spaxel_string +'</td><td> '+tsncont_p2sp_fibre_string+'</td><td> per spectral FWHM (voxel)</td></tr>'+\
+                                  '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pdp.jpeg" /></td><td class="perframecolumn"> '+  snline_1_aa_string +'</td><td> '+tsncont_1aa_fibre_string+'</td><td> per arcsec per AA</td></tr>'+\
+                                  '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pdp.jpeg" /></td><td class="perframecolumn"> '+ snline_fibre1aa_string +'</td><td> '+tsncont_1aa_1_string+'</td><td> per fiber per AA</td></tr>'+\
+                                  '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pdp.jpeg" /></td><td class="perframecolumn"> '+ snline_fibre_string +'</td><td> '+tsncont_band_fibre_string+'</td><td> per fiber in aperture</td></tr>'+\
+                                  '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pdp.jpeg" /></td><td class="perframecolumn"> '+ snline_all_string +'</td><td> </td><td> total in aperture</td></tr>'+\
+                                  '</table><br />'
+                                  # '<tr><td>OUTPUT LINE SNR:</td><td></td><td></td><td></td></tr>'+\
+            else:
+                tableloutstring = 'No line input<br /><br />'
+
 
             tableinputstring = '<table border=1>'+\
                              '<tr><td>INPUT PARAMETERS:</td><td></td></tr>'+\

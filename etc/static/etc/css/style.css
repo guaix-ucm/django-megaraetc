@@ -1,0 +1,161 @@
+/* GLOBAL */
+
+body{
+    max-width: 1080px;
+    margin: 0 auto !important;
+    float: none !important;
+}
+
+#header{
+    height: 100px;
+}
+
+div.ucmlogotd{
+    float:left
+}
+
+div.megaralogotd{
+    float:right;
+}
+
+div.maintitletd {
+    width: 30%;
+    margin-left: 2%;
+    float: left;
+}
+
+
+
+
+
+/* INDEX PAGE */
+
+#index_wrapper {
+    width: 100%;
+    margin: 0 auto;
+}
+
+#index_content {
+    width: 900px;
+    margin-top: 30%;
+    margin-left: 10%;
+    align: center;
+/*    padding-top: 11%;
+    padding-left: 10%; */
+}
+
+#index_leftdiv {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 15%;
+}
+
+#index_centerdiv{
+    display: inline-block;
+    vertical-align: middle;
+    text-align: left;
+}
+
+#index_rightdiv {
+    display: inline-block;
+    vertical-align: middle;
+    text-align: left;
+}
+
+#index_hr_special {
+    background-color: red;
+    width: 100%;
+    height: 2px;
+    text-align: left;
+}
+
+#img_bigImage {
+    width: 150px;
+}
+
+#img_poweredby {
+    text-align: right;
+    width: 100px;
+}
+
+#copyright {
+    font-size: 10pt;
+}
+
+#index_footer {
+    text-align: center;
+}
+
+/*  RESULTS PAGE */
+
+#result_wrapper {
+    width: 100%;
+    text-align: center;
+}
+
+#result_content {
+    width: 951px;
+    font-size: 15pt;
+    text-align: center;
+}
+
+#result_header {
+    width: 100%;
+    display: inline-block;
+    color: red;
+    text-align: center;
+    vertical-align: top;
+    border-style: groove;
+}
+
+#result_left {
+    width: 38%;
+    display: inline-block;
+    text-align: left;
+    vertical-align: top;
+    border-style: groove;
+    float: left;
+}
+
+#result_center {
+    width: 30%;
+    display: inline-block;
+    text-align: left;
+    vertical-align: top;
+    border-style: groove;
+    float: none;
+}
+
+#result_right {
+    width: 30%;
+    display: inline-block;
+    text-align: left;
+    vertical-align: top;
+    border-style: groove;
+    float: right;
+}
+
+#result_bottom {
+    text-align: left;
+    vertical-align: middle;
+    width:100%;
+    margin: 0 auto;
+    /*padding: 10 10 10 10;*/
+}
+
+#img_plot1 {
+    width: 450px;
+}
+
+div#footer{
+    float: left;
+    width: 100%;
+}
+
+div#footer > p{
+    background-color: transparent;
+}
+
+div.release{
+    float:right;
+}

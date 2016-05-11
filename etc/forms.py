@@ -106,6 +106,8 @@ class ObservationalSetupForm(forms.Form):
 
     numframes = forms.IntegerField(label="Num. Exp.", initial=1, min_value=1, widget=forms.TextInput(attrs={'size':'7'}))
     exptimepframe = forms.FloatField(label="Exptime per frame (sec)", initial=3600.0, min_value=1.0, widget=forms.TextInput(attrs={'size':'7'}))
-    nfibers = forms.IntegerField(label="(*)No. of sky fibers", help_text=nfibers_help, initial=100, min_value=0, max_value=3600, widget=forms.TextInput(attrs={'size':'6'}))
+    # LCB: default=8 bundles (56 fibers), max=89 bundles (623 fibers); min= 1 bundle.
+    # MOS: default=max=92 bundles (644 fibers), min= 1 bundle (7 fibers);
+    nfibers = forms.IntegerField(label="(*)No. of bundles", help_text=nfibers_help, initial=8, min_value=1, max_value=89, widget=forms.TextInput(attrs={'size':'6'}))
     lineap = forms.FloatField(label="Line aperture", help_text=lineap_help, initial=1.0, widget=forms.TextInput(attrs={'size':'5','disabled':'true'}))
     contap = forms.FloatField(label="Continuum aperture", help_text=contap_help, initial=1.0, widget=forms.TextInput(attrs={'size':'5','disabled':'true'}))
