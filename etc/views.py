@@ -200,6 +200,8 @@ def etc_do(request):
         vph = request.POST['vph']
         queryvph = VPHSetup.objects.filter(pk=vph).values()
         vph_val = queryvph[0]['name']
+        vph_minval = queryvph[0]['lambda_b']
+        vph_maxval = queryvph[0]['lambda_e']
         spec = request.POST['spectype']
         queryspec = SpectralTemplate.objects.filter(pk=spec).values()
         entry_spec_name = queryspec[0]['name']
@@ -262,10 +264,15 @@ def etc_do(request):
         coutputstring = '<br /><p>' + str(outputofcalc['textoc']) + '</p>'
         loutputstring = '<br /><p>' + str(outputofcalc['textol']) + '</p>'
 
-        figura = plot_and_save_new('', x, y, label1, label2, label3)
+        x3 = outputofcalc['wline_val']
+        y3 = outputofcalc['fwhmline_val']
+        z3 = outputofcalc['fline_val']
+        figura = plot_and_save_new('', x, y, x3, y3, z3, vph_minval, vph_maxval, label1, label2, label3)
         html = mpld3.fig_to_html(figura)
+
         figura2 = plot_and_save2_new('', x2, y2, x2b, y2b, x2c, y2c, x2d, y2d, label2a, label2b, label2c)
         html += mpld3.fig_to_html(figura2)
+
 
         html = html.replace("None", "")  # No se xq introduce string None
 

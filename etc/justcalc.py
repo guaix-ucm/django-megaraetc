@@ -399,7 +399,7 @@ vphchar = list( [(p.fwhm, p.dispersion, p.deltab, p.lambdac, p.relatedband,\
 
 # Templates of spectrum of different astronomical objects
 queryspec = SpectralTemplate.objects.all()
-spect_list = list( [str(p.name) for p in queryspec])
+spect_list = list([str(p.name) for p in queryspec])
 # spect_list = ['Uniform', 'Elliptical', 'S0', 'Sa', 'Sb', 'Sc', 'NGC1068', 'M2 I', 'Starburst1',
 #              'Starburst2','Starburst3','Starburst4','Starburst5','Starburst6',
 #              'Bulge', 'Liner', 'QSO', 'Sy1', 'Sy2', 'Orion', 'PN',

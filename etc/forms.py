@@ -38,8 +38,11 @@ RLINECHOICES=[('N','No'),
 CONTMAGFLUX=[('M','Continuum mag'),
             ('F','Continuum flux')]
 
-def template_choice():
-    return [(o.pk, o.name) for o in SpectralTemplate.objects.all()]
+def template_choice(iflux_var):
+    if iflux_var=='C':
+        return [(o.pk, o.name) for o in SpectralTemplate.objects.all()]
+    else:
+        return [(o.pk, o.name) for o in SpectralTemplate.objects.all()]
 
 def vph_choice():
     return [(o.pk, o.name) for o in VPHSetup.objects.all()]
@@ -68,7 +71,7 @@ class TargetForm(forms.Form):
     iflux = forms.ChoiceField(label="Input flux", initial="C", choices=IFLUX, widget=forms.RadioSelect(renderer=HorizontalRadioRenderer, attrs={'onclick':'selectInputflux()'}))
     rline = forms.ChoiceField(label="Resolved line?", initial="N", choices=RLINECHOICES, widget=forms.RadioSelect(renderer=HorizontalRadioRenderer, attrs={'onclick':'selectRline()','disabled':'true'})) #attrs={'disabled':'disabled'}
 
-    spectype = forms.ChoiceField(label="Input spectrum", initial=1, choices=template_choice()) #, widget=forms.Select(attrs={'size':'4', 'style':'width:100px' }))
+    spectype = forms.ChoiceField(label="Input spectrum", initial=1, choices=template_choice(iflux)) #, widget=forms.Select(attrs={'size':'4', 'style':'width:100px' }))
     pfilter = forms.ChoiceField(label="Continuum band", initial=3, choices=filter_choice()) #, widget=forms.Select(attrs={'size':'5', 'style':'width:100px' }))
 
     contmagflux = forms.ChoiceField(label="", initial="M", choices=CONTMAGFLUX, widget=forms.RadioSelect(renderer=HorizontalRadioRenderer, attrs={'onclick':'selectcontmagflux()'}))
