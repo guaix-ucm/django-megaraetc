@@ -18,7 +18,6 @@ def reading(filename, skipline):
     return numpy.loadtxt(psfile, unpack=True)
 
 
-
 # ********************************
 # Finding out if input is a float.
 
@@ -28,8 +27,6 @@ def isafloat(inp, val):
     except ValueError:
         inp = val
     return inp
-
-
 
 # ********************************
 # Text for output in warning and help windows.
@@ -172,20 +169,20 @@ def outtextinp(om_val, bandc_val, sourcet_val, mag_val, netflux, size_val,
 # ********************************
 # Function to create the text for giving final output for continuum.
 
-def outtextoutc(sourcet_val,nfibres, nfib, nfib1,\
-                sncont_p2sp_all, tsncont_p2sp_all,\
-                sncont_1aa_all, tsncont_1aa_all,\
-                sncont_band_all, tsncont_band_all,\
-                sncont_p2sp_fibre, tsncont_p2sp_fibre,\
-                sncont_1aa_fibre, tsncont_1aa_fibre,\
-                sncont_band_fibre, tsncont_band_fibre,\
-                sncont_p2sp_seeing, tsncont_p2sp_seeing,\
-                sncont_1aa_seeing, tsncont_1aa_seeing,\
-                sncont_band_seeing, tsncont_band_seeing,\
-                sncont_p2sp_1, tsncont_p2sp_1,\
-                sncont_1aa_1, tsncont_1aa_1,\
-                sncont_band_1, tsncont_band_1,\
-                sncont_psp_pspp, tsncont_psp_pspp,\
+def outtextoutc(sourcet_val,nfibres, nfib, nfib1,
+                sncont_p2sp_all, tsncont_p2sp_all,
+                sncont_1aa_all, tsncont_1aa_all,
+                sncont_band_all, tsncont_band_all,
+                sncont_p2sp_fibre, tsncont_p2sp_fibre,
+                sncont_1aa_fibre, tsncont_1aa_fibre,
+                sncont_band_fibre, tsncont_band_fibre,
+                sncont_p2sp_seeing, tsncont_p2sp_seeing,
+                sncont_1aa_seeing, tsncont_1aa_seeing,
+                sncont_band_seeing, tsncont_band_seeing,
+                sncont_p2sp_1, tsncont_p2sp_1,
+                sncont_1aa_1, tsncont_1aa_1,
+                sncont_band_1, tsncont_band_1,
+                sncont_psp_pspp, tsncont_psp_pspp,
                 lambdaeff):
 
     # Output in one fibre
@@ -252,6 +249,7 @@ def outtextoutc(sourcet_val,nfibres, nfib, nfib1,\
         pass
 
     return text,textfile
+
 
 # ********************************
 # Function to create the text for giving final output for line output.

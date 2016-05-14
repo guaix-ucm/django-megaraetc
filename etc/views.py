@@ -23,15 +23,14 @@ import matplotlib.pyplot as plt
 
 import mpld3
 
-#/home/pica/Documents/virt_django/django_megara
+# /home/pica/Documents/virt_django/django_megara
 
 
 def compute5(request):
     print request.POST['stype']
-    size_val = 1.0 if request.POST['stype']== 'P' else request.POST['size']
+    size_val = 1.0 if request.POST['stype'] == 'P' else request.POST['size']
     mag_val = float(request.POST['contmagval']) if request.POST['contmagflux'] == 'M' else 20.0
     fc_val = 1e-16 if request.POST['contmagflux'] == 'M' else float(request.POST['contfluxval'])
-
 
     fluxt_val = request.POST['iflux']
     if fluxt_val == "C":
@@ -54,7 +53,6 @@ def compute5(request):
         elif fluxt_val == "L" and request.POST['rline'] == "Y":
             resolvedline_val = "Y"
             fwhmline_val = float(request.POST['linefwhm'])
-
 
     querybandc = PhotometricFilter.objects.filter(pk=request.POST['pfilter']).values()  # get row with the values at primary key
     bandc_val = querybandc[0]['name']
@@ -93,6 +91,29 @@ def compute5(request):
         # filtercar2 = ["0","0",entry_vph_lambdab,entry_vph_lambdae]
 
         spec = request.POST['spectype']
+        if fluxt_val == "L":
+            if spec == '7':  # NGC1068
+                spec = '47'  # NGC1068 (smooth)
+            elif spec == '20':  # Orion
+                spec = '48'  # Orion (smooth)
+            elif spec == '21':  # PN
+                spec = '49'  # PN (smooth)
+            elif spec == '6':  # Sc
+                spec = '50'  # Sc (smooth)
+            elif spec == '9':  # Starburst1
+                spec = '51'  # Starburst1 (smooth)
+            elif spec == '10':  # Starburst2
+                spec = '52'  # Starburst2 (smooth)
+            elif spec == '11':  # Starburst3
+                spec = '53'  # Starburst3 (smooth)
+            elif spec == '12':  # Starburst4
+                spec = '54'  # Starburst4 (smooth)
+            elif spec == '13':  # Starburst5
+                spec = '55'  # Starburst5 (smooth)
+            elif spec == '14':  # Starburst6
+                spec = '56'  # Starburst6 (smooth)
+            elif spec == '19':  # Sy2
+                spec = '57'  # Sy2 (smooth)
         queryspec = SpectralTemplate.objects.filter(pk=spec).values()
         entry_spec_name = queryspec[0]['name']
         # entry_spec_path = queryspec[0]['path']
@@ -107,14 +128,16 @@ def compute5(request):
         exptimepframe_val = float(request.POST['exptimepframe'])
         nsbundles_val = int(request.POST['nfibers'])
 
-        outputofcalc = calc(request.POST['stype'],request.POST['contmagflux'],\
-                            mag_val,fc_val,size_val,fluxt_val,\
-                            fline_val,wline_val,nfwhmline_val,cnfwhmline_val,
-                            fwhmline_val,resolvedline_val,spect_val,bandc_val,\
-                            request.POST['om_val'],vph_val,\
-                            skycond_val,moon_val,airmass_val,seeing_val,\
-                            numframes_val,exptimepframe_val,nsbundles_val)
-
+        outputofcalc = calc(request.POST['stype'],
+                            request.POST['contmagflux'],
+                            mag_val, fc_val, size_val, fluxt_val,
+                            fline_val, wline_val,
+                            nfwhmline_val, cnfwhmline_val,
+                            fwhmline_val, resolvedline_val,
+                            spect_val, bandc_val,
+                            request.POST['om_val'], vph_val,
+                            skycond_val, moon_val, airmass_val, seeing_val,
+                            numframes_val, exptimepframe_val, nsbundles_val)
 
     # cleanstring = string1.replace("\'", '\n')
     # cleanstring = cleanstring.replace(",", ' ')
@@ -126,10 +149,13 @@ def compute5(request):
 
     return outputofcalc
 
-##############################################################################################################################
-##############################################################################################################################
+##############################################################################
+##############################################################################
+
+
 def basic(request):
     return render(request, 'etc/index.html')
+
 
 def get_info(request):
     # if this is a POST request we need to process the form data
@@ -153,7 +179,6 @@ def get_info(request):
                                              'form3': form3,
                                              'form4': form4,
                                              })
-
 
 
 # LOADS THIS AFTER PUSHING "START" in index.html
@@ -192,7 +217,7 @@ def etc_do(request):
 
         tocheck = str(outputofcalc['outtext'])
         if not tocheck:
-            outtextstring = ""  #No warning.
+            outtextstring = ""  # No warning.
         else:
             outtextstring = tocheck
 
@@ -264,15 +289,24 @@ def etc_do(request):
         coutputstring = '<br /><p>' + str(outputofcalc['textoc']) + '</p>'
         loutputstring = '<br /><p>' + str(outputofcalc['textol']) + '</p>'
 
-        x3 = outputofcalc['wline_val']
-        y3 = outputofcalc['fwhmline_val']
-        z3 = outputofcalc['fline_val']
-        figura = plot_and_save_new('', x, y, x3, y3, z3, vph_minval, vph_maxval, label1, label2, label3)
+        if not tocheck:
+            x3 = outputofcalc['wline_val']
+            y3 = outputofcalc['fwhmline_val']
+            z3 = outputofcalc['fline_val']
+        else:
+            x3 = numpy.arange(1, 100, 1)
+            y3 = numpy.arange(1, 100, 1)
+            z3 = numpy.arange(1, 100, 1)
+
+        figura = plot_and_save_new('', x, y, x3, y3, z3,
+                                   vph_minval, vph_maxval,
+                                   label1, label2, label3)
         html = mpld3.fig_to_html(figura)
 
-        figura2 = plot_and_save2_new('', x2, y2, x2b, y2b, x2c, y2c, x2d, y2d, label2a, label2b, label2c)
+        figura2 = plot_and_save2_new('', x2, y2, x2b, y2b,
+                                     x2c, y2c, x2d, y2d,
+                                     label2a, label2b, label2c)
         html += mpld3.fig_to_html(figura2)
-
 
         html = html.replace("None", "")  # No se xq introduce string None
 
@@ -390,7 +424,7 @@ def etc_do(request):
                               '</table><br />'
 
             if fluxt_val_string == 'L':
-                tableloutstring = 'OUTPUT LINE SNR:'+fluxt_val_string+\
+                tableloutstring = 'OUTPUT LINE SNR: '+fluxt_val_string+\
                                   '<br />(at lambda_line = '+wline_val_string+' AA)'+\
                                   '<table border=1>'+\
                                   '<tr><th class="iconcolumn" scope="row"> </th><td class="perframecolumn">per frame</td><td class="allframecolumn">all frames</td><td></td></tr>'+\

@@ -1,0 +1,15 @@
+** INPUT SPECTRUM **
+IF "Input flux" is "Line + Continuum",
+then
+"Sc" becomes "Sc (smooth)",
+"NGC1068" becomes "NGC1068 (smooth)",
+"Orion" becomes "Orion (smooth)",
+"PN" becomes "PN (smooth)",
+"Sy2" becomes "Sy2 (smooth)",
+"Starburst1" becomes "Starburst1 (smooth)",
+"Starburst2" becomes "Starburst2 (smooth)",
+"Starburst3" becomes "Starburst3 (smooth)",
+"Starburst4" becomes "Starburst4 (smooth)",
+"Starburst5" becomes "Starburst5 (smooth)",
+"Starburst6" becomes "Starburst6 (smooth)",
+where a continuum fit has been performed to remove spectral lines.

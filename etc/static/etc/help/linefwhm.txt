@@ -1,4 +1,4 @@
 ** LINE FWHM **
-Line FWHM in Angstromgs.
+Line FWHM in Angstroms.
 If the line is not resolved, the nominal FWHM of the selected VPH at its central wavelength is assumed.
 This parameter is available only if the 'Continuum+Line' and 'Resolved line=yes' options are set.
