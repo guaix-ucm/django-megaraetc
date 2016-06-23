@@ -1,0 +1,4 @@
+** RADIUS **
+Source radius in arcsec.
+Will compute a circular area (in arcsec^2) based on set radius.
+This parameter is available only if the 'Source Type=Extended' option is set.

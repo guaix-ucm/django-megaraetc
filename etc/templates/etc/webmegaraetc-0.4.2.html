@@ -5,8 +5,8 @@
 
     {% block head %}
             <title>MEGARA Online Exposure Time Calculator</title>
-            <link href="{% static 'etc/css/webmegaraetc-0.4.2.css' %}" rel="stylesheet" type="text/css" />
-            <script src="{% static 'etc/js/webmegaraetc-0.4.2.js' %}"></script>
+            <link href="{% static 'etc/css/webmegaraetc-0.4.3.css' %}" rel="stylesheet" type="text/css" />
+            <script src="{% static 'etc/js/webmegaraetc-0.4.3.js' %}"></script>
             <script src="{% static 'etc/js/d3.min.js' %}"></script>
 
     {% endblock %}
@@ -21,7 +21,6 @@
 
     <div id="wrapper">
         <div id="theformcontainer">
-{#            <form id="myform" action="{% url 'etc:results' %}" method="post">#}
             <form id="myform" method="post">{% csrf_token %}
                 <div id="leftdiv">
                     <h4>Target Input Flux Distribution</h4>
@@ -46,47 +45,11 @@
                 {% buttons class="aux" %}
                     {% bootstrap_button "Submit" button_type="submit" button_class="btn-primary" icon="star" %}
                     {% bootstrap_button "Reset" button_type="reset" button_class="btn-primary" icon="remove" %}
-                    {% bootstrap_button "Manual v0.4.2" button_type="link" button_class="btn-primary" icon="save-file" href="Javascript:newPopupBig('/static/etc/TEC_MEG_057-2D.pdf');" %}
+                    {% bootstrap_button "Manual v0.4.3" button_type="link" button_class="btn-primary" icon="save-file" href="Javascript:newPopupBig('/static/etc/TEC_MEG_057-2D.pdf');" %}
                     {% bootstrap_button "Help" button_type="link" button_class="btn-primary" icon="question-sign" href="Javascript:newPopupBig('/static/etc/help/HELP.txt');" %}
-                    {% bootstrap_button "Download" button_type="link" button_class="btn-primary" icon="floppy-save" href="/static/etc/megaraetc-0.4.1.tar" %}
+                    <!--{% bootstrap_button "Download" button_type="link" button_class="btn-primary" icon="floppy-save" href="/static/etc/megaraetc-0.4.1.tar" %}-->
                 {% endbuttons %}
                 </div>
-
-{#                <div id="submitbuttonsdiv">#}
-{#                    <hr>#}
-{#                    <table id="tablebuttons">#}
-{#                        <tr>#}
-{#                            <td align="left">#}
-{#                                <input type="submit" value="Submit" id="btn1"/>#}
-{#                                <input type="reset" value="Reset" />#}
-{#                            </td>#}
-{#                            <td align="center">#}
-{#                                <input type='button' id='btn2' value='New Window'>#}
-{#                                <a href="{% static 'etc/outputcalc.txt' %}" download>#}
-{#                                    <input type="button" value="Print to file">#}
-{#                                </a>#}
-{#                            </td>#}
-{#                            <td align="right">#}
-{#                                <p id="smalltext">original ETC (offline) python v0.4.1 (114MB)</p>#}
-{#                                <a href="{% static 'etc/megaraetc-0.4.1.tar' %}" download>#}
-{#                                    <input type="button" value="Download">#}
-{#                                </a>#}
-{#                            </td>#}
-{#                            <!--Required to output the result to different targets-->#}
-{#                            <script>#}
-{#                                var form = document.getElementById('myform');#}
-{#                                form.onsubmit = function() {#}
-{#                                form.target = 'my_iframe';#}
-{#    #}
-{#                                };#}
-{#    #}
-{#                                document.getElementById('btn2').onclick = function() {#}
-{#                                form.target = '_blank';#}
-{#                                form.submit();#}
-{#                                }#}
-{#                            </script>#}
-{#                        </tr>#}
-{#                    </table>#}
             </form>
 
     <!-- THE OUTPUT form STARTS HERE -->

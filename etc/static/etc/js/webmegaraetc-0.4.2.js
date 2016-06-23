@@ -58,19 +58,61 @@ function closeWin() {
 // for source type
 function selector() {
     if (document.getElementById("id_stype_0").checked == true) {
+        document.getElementById("id_isize_0").disabled = true;
+        document.getElementById("id_isize_1").disabled = true;
         document.getElementById("id_size").disabled = true;
         document.getElementById("id_size").style.color = "grey";
-        $('label[for="id_size"]').each(function() {
+//        $('label[for="id_size"]').each(function() {
+//            this.style.color = "grey"
+//        });
+        $('label[for="id_isize_0"]').each(function() {
             this.style.color = "grey"
         });
+        $('label[for="id_isize_1"]').each(function() {
+            this.style.color = "grey"
+        });
+
         //document.getElementById("sizet").style.color = "grey";
     } else if (document.getElementById("id_stype_0").checked == false) {
+        $('label[for="id_isize_0"]').each(function() {
+            this.checked = true
+        });
+        $('label[for="id_isize_0"]').each(function() {
+            this.style.color = "black"
+        });
         document.getElementById("id_size").disabled = false;
         document.getElementById("id_size").style.color = "black";
+        document.getElementById("id_isize").disabled = false;
+        document.getElementById("id_isize_0").disabled = false;
+        document.getElementById("id_isize_1").disabled = false;
+        document.getElementById("id_isize_0").checked = true;
+        document.getElementById("id_isize_0").style.color = "black";
         $('label[for="id_size"]').each(function() {
             this.style.color = "black"
         });
+        $('label[for="id_isize_0"]').each(function() {
+            this.style.color = "black"
+        });
+        $('label[for="id_isize_1"]').each(function() {
+            this.style.color = "black"
+        });
+
     }
+}
+
+// for source type
+function selectInputSize() {
+    if (document.getElementById("id_isize_0").checked == true) {
+        document.getElementById("id_size").disabled = false;
+        document.getElementById("id_size").style.color = "black";
+        document.getElementById("id_radius").disabled = true;
+        document.getElementById("id_radius").style.color = "grey";
+    } else if (document.getElementById("id_isize_0").checked == false) {
+        document.getElementById("id_size").disabled = true;
+        document.getElementById("id_size").style.color = "grey";
+        document.getElementById("id_radius").disabled = false;
+        document.getElementById("id_radius").style.color = "black";
+     }
 }
 
 // for continuum magnitude or flux

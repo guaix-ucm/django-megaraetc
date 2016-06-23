@@ -10,7 +10,10 @@ from django.utils.safestring import mark_safe
 STYPE = [('P', 'Point'),
          ('E', 'Extended')]
 
-OMODE = [('LCB', 'LCB'),
+ISIZE = [('A', 'Area'),
+         ('R', 'Radius')]
+
+OMODE = [('LCB', 'LCB IFU'),
          ('MOS', 'MOS')]
 
 SKYCOND = [('Photometric', 'Photometric'),
@@ -55,6 +58,7 @@ class HorizontalRadioRenderer(forms.RadioSelect.renderer):
 class TargetForm(forms.Form):
     botton = "<a class=\"\" href=\"Javascript:newPopupBig('/static/etc/help/%s.txt');\" type=\"link\"><span class=\"glyphicon glyphicon-question-sign\"></span></a>"
     size_help = botton % "size"
+    radius_help = botton % "radius"
     contfluxval_help = botton % "continuumflux"
     contmagval_help = botton % "continuummagnitude"
     lineflux_help = botton % "lineflux"
@@ -63,7 +67,9 @@ class TargetForm(forms.Form):
     spectype_help = botton % "spectype"
 
     stype = forms.ChoiceField(label="Source type", initial="P", choices=STYPE, widget=forms.RadioSelect(renderer=HorizontalRadioRenderer, attrs={'onclick':'selector()'}))
-    size = forms.FloatField(label="Size", initial=1.0, min_value=0.0, max_value=3600, help_text=size_help, widget=forms.TextInput(attrs={'size':'7','disabled':'true'}))
+    isize = forms.ChoiceField(label="Input Size", initial="A", choices=ISIZE, widget=forms.RadioSelect(renderer=HorizontalRadioRenderer, attrs={'onclick':'selectInputSize()','disabled':'true'}))
+    size = forms.FloatField(label="Area", initial=1.0, min_value=0.0, max_value=3600, help_text=size_help, widget=forms.TextInput(attrs={'size':'7','disabled':'true'}))
+    radius = forms.FloatField(label="Radius", initial=1.0, min_value=0.0, max_value=3600, help_text=radius_help, widget=forms.TextInput(attrs={'size':'7','disabled':'true'}))
 
     iflux = forms.ChoiceField(label="Input flux", initial="C", choices=IFLUX, widget=forms.RadioSelect(renderer=HorizontalRadioRenderer, attrs={'onclick':'selectInputflux()'}))
     rline = forms.ChoiceField(label="Resolved line?", initial="N", choices=RLINECHOICES, widget=forms.RadioSelect(renderer=HorizontalRadioRenderer, attrs={'onclick':'selectRline()','disabled':'true'})) #attrs={'disabled':'disabled'}
@@ -105,7 +111,7 @@ class ObservationalSetupForm(forms.Form):
     contap_help = botton % "continuumaperture.txt"
 
     numframes = forms.IntegerField(label="Number of exp. frames", initial=1, min_value=1, widget=forms.TextInput(attrs={'size':'7'}))
-    exptimepframe = forms.FloatField(label="Exptime per frame (sec)", initial=3600.0, min_value=1.0, widget=forms.TextInput(attrs={'size':'7'}))
+    exptimepframe = forms.FloatField(label="Exptime per frame (s)", initial=3600.0, min_value=1.0, widget=forms.TextInput(attrs={'size':'7'}))
     # LCB: default=8 bundles (56 fibers), max=89 bundles (623 fibers); min= 1 bundle.
     # MOS: default=max=92 bundles (644 fibers), min= 1 bundle (7 fibers);
     nfibers = forms.IntegerField(label="Number of bundles", help_text=nfibers_help, initial=8, min_value=1, max_value=89, widget=forms.TextInput(attrs={'size':'6'}))

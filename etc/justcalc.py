@@ -112,7 +112,8 @@ def outmessage(textcode):
 # ********************************
 # Function to create the text for giving final output for input parameters.
 
-def outtextinp(om_val, bandc_val, sourcet_val, mag_val, netflux, size_val,
+def outtextinp(om_val, bandc_val, sourcet_val, mag_val, netflux, isize_val,
+               size_val, radius_val,
                seeingx, pi, fluxt_val, wline_val, fline_val, fwhmline_val,
                vph_val, skycond_val, moon_val, airmass_val, seeing_zenith, fsky, numframe_val,
                exptimepframe_val, exptime_val, npdark_val, nsbundles_val, nsfib_val,
@@ -124,7 +125,8 @@ def outtextinp(om_val, bandc_val, sourcet_val, mag_val, netflux, size_val,
     else:
         text = '* Source type: Extended\n  Continuum: V = %5.3f mag/arcsec**2\n' % (mag_val)
         text = text + '  Flux = %7.3e cgs\n' % (netflux)
-        text = text + '  Size = %5.2f arcsec**2\n' % (size_val)
+        text = text + '  Radius = %5.2f arcsec\n' % (radius_val)
+        text = text + '  Area = %5.2f arcsec**2\n' % (size_val)
 
     if seeingx >= (2. * math.sqrt (size_val / pi)) and sourcet_val == "E":
         text = text + '  ** SEEING-DOMINATED ** \n'
@@ -495,11 +497,16 @@ tcond = [1,             # Photometric
 
 #######
 # Compute results
-def calc(sourcet_val, inputcontt_val, mag_val, fc_val, size_val, fluxt_val,\
-         fline_val, wline_val, nfwhmline_val, cnfwhmline_val,\
-         fwhmline_val, resolvedline_val, spect_val, bandc_val,\
-         om_val,vph_val, skycond_val, moon_val, airmass_val, seeing_val, numframe_val, exptimepframe_val,\
-         nsbundles_val):
+def calc(sourcet_val, inputcontt_val, mag_val, fc_val,\
+         isize_val, size_val, radius_val,\
+         fluxt_val,\
+         fline_val, wline_val,\
+         nfwhmline_val, cnfwhmline_val,\
+         fwhmline_val, resolvedline_val,\
+         spect_val, bandc_val,\
+         om_val,vph_val,\
+         skycond_val, moon_val, airmass_val, seeing_val,\
+         numframe_val, exptimepframe_val, nsbundles_val):
 
     global texti, textoc, textol
     # Clear previous outputs
@@ -526,8 +533,10 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, size_val, fluxt_val,\
 
     # Size if extended in arcsec**2; checking float
     size_val = isafloat(size_val, 1.0)
+    radius_val = isafloat(radius_val, 1.0)
     if sourcet_val == "P":
         size_val = 0.
+        radius_val = 0.
 
     # Type of computation: continuum or line+continuum
     # Input parameters related to Line
@@ -839,8 +848,12 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, size_val, fluxt_val,\
         areafibre = 3.0 * math.sqrt(3.0) * (rfibre**2) / 2.0
 
         # Projected source area in arcsec**2
-        realareasource = size_val
-        realrsource = math.sqrt(size_val / pi)
+        if isize_val == "A":
+            realareasource = size_val
+            realrsource = math.sqrt(size_val / pi)
+        else:
+            realareasource = pi*(radius_val**2)
+            realrsource = radius_val
 
         # Area equivalent to a seeing disk circunscribed in the hexagonal fibre
         areaeq =  pi * (afibre **2.)
@@ -904,7 +917,10 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, size_val, fluxt_val,\
 
         if sourcet_val == "E": # Assuming that projected source area is circular
             diamsource = 2. * realrsource
-            areasource = size_val
+            if isize_val == "A":
+                areasource = size_val
+            else:
+                areasource = pi*(radius_val**2)
             # if source is dominated by seeing
             if rseeingx >= realrsource:
                 diamsource = seeingx
@@ -1296,9 +1312,16 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, size_val, fluxt_val,\
         ##############################
         # Output of input parameters #
         ##############################
-        textigui,texti = outtextinp(om_val,bandc_val,sourcet_val,mag_val,netflux,size_val,seeingx,pi,fluxt_val,wline_val,\
-         fline_val, fwhmline_val,vph_val, skycond_val, moon_val, airmass_val, seeing_zenith,fsky,numframe_val,exptimepframe_val,exptime_val,\
-        npdark_val,nsbundles_val,nsfib_val,nfwhmline_val, cnfwhmline_val,resolvedline_val, bandsky)
+        textigui,texti = outtextinp(om_val, bandc_val, sourcet_val, mag_val,\
+                                    netflux, isize_val, realareasource, realrsource,\
+                                    seeingx, pi, fluxt_val, wline_val,\
+                                    fline_val, fwhmline_val, vph_val,\
+                                    skycond_val, moon_val, airmass_val,\
+                                    seeing_zenith,fsky, numframe_val,\
+                                    exptimepframe_val, exptime_val,\
+                                    npdark_val, nsbundles_val, nsfib_val,\
+                                    nfwhmline_val, cnfwhmline_val,\
+                                    resolvedline_val, bandsky)
 
         #######################################
         # Output of continuum signal-to-noise #
@@ -1345,9 +1368,13 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, size_val, fluxt_val,\
         # FOR DJANGO: Finally, return these outputs.
         # Order: input values, Output Cont., Output Line.
         #
-        return {'outtext' : outtext, 'texti' : texti, 'textoc' : textoc, 'textol' : textol,\
-                'om_val' : om_val, 'bandc_val' : bandc_val, 'sourcet_val' : sourcet_val,\
-                'mag_val' : mag_val, 'netflux' : netflux, 'size_val' : size_val,\
+        return {'outtext' : outtext, 'texti' : texti,\
+                'textoc' : textoc, 'textol' : textol,\
+                'om_val' : om_val, 'bandc_val' : bandc_val,\
+                'sourcet_val' : sourcet_val,\
+                'mag_val' : mag_val, 'netflux' : netflux,\
+                'isize_val': isize_val,\
+                'size_val' : areasource, 'radius_val' : rsource,\
                 'seeingx' : seeingx, 'pi': pi, 'fluxt_val' : fluxt_val,\
                 'wline_val' : wline_val, 'fline_val' : fline_val, 'fwhmline_val' : fwhmline_val,\
                 'vph_val' : vph_val, 'skycond_val' : skycond_val, 'moon_val' : moon_val,\

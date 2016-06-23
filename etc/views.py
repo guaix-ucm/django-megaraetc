@@ -13,24 +13,41 @@ from justcalc import calc
 # from plot1 import plot_and_save, plot_and_save2, plot_and_save_new, plot_and_save2_new
 from plot1 import plot_and_save_new, plot_and_save2_new
 
-import numpy
+import numpy as np
 import os
 import tempfile
 
 import matplotlib
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 import mpld3
+
 
 # /home/pica/Documents/virt_django/django_megara
 
 
 def compute5(request):
     print request.POST['stype']
-    size_val = 1.0 if request.POST['stype'] == 'P' else request.POST['size']
-    mag_val = float(request.POST['contmagval']) if request.POST['contmagflux'] == 'M' else 20.0
-    fc_val = 1e-16 if request.POST['contmagflux'] == 'M' else float(request.POST['contfluxval'])
+
+    if request.POST['stype'] == 'P':
+        isize_val = 'A'
+        size_val = 1.0
+        radius_val = 1.0
+    else:
+        if request.POST['isize'] == 'A':
+            isize_val = request.POST['isize']
+            size_val = request.POST['size']
+            radius_val = 1.0
+        else:
+            isize_val = request.POST['isize']
+            radius_val = float(request.POST['radius'])
+            size_val = np.pi * (radius_val**2)
+    mag_val = float(request.POST['contmagval']) if request.POST[
+                                                       'contmagflux'] == 'M' else 20.0
+    fc_val = 1e-16 if request.POST['contmagflux'] == 'M' else float(
+        request.POST['contfluxval'])
 
     fluxt_val = request.POST['iflux']
     if fluxt_val == "C":
@@ -54,7 +71,8 @@ def compute5(request):
             resolvedline_val = "Y"
             fwhmline_val = float(request.POST['linefwhm'])
 
-    querybandc = PhotometricFilter.objects.filter(pk=request.POST['pfilter']).values()  # get row with the values at primary key
+    querybandc = PhotometricFilter.objects.filter(pk=request.POST[
+        'pfilter']).values()  # get row with the values at primary key
     bandc_val = querybandc[0]['name']
     # entry_filter_cwl = querybandc[0]['cwl']
     # entry_filter_width = querybandc[0]['path']
@@ -62,19 +80,20 @@ def compute5(request):
     queryvph = VPHSetup.objects.filter(pk=request.POST['vph']).values()
     vph_val = queryvph[0]['name']
 
-    if vph_val == '-empty-':        # Deals with -empty- VPH Setup
+    if vph_val == '-empty-':  # Deals with -empty- VPH Setup
         # vph_val = 'MR-UB'
-        outtext="WARNING: VPH Setup is -empty-! Choose a VPH."
-        texti=" "
-        textoc=" "
-        textol=" "
-        outputfilename="etc/static/etc/outputcalc.txt"
+        outtext = "WARNING: VPH Setup is -empty-! Choose a VPH."
+        texti = " "
+        textoc = " "
+        textol = " "
+        outputfilename = "etc/static/etc/outputcalc.txt"
         with open(outputfilename, 'w') as f:
             print >> f, outtext
             print >> f, texti
             print >> f, textoc
             print >> f, textol
-        outputofcalc = ({'outtext':outtext, 'texti':texti, 'textoc':textoc, 'textol':textol})
+        outputofcalc = ({'outtext': outtext, 'texti': texti, 'textoc': textoc,
+                         'textol': textol})
         # return outputofcalc
     else:
         entry_vph_fwhm = queryvph[0]['fwhm']
@@ -130,7 +149,10 @@ def compute5(request):
 
         outputofcalc = calc(request.POST['stype'],
                             request.POST['contmagflux'],
-                            mag_val, fc_val, size_val, fluxt_val,
+                            mag_val, fc_val,
+                            isize_val,
+                            size_val, radius_val,
+                            fluxt_val,
                             fline_val, wline_val,
                             nfwhmline_val, cnfwhmline_val,
                             fwhmline_val, resolvedline_val,
@@ -148,6 +170,7 @@ def compute5(request):
     # cleanstring = [outtextstring,inputstring,coutputstring,loutputstring]
 
     return outputofcalc
+
 
 ##############################################################################
 ##############################################################################
@@ -173,12 +196,12 @@ def get_info(request):
         form3 = AtmosphericConditionsForm()
         form4 = ObservationalSetupForm()
 
-    return render(request, 'etc/webmegaraetc-0.4.2.html', {
-                                             'form1': form1,
-                                             'form2': form2,
-                                             'form3': form3,
-                                             'form4': form4,
-                                             })
+    return render(request, 'etc/webmegaraetc-0.4.3.html', {
+        'form1': form1,
+        'form2': form2,
+        'form3': form3,
+        'form4': form4,
+    })
 
 
 # LOADS THIS AFTER PUSHING "START" in index.html
@@ -194,7 +217,7 @@ def etc_form(request):
                    'form4': form4,
                    }
 
-    return render(request, 'etc/webmegaraetc-0.4.2.html', total_formu)
+    return render(request, 'etc/webmegaraetc-0.4.3.html', total_formu)
 
 
 # LOADS THIS AFTER PRESSING "COMPUTE" webmegaraetc.html and
@@ -263,7 +286,7 @@ def etc_do(request):
             y2d = numpy.arange(1, 100, 1)
 
             label1 = "none"
-            label2 = 20.0   # Float
+            label2 = 20.0  # Float
             label3 = "none"
             label2a = "none"
             label2b = "none"
@@ -344,158 +367,168 @@ def etc_do(request):
             fc_string = str(outputofcalc['fc'])
             pframesn_psp_asp_string = str(outputofcalc['pframesn_psp_asp'])
             allframesn_psp_asp_string = str(outputofcalc['pframesn_psp_asp'])
-            pframesn_psp_asp_all_string = str(outputofcalc['pframesn_psp_asp_all'])
-            allframesn_psp_asp_all_string = str(outputofcalc['allframesn_psp_asp_all'])
+            pframesn_psp_asp_all_string = str(
+                outputofcalc['pframesn_psp_asp_all'])
+            allframesn_psp_asp_all_string = str(
+                outputofcalc['allframesn_psp_asp_all'])
 
             nfibres_string = str(outputofcalc['nfibres'])
             nfib_string = str(outputofcalc['nfib'])
             nfib1def_string = str(outputofcalc['nfib1def'])
-            sncont_p2sp_all_string = "{0:.2f}".format(float(outputofcalc['sncont_p2sp_all'])/2)
-            tsncont_p2sp_all_string = "{0:.2f}".format(float(outputofcalc['tsncont_p2sp_all'])/2)
-            sncont_pspfwhm_all_string = "{0:.2f}".format(float(outputofcalc['sncont_p2sp_all']))
-            tsncont_pspfwhm_all_string = "{0:.2f}".format(float(outputofcalc['tsncont_p2sp_all']))
-            sncont_1aa_all_string = "{0:.2f}".format(float(outputofcalc['sncont_1aa_all']))
-            tsncont_1aa_all_string = "{0:.2f}".format(float(outputofcalc['tsncont_1aa_all']))
+            sncont_p2sp_all_string = "{0:.2f}".format(
+                float(outputofcalc['sncont_p2sp_all']) / 2)
+            tsncont_p2sp_all_string = "{0:.2f}".format(
+                float(outputofcalc['tsncont_p2sp_all']) / 2)
+            sncont_pspfwhm_all_string = "{0:.2f}".format(
+                float(outputofcalc['sncont_p2sp_all']))
+            tsncont_pspfwhm_all_string = "{0:.2f}".format(
+                float(outputofcalc['tsncont_p2sp_all']))
+            sncont_1aa_all_string = "{0:.2f}".format(
+                float(outputofcalc['sncont_1aa_all']))
+            tsncont_1aa_all_string = "{0:.2f}".format(
+                float(outputofcalc['tsncont_1aa_all']))
             sncont_band_all_string = str(outputofcalc['sncont_band_all'])
             tsncont_band_all_string = str(outputofcalc['tsncont_band_all'])
-            sncont_p2sp_fibre_string = "{0:.2f}".format(float(outputofcalc['sncont_p2sp_fibre']))
-            tsncont_p2sp_fibre_string = "{0:.2f}".format(float(outputofcalc['tsncont_p2sp_fibre']))
-            sncont_1aa_fibre_string = "{0:.2f}".format(float(outputofcalc['sncont_1aa_fibre']))
-            tsncont_1aa_fibre_string = "{0:.2f}".format(float(outputofcalc['tsncont_1aa_fibre']))
+            sncont_p2sp_fibre_string = "{0:.2f}".format(
+                float(outputofcalc['sncont_p2sp_fibre']))
+            tsncont_p2sp_fibre_string = "{0:.2f}".format(
+                float(outputofcalc['tsncont_p2sp_fibre']))
+            sncont_1aa_fibre_string = "{0:.2f}".format(
+                float(outputofcalc['sncont_1aa_fibre']))
+            tsncont_1aa_fibre_string = "{0:.2f}".format(
+                float(outputofcalc['tsncont_1aa_fibre']))
             sncont_band_fibre_string = str(outputofcalc['sncont_band_fibre'])
             tsncont_band_fibre_string = str(outputofcalc['tsncont_band_fibre'])
-            sncont_p2sp_seeing_string = "{0:.2f}".format(float(outputofcalc['sncont_p2sp_seeing']))
-            tsncont_p2sp_seeing_string = "{0:.2f}".format(float(outputofcalc['tsncont_p2sp_seeing']))
-            sncont_1aa_seeing_string = "{0:.2f}".format(float(outputofcalc['sncont_1aa_seeing']))
-            tsncont_1aa_seeing_string = "{0:.2f}".format(float(outputofcalc['tsncont_1aa_seeing']))
-            sncont_band_seeing_string = "{0:.2f}".format(float(outputofcalc['sncont_band_seeing']))
-            tsncont_band_seeing_string = "{0:.2f}".format(float(outputofcalc['tsncont_band_seeing']))
-            sncont_p2sp_1_string = "{0:.2f}".format(float(outputofcalc['sncont_p2sp_1']))
-            tsncont_p2sp_1_string = "{0:.2f}".format(float(outputofcalc['tsncont_p2sp_1']))
-            sncont_1aa_1_string = "{0:.2f}".format(float(outputofcalc['sncont_1aa_1']))
-            tsncont_1aa_1_string = "{0:.2f}".format(float(outputofcalc['tsncont_1aa_1']))
-            sncont_band_1_string = "{0:.2f}".format(float(outputofcalc['sncont_band_1']))
-            tsncont_band_1_string = "{0:.2f}".format(float(outputofcalc['tsncont_band_1']))
-            sncont_psp_pspp_string = "{0:.2f}".format(float(outputofcalc['sncont_psp_pspp']))
-            tsncont_psp_pspp_string = "{0:.2f}".format(float(outputofcalc['tsncont_psp_pspp']))
-            sncont_psp_pspp2_string = "{0:.2f}".format(float(outputofcalc['sncont_psp_pspp']*2))
-            tsncont_psp_pspp2_string = "{0:.2f}".format(float(outputofcalc['tsncont_psp_pspp']*2))
+            sncont_p2sp_seeing_string = "{0:.2f}".format(
+                float(outputofcalc['sncont_p2sp_seeing']))
+            tsncont_p2sp_seeing_string = "{0:.2f}".format(
+                float(outputofcalc['tsncont_p2sp_seeing']))
+            sncont_1aa_seeing_string = "{0:.2f}".format(
+                float(outputofcalc['sncont_1aa_seeing']))
+            tsncont_1aa_seeing_string = "{0:.2f}".format(
+                float(outputofcalc['tsncont_1aa_seeing']))
+            sncont_band_seeing_string = "{0:.2f}".format(
+                float(outputofcalc['sncont_band_seeing']))
+            tsncont_band_seeing_string = "{0:.2f}".format(
+                float(outputofcalc['tsncont_band_seeing']))
+            sncont_p2sp_1_string = "{0:.2f}".format(
+                float(outputofcalc['sncont_p2sp_1']))
+            tsncont_p2sp_1_string = "{0:.2f}".format(
+                float(outputofcalc['tsncont_p2sp_1']))
+            sncont_1aa_1_string = "{0:.2f}".format(
+                float(outputofcalc['sncont_1aa_1']))
+            tsncont_1aa_1_string = "{0:.2f}".format(
+                float(outputofcalc['tsncont_1aa_1']))
+            sncont_band_1_string = "{0:.2f}".format(
+                float(outputofcalc['sncont_band_1']))
+            tsncont_band_1_string = "{0:.2f}".format(
+                float(outputofcalc['tsncont_band_1']))
+            sncont_psp_pspp_string = "{0:.2f}".format(
+                float(outputofcalc['sncont_psp_pspp']))
+            tsncont_psp_pspp_string = "{0:.2f}".format(
+                float(outputofcalc['tsncont_psp_pspp']))
+            sncont_psp_pspp2_string = "{0:.2f}".format(
+                float(outputofcalc['sncont_psp_pspp'] * 2))
+            tsncont_psp_pspp2_string = "{0:.2f}".format(
+                float(outputofcalc['tsncont_psp_pspp'] * 2))
             lambdaeff_string = str(outputofcalc['lambdaeff'])
 
-            snline_all_string = "{0:.2f}".format(float(outputofcalc['snline_all']))
-            snline_fibre_string = "{0:.2f}".format(float(outputofcalc['snline_fibre']))
-            snline_pspp_string = "{0:.2f}".format(float(outputofcalc['snline_pspp']))
-            snline_1_aa_string = "{0:.2f}".format(float(outputofcalc['snline_1_aa']))
+            snline_all_string = "{0:.2f}".format(
+                float(outputofcalc['snline_all']))
+            snline_fibre_string = "{0:.2f}".format(
+                float(outputofcalc['snline_fibre']))
+            snline_pspp_string = "{0:.2f}".format(
+                float(outputofcalc['snline_pspp']))
+            snline_1_aa_string = "{0:.2f}".format(
+                float(outputofcalc['snline_1_aa']))
             snline_seeing_string = str(outputofcalc['snline_seeing'])
             snline_1_string = str(outputofcalc['snline_1'])
-            snline_spaxel_string = "{0:.2f}".format(float(outputofcalc['snline_spaxel']))
-            snline_fibre1aa_string = "{0:.2f}".format(float(outputofcalc['snline_fibre1aa']))
+            snline_spaxel_string = "{0:.2f}".format(
+                float(outputofcalc['snline_spaxel']))
+            snline_fibre1aa_string = "{0:.2f}".format(
+                float(outputofcalc['snline_fibre1aa']))
 
-            tablecoutstring = 'OUTPUT CONTINUUM SNR:'+\
-                              '<br />(at lambda_c(VPH) = '+lambdaeff_string+' AA)'+\
-                              '<table border=1>'+\
-                              '<tr><th class="iconcolumn" scope="col"> </th><th scope="col" colspan="2">* SNR per fibre:</th><th scope="col"></th></tr>'+\
-                              '<tr><th class="iconcolumn" scope="row"> </th><td class="perframecolumn">per frame</td><td class="allframecolumn">all frames</td><td></td></tr>'+\
-                              '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pdp.jpeg" /></td><td class="perframecolumn"> '+sncont_psp_pspp_string+' </td><td> '+tsncont_psp_pspp_string+'</td><td> per detector pixel</td></tr>'+\
-                              '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspp.jpeg" /></td><td class="perframecolumn"> '+sncont_psp_pspp2_string+' </td><td> '+tsncont_psp_pspp2_string+'</td><td> per spectral pixel</td></tr>'+\
-                              '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspfwhm.jpeg" /></td><td class="perframecolumn"> '+sncont_p2sp_fibre_string+' </td><td> '+tsncont_p2sp_fibre_string+'</td><td> per spectral FWHM (voxel)</td></tr>'+\
-                              '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_peraa.jpeg" /></td><td class="perframecolumn"> '+sncont_1aa_fibre_string+' </td><td> '+tsncont_1aa_fibre_string+'</td><td> per AA</td></tr>'+\
-                              '<tr class="rowheight"><td> </td></tr>'+\
-                              '<tr><td class="iconcolumn"> </td><th scope="col" colspan="2">* SNR in total source area:</th><th>(number of fibers = '+nfibres_string+')</th></tr>'+\
-                              '<tr><td class="iconcolumn"> </td><td class="perframecolumn">per frame</td><td class="allframecolumn">all frames</td><td></td></tr>'+\
-                              '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspp.jpeg" /></td><td> '+sncont_p2sp_all_string+' </td><td> '+tsncont_p2sp_all_string+'</td><td> per spectral pixel</td></tr>'+\
-                              '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspfwhm.jpeg" /></td><td> '+sncont_pspfwhm_all_string+' </td><td> '+tsncont_pspfwhm_all_string+'</td><td> per spectral FWHM</td></tr>'+\
-                              '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_peraa.jpeg" /></td><td> '+sncont_1aa_all_string+' </td><td> '+tsncont_1aa_all_string+'</td><td> per AA</td></tr>'+\
+            tablecoutstring = 'OUTPUT CONTINUUM SNR:' + \
+                              '<br />(at lambda_c(VPH) = ' + lambdaeff_string + ' AA)' + \
+                              '<table border=1>' + \
+                              '<tr><th class="iconcolumn" scope="col"> </th><th scope="col" colspan="2">* SNR per fibre:</th><th scope="col"></th></tr>' + \
+                              '<tr><th class="iconcolumn" scope="row"> </th><td class="perframecolumn">per frame</td><td class="allframecolumn">all frames</td><td></td></tr>' + \
+                              '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pdp.jpeg" /></td><td class="perframecolumn"> ' + sncont_psp_pspp_string + ' </td><td> ' + tsncont_psp_pspp_string + '</td><td> per detector pixel</td></tr>' + \
+                              '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspp.jpeg" /></td><td class="perframecolumn"> ' + sncont_psp_pspp2_string + ' </td><td> ' + tsncont_psp_pspp2_string + '</td><td> per spectral pixel</td></tr>' + \
+                              '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspfwhm.jpeg" /></td><td class="perframecolumn"> ' + sncont_p2sp_fibre_string + ' </td><td> ' + tsncont_p2sp_fibre_string + '</td><td> per spectral FWHM (voxel)</td></tr>' + \
+                              '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_peraa.jpeg" /></td><td class="perframecolumn"> ' + sncont_1aa_fibre_string + ' </td><td> ' + tsncont_1aa_fibre_string + '</td><td> per AA</td></tr>' + \
+                              '<tr class="rowheight"><td> </td></tr>' + \
+                              '<tr><td class="iconcolumn"> </td><th scope="col" colspan="2">* SNR in total source area:</th><th>(number of fibers = ' + nfibres_string + ')</th></tr>' + \
+                              '<tr><td class="iconcolumn"> </td><td class="perframecolumn">per frame</td><td class="allframecolumn">all frames</td><td></td></tr>' + \
+                              '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspp.jpeg" /></td><td> ' + sncont_p2sp_all_string + ' </td><td> ' + tsncont_p2sp_all_string + '</td><td> per spectral pixel</td></tr>' + \
+                              '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspfwhm.jpeg" /></td><td> ' + sncont_pspfwhm_all_string + ' </td><td> ' + tsncont_pspfwhm_all_string + '</td><td> per spectral FWHM</td></tr>' + \
+                              '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_peraa.jpeg" /></td><td> ' + sncont_1aa_all_string + ' </td><td> ' + tsncont_1aa_all_string + '</td><td> per AA</td></tr>' + \
                               '</table><br />'
             if sourcet_val_string == 'E':
-                tablecoutstring = tablecoutstring+\
-                              '<table border=1>'+\
-                              '<tr><th class="iconcolumn" scope="col"> </td><th scope="col" colspan="2">* SNR in one seeing:</th><th scope="col"></th></tr>'+\
-                              '<tr><th class="iconcolumn" scope="row"> </th><td class="perframecolumn">per frame</td><td class="allframecolumn">all frames</td><td></td></tr>'+\
-                              '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspfwhm.jpeg" /></td><td> '+sncont_p2sp_seeing_string+' </td><td> '+tsncont_p2sp_seeing_string+'</td><td> per spectral FWHM</td></tr>'+\
-                              '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_peraa.jpeg" /></td><td> '+sncont_1aa_seeing_string+' </td><td> '+tsncont_1aa_seeing_string+'</td><td> per AA</td></tr>'+\
-                              '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_collapsed.jpeg" /></td><td> '+sncont_band_seeing_string+' </td><td> '+tsncont_band_seeing_string+'</td><td> per collapsed spectrum (spaxel)</td></tr>'+\
-                              '<tr class="rowheight"><td> </td></tr>'+\
-                              '<tr><td class="iconcolumn"> </td><th scope="col" colspan="2">* SNR in one arcsec^2:</th><th></th></tr>'+\
-                              '<tr><td class="iconcolumn"> </td><td class="perframecolumn">per frame</td><td class="allframecolumn">all frames</td><td></td></tr>'+\
-                              '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspfwhm.jpeg" /></td><td> '+sncont_p2sp_1_string+' </td><td> '+tsncont_p2sp_1_string+'</td><td> per spectral FWHM</td></tr>'+\
-                              '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_peraa.jpeg" /></td><td> '+sncont_1aa_1_string+' </td><td> '+tsncont_1aa_1_string+'</td><td> per AA</td></tr>'+\
-                              '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_collapsed.jpeg" /></td><td> '+sncont_band_1_string+' </td><td> '+tsncont_band_1_string+'</td><td> per collapsed spectrum (spaxel)</td></tr>'+\
-                              '</table><br />'
+                tablecoutstring = tablecoutstring + \
+                                  '<table border=1>' + \
+                                  '<tr><th class="iconcolumn" scope="col"> </td><th scope="col" colspan="2">* SNR in one seeing:</th><th scope="col"></th></tr>' + \
+                                  '<tr><th class="iconcolumn" scope="row"> </th><td class="perframecolumn">per frame</td><td class="allframecolumn">all frames</td><td></td></tr>' + \
+                                  '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspfwhm.jpeg" /></td><td> ' + sncont_p2sp_seeing_string + ' </td><td> ' + tsncont_p2sp_seeing_string + '</td><td> per spectral FWHM</td></tr>' + \
+                                  '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_peraa.jpeg" /></td><td> ' + sncont_1aa_seeing_string + ' </td><td> ' + tsncont_1aa_seeing_string + '</td><td> per AA</td></tr>' + \
+                                  '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_collapsed.jpeg" /></td><td> ' + sncont_band_seeing_string + ' </td><td> ' + tsncont_band_seeing_string + '</td><td> per collapsed spectrum (spaxel)</td></tr>' + \
+                                  '<tr class="rowheight"><td> </td></tr>' + \
+                                  '<tr><td class="iconcolumn"> </td><th scope="col" colspan="2">* SNR in one arcsec^2:</th><th></th></tr>' + \
+                                  '<tr><td class="iconcolumn"> </td><td class="perframecolumn">per frame</td><td class="allframecolumn">all frames</td><td></td></tr>' + \
+                                  '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspfwhm.jpeg" /></td><td> ' + sncont_p2sp_1_string + ' </td><td> ' + tsncont_p2sp_1_string + '</td><td> per spectral FWHM</td></tr>' + \
+                                  '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_peraa.jpeg" /></td><td> ' + sncont_1aa_1_string + ' </td><td> ' + tsncont_1aa_1_string + '</td><td> per AA</td></tr>' + \
+                                  '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_collapsed.jpeg" /></td><td> ' + sncont_band_1_string + ' </td><td> ' + tsncont_band_1_string + '</td><td> per collapsed spectrum (spaxel)</td></tr>' + \
+                                  '</table><br />'
 
             if fluxt_val_string == 'L':
-                tableloutstring = 'OUTPUT LINE SNR: '+fluxt_val_string+\
-                                  '<br />(at lambda_line = '+wline_val_string+' AA)'+\
-                                  '<table border=1>'+\
-                                  '<tr><th class="iconcolumn" scope="row"> </th><td class="perframecolumn">per frame</td><td class="allframecolumn">all frames</td><td></td></tr>'+\
-                                  '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pdp.jpeg" /></td><td class="perframecolumn"> '+ snline_pspp_string +'</td><td> '+tsncont_psp_pspp_string+'</td><td> per detector pixel</td></tr>'+\
-                                  '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspfwhm.jpeg" /></td><td class="perframecolumn"> '+ snline_spaxel_string +'</td><td> '+tsncont_p2sp_fibre_string+'</td><td> per spectral FWHM (voxel)</td></tr>'+\
-                                  '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pdp.jpeg" /></td><td class="perframecolumn"> '+  snline_1_aa_string +'</td><td> '+tsncont_1aa_fibre_string+'</td><td> per arcsec per AA</td></tr>'+\
-                                  '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pdp.jpeg" /></td><td class="perframecolumn"> '+ snline_fibre1aa_string +'</td><td> '+tsncont_1aa_1_string+'</td><td> per fiber per AA</td></tr>'+\
-                                  '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pdp.jpeg" /></td><td class="perframecolumn"> '+ snline_fibre_string +'</td><td> '+tsncont_band_fibre_string+'</td><td> per fiber in aperture</td></tr>'+\
-                                  '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pdp.jpeg" /></td><td class="perframecolumn"> '+ snline_all_string +'</td><td> </td><td> total in aperture</td></tr>'+\
+                tableloutstring = 'OUTPUT LINE SNR: ' + fluxt_val_string + \
+                                  '<br />(at lambda_line = ' + wline_val_string + ' AA)' + \
+                                  '<table border=1>' + \
+                                  '<tr><th class="iconcolumn" scope="row"> </th><td class="perframecolumn">per frame</td><td class="allframecolumn">all frames</td><td></td></tr>' + \
+                                  '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pdp.jpeg" /></td><td class="perframecolumn"> ' + snline_pspp_string + '</td><td> ' + tsncont_psp_pspp_string + '</td><td> per detector pixel</td></tr>' + \
+                                  '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspfwhm.jpeg" /></td><td class="perframecolumn"> ' + snline_spaxel_string + '</td><td> ' + tsncont_p2sp_fibre_string + '</td><td> per spectral FWHM (voxel)</td></tr>' + \
+                                  '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_peraa.jpeg" /></td><td class="perframecolumn"> ' + snline_1_aa_string + '</td><td> ' + tsncont_1aa_fibre_string + '</td><td> per arcsec per AA</td></tr>' + \
+                                  '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_peraa.jpeg" /></td><td class="perframecolumn"> ' + snline_fibre1aa_string + '</td><td> ' + tsncont_1aa_1_string + '</td><td> per fiber per AA</td></tr>' + \
+                                  '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_peraa.jpeg" /></td><td class="perframecolumn"> ' + snline_fibre_string + '</td><td> ' + tsncont_band_fibre_string + '</td><td> per fiber in aperture</td></tr>' + \
+                                  '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_peraa.jpeg" /></td><td class="perframecolumn"> ' + snline_all_string + '</td><td> </td><td> total in aperture</td></tr>' + \
                                   '</table><br />'
-                                  # '<tr><td>OUTPUT LINE SNR:</td><td></td><td></td><td></td></tr>'+\
+                # '<tr><td>OUTPUT LINE SNR:</td><td></td><td></td><td></td></tr>'+\
             else:
                 tableloutstring = 'No line input<br /><br />'
 
-
-            tableinputstring = '<table border=1>'+\
-                             '<tr><td>INPUT PARAMETERS:</td><td></td></tr>'+\
-                             '<tr><td>Observing mode:</td><td>'+om_val_string+'</td></tr>'+\
-                             '<tr><td>VPH:</td><td>'+vph_val_string+'</td></tr>'+\
-                             '<tr><td>Source type:</td><td>'+sourcet_val_string+'</td></tr>'+\
-                             '<tr><td>Continuum:</td><td>'+bandc_val_string+' = '+mag_val_string+'mag</td></tr>'+\
-                             '<tr><td>Continuum flux:</td><td>'+netflux_string+' cgs</td></tr>'+\
-                             '<tr><td>*Sky Condition:</td><td>'+skycond_val_string+'</td></tr>'+\
-                             '<tr><td>Moon:</td><td>'+moon_val_string+'</td></tr>'+\
-                             '<tr><td>Airmass: X=</td><td>'+airmass_val_string+'</td></tr>'+\
-                             '<tr><td>Seeing(@X=1):</td><td>'+seeing_zenith_string+'</td></tr>'+\
-                             '<tr><td>Sky-flux(R,@X):</td><td>'+fsky_string+' cgs</td></tr>'+\
-                             '<tr><td>Seeing(@X):</td><td>'+seeingx_string+'</td></tr>'+\
-                             '<tr><td>*Observation:</td></td><td></tr>'+\
-                             '<tr><td>Number of frames:</td><td>'+numframe_val_string+'</td></tr>'+\
-                             '<tr><td>Exptime per frame:</td><td>'+exptimepframe_val_string+' s</td></tr>'+\
-                             '<tr><td>Total exptime:</td><td>'+exptime_val_string+' s</td></tr>'+\
-                             '<tr><td>NP_Dark:</td><td>'+npdark_val_string+'</td></tr>'+\
-                             '<tr><td>Sky-bundles:</td><td>'+nsbundles_val_string+'</td></tr>'+\
-                             '</table><br />'
+            tableinputstring = '<table border=1>' + \
+                               '<tr><td>INPUT PARAMETERS:</td><td></td></tr>' + \
+                               '<tr><td>Observing mode:</td><td>' + om_val_string + '</td></tr>' + \
+                               '<tr><td>VPH:</td><td>' + vph_val_string + '</td></tr>' + \
+                               '<tr><td>Source type:</td><td>' + sourcet_val_string + '</td></tr>' + \
+                               '<tr><td>Continuum:</td><td>' + bandc_val_string + ' = ' + mag_val_string + 'mag</td></tr>' + \
+                               '<tr><td>Continuum flux:</td><td>' + netflux_string + ' cgs</td></tr>' + \
+                               '<tr><td>*Sky Condition:</td><td>' + skycond_val_string + '</td></tr>' + \
+                               '<tr><td>Moon:</td><td>' + moon_val_string + '</td></tr>' + \
+                               '<tr><td>Airmass: X=</td><td>' + airmass_val_string + '</td></tr>' + \
+                               '<tr><td>Seeing(@X=1):</td><td>' + seeing_zenith_string + '</td></tr>' + \
+                               '<tr><td>Sky-flux(R,@X):</td><td>' + fsky_string + ' cgs</td></tr>' + \
+                               '<tr><td>Seeing(@X):</td><td>' + seeingx_string + '</td></tr>' + \
+                               '<tr><td>*Observation:</td></td><td></tr>' + \
+                               '<tr><td>Number of frames:</td><td>' + numframe_val_string + '</td></tr>' + \
+                               '<tr><td>Exptime per frame:</td><td>' + exptimepframe_val_string + ' s</td></tr>' + \
+                               '<tr><td>Total exptime:</td><td>' + exptime_val_string + ' s</td></tr>' + \
+                               '<tr><td>NP_Dark:</td><td>' + npdark_val_string + '</td></tr>' + \
+                               '<tr><td>Sky-bundles:</td><td>' + nsbundles_val_string + '</td></tr>' + \
+                               '</table><br />'
         else:
             tablecoutstring = ''
             tableloutstring = ''
             tableinputstring = ''
 
         from django.http import JsonResponse
-        return JsonResponse({'outtext' : outtextstring,
-                             'textinput' : inputstring,
-                             'textcout' : coutputstring,
-                             'textlout' : loutputstring,
-                             'tablecout' : tablecoutstring,
-                             'tablelout' : tableloutstring,
-                             'tableinput' : tableinputstring,
-                             'graphic' : html,
+        return JsonResponse({'outtext': outtextstring,
+                             'textinput': inputstring,
+                             'textcout': coutputstring,
+                             'textlout': loutputstring,
+                             'tablecout': tablecoutstring,
+                             'tablelout': tableloutstring,
+                             'tableinput': tableinputstring,
+                             'graphic': html,
 
                              })
-
-
-# def etc_tab(request):
-#     if request.method == 'GET':
-#         outputofcalc = compute5(request)
-#
-#         tocheck = str(outputofcalc['outtext'])
-#         if not tocheck:
-#             outtextstring = "No warning."
-#         else:
-#             outtextstring = tocheck
-#         inputstring = str(outputofcalc['texti'])
-#         coutputstring = str(outputofcalc['textoc'])
-#         loutputstring = str(outputofcalc['textol'])
-#
-#         return render(request, 'etc/tab.html',
-#             context={
-#                       'outtext':outtextstring,
-#                       'textinput':inputstring,
-#                       'textcout':coutputstring,
-#                       'textlout':loutputstring
-#                      }
-#                       )
