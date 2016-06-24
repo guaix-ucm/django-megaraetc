@@ -1,0 +1,16 @@
+{% load staticfiles %}
+
+
+
+
+<div id="header" onclick="document.location='{% url 'etc:index' %}'" onmouseover="style.cursor='pointer' ">
+    <div class="ucmlogotd">
+        <img id="ucmlogoimg" src="{% static 'etc/images/ucm-small.jpg' %}"/>
+    </div>
+    <div class="maintitletd">
+        <h5>MEGARA Online Exposure Time Calculator (v0.4.3)</h5>
+    </div>
+    <div class="megaralogotd">
+        <img src="{% static 'etc/images/megara_logo.gif' %}" width=150px />
+    </div>
+</div>

@@ -216,7 +216,7 @@ function selectInputflux() {
 
         document.getElementById("id_rline_0").disabled = false;
         document.getElementById("id_rline_1").disabled = false;
-        document.getElementById("id_rline_0").checked = true;
+//        document.getElementById("id_rline_0").checked = true;
 
         document.getElementById("id_lineflux").disabled = false;
         document.getElementById("id_linewave").disabled = false;

@@ -1,0 +1,32 @@
+
+{% load staticfiles %}
+{% load bootstrap3 %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <script type="text/javascript" src="{% static 'etc/js/jquery-1.12.0.min.js' %}" ></script>
+        <link rel="stylesheet" type="text/css" href="{% static 'etc/css/style.css' %}" />
+        {% block head %}
+            <title>MEGARA Online Exposure Time Calculator </title>
+        {% endblock head %}
+        {% bootstrap_css %}
+        {% bootstrap_javascript %}
+        {% bootstrap_messages %}
+    </head>
+<body>
+    {% block header %}
+    {% endblock header %}
+
+
+    {% block content %}
+    {% endblock content %}
+
+
+    {% block footer %}
+    {% endblock footer %}
+
+</body>
+</html>

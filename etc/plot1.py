@@ -100,25 +100,30 @@ def plot_and_save_new(tempname, x, y, mu_var, fwhm_var, linef_var,
 
     gauxmin = mean-10*sigma
     gauxmax = mean+10*sigma
-    gaux = numpy.linspace(gauxmin, gauxmax, numpoints)
-    minxindex = min(range(len(filtx)), key=lambda i: abs(filtx[i]-gauxmin))
-    maxxindex = min(range(len(filtx)), key=lambda i: abs(filtx[i]-gauxmax))
-    # meanxindex = int(round((minxindex+maxxindex)/2))    # central value index
-    meany = (filty[minxindex]+filty[maxxindex])/2
-    gauy = meany + mlab.normpdf(gaux, mean, sigma)*(amplitude*10**17)  # gaussian y
-    ax.plot([gauxmin, gauxmax], [filty[minxindex], filty[maxxindex]],
-            color='g')  # continuum
 
-    ax.plot([gauxmin, gauxmin], [filty[minxindex], gauy[0]],
-            color='g', ls='--')
-    ax.plot([gauxmax, gauxmax], [gauy[numpoints-1], filty[maxxindex]],
-            color='g', ls='--')
+    if isinstance(gauxmin, float) :
+        gaux = numpy.linspace(gauxmin, gauxmax, numpoints)
+        minxindex = min(range(len(filtx)), key=lambda i: abs(filtx[i]-gauxmin))
+        maxxindex = min(range(len(filtx)), key=lambda i: abs(filtx[i]-gauxmax))
+        # meanxindex = int(round((minxindex+maxxindex)/2))    # central value index
+        meany = (filty[minxindex]+filty[maxxindex])/2
+        gauy = meany + mlab.normpdf(gaux, mean, sigma)*(amplitude*10**17)  # gaussian y
+        ax.plot([gauxmin, gauxmax], [filty[minxindex], filty[maxxindex]],
+                color='g')  # continuum
 
-    ax.plot(gaux, gauy, color='purple')  # gaussian plot
-    plt.plot([vph_minval_var, vph_minval_var], [ymin/2, ymax*2],
-             ls='--', color='red')  # vph-limit
-    plt.plot([vph_maxval_var, vph_maxval_var], [ymin/2, ymax*2],
-             ls='--', color='red')  # vph-limit
+        ax.plot([gauxmin, gauxmin], [filty[minxindex], gauy[0]],
+                color='g', ls='--')
+        ax.plot([gauxmax, gauxmax], [gauy[numpoints-1], filty[maxxindex]],
+                color='g', ls='--')
+
+        ax.plot(gaux, gauy, color='purple')  # gaussian plot
+        plt.plot([vph_minval_var, vph_minval_var], [ymin/2, ymax*2],
+                 ls='--', color='red')  # vph-limit
+        plt.plot([vph_maxval_var, vph_maxval_var], [ymin/2, ymax*2],
+                 ls='--', color='red')  # vph-limit
+    else:
+        ax.text(xmax/2, ymax/2,'STOP')
+        print "STOP"
 
     ### ADJUST THE PLOT
     leftval=0.12

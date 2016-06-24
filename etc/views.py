@@ -13,7 +13,7 @@ from justcalc import calc
 # from plot1 import plot_and_save, plot_and_save2, plot_and_save_new, plot_and_save2_new
 from plot1 import plot_and_save_new, plot_and_save2_new
 
-import numpy as np
+import numpy
 import os
 import tempfile
 
@@ -43,7 +43,7 @@ def compute5(request):
         else:
             isize_val = request.POST['isize']
             radius_val = float(request.POST['radius'])
-            size_val = np.pi * (radius_val**2)
+            size_val = numpy.pi * (radius_val**2)
     mag_val = float(request.POST['contmagval']) if request.POST[
                                                        'contmagflux'] == 'M' else 20.0
     fc_val = 1e-16 if request.POST['contmagflux'] == 'M' else float(
@@ -274,16 +274,16 @@ def etc_do(request):
             label2b = vph_val
             label2c = outputofcalc['bandc_val']
         else:
-            x = numpy.arange(1, 100, 1)
-            y = numpy.arange(1, 100, 1)
-            x2 = numpy.arange(1, 100, 1)
-            y2 = numpy.arange(1, 100, 1)
-            x2b = numpy.arange(1, 100, 1)
-            y2b = numpy.arange(1, 100, 1)
-            x2c = numpy.arange(1, 100, 1)
-            y2c = numpy.arange(1, 100, 1)
-            x2d = numpy.arange(1, 100, 1)
-            y2d = numpy.arange(1, 100, 1)
+            x = numpy.arange(1, 1001, 1)
+            y = numpy.arange(1, 1001, 1)
+            x2 = numpy.arange(1, 1001, 1)
+            y2 = numpy.arange(1, 1001, 1)
+            x2b = numpy.arange(1, 1001, 1)
+            y2b = numpy.arange(1, 1001, 1)
+            x2c = numpy.arange(1, 1001, 1)
+            y2c = numpy.arange(1, 1001, 1)
+            x2d = numpy.arange(1, 1001, 1)
+            y2d = numpy.arange(1, 1001, 1)
 
             label1 = "none"
             label2 = 20.0  # Float
@@ -317,9 +317,9 @@ def etc_do(request):
             y3 = outputofcalc['fwhmline_val']
             z3 = outputofcalc['fline_val']
         else:
-            x3 = numpy.arange(1, 100, 1)
-            y3 = numpy.arange(1, 100, 1)
-            z3 = numpy.arange(1, 100, 1)
+            x3 = numpy.arange(1, 1001, 1)
+            y3 = numpy.arange(1, 1001, 1)
+            z3 = numpy.arange(1, 1001, 1)
 
         figura = plot_and_save_new('', x, y, x3, y3, z3,
                                    vph_minval, vph_maxval,
