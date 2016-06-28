@@ -30,6 +30,7 @@ import mpld3
 
 def compute5(request):
     print request.POST['stype']
+    print 'LOG: Entered compute5'
 
     if request.POST['stype'] == 'P':
         isize_val = 'A'
@@ -168,7 +169,7 @@ def compute5(request):
     # cleanstring = cleanstring[:-1].replace("(", '\n')
 
     # cleanstring = [outtextstring,inputstring,coutputstring,loutputstring]
-
+    print 'LOG: About to leave compute5 and return outputofcalc'
     return outputofcalc
 
 
@@ -236,6 +237,7 @@ def etc_do(request):
         return HttpResponse("<html><body>It works!</body></html>")
 
     elif request.method == 'POST':
+        print 'LOG: VIEW'
         outputofcalc = compute5(request)
 
         tocheck = str(outputofcalc['outtext'])
