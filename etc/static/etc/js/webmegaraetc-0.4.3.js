@@ -55,6 +55,8 @@ function closeWin() {
 	alert("Just close the browser's tab to quit.")
 }
 
+
+
 // for source type
 function selector() {
     if (document.getElementById("id_stype_0").checked == true) {
@@ -118,7 +120,7 @@ function selector() {
     }
 }
 
-// for source type
+// for input area type
 function selectInputSize() {
     if (document.getElementById("id_isize_0").checked == true) {
         document.getElementById("id_size").disabled = false;
@@ -244,6 +246,253 @@ function selectRline() {
         document.getElementById("id_linefwhm").disabled = false;
     }
 
+}
+
+// FOR COOKIES
+// get cookie = read cookie and return
+function getCookie(cname) {
+	var name = cname + "=";
+	var ca = document.cookie.split(';');
+	for(var i = 0; i <ca.length; i++) {
+		var c = ca[i];
+		while (c.charAt(0)==' ') {
+			c = c.substring(1);
+		}
+		if (c.indexOf(name) == 0) {
+			return c.substring(name.length,c.length);
+		}
+	}
+	return "";
+}
+
+// set cookie = create the cookie with name, value, and expiration days
+function setCookie(cname,cvalue,exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    var expires = "expires=" + d.toGMTString();
+    document.cookie = cname+"="+cvalue+"; "+expires;
+}
+
+// store values of form
+function storeValues(form)
+  {
+    if (document.getElementById("id_stype_0").checked == true) {
+        setCookie("the_stype", myform.id_stype_0.value, 365);
+    }
+    else if (document.getElementById("id_stype_1").checked == true) {
+        setCookie("the_stype", myform.id_stype_1.value, 365);
+    }
+    if (document.getElementById("id_isize_0").checked == true) {
+        setCookie("the_isize", myform.id_isize_0.value, 365);
+    }
+    else if (document.getElementById("id_isize_1").checked == true) {
+        setCookie("the_isize", myform.id_isize_1.value, 365);
+    }
+
+    setCookie("the_area", myform.id_size.value, 365);
+    setCookie("the_radius", myform.id_radius.value, 365);
+
+    if (document.getElementById("id_iflux_0").checked == true) {
+        setCookie("the_iflux", myform.id_iflux_0.value, 365);
+    }
+    else if (document.getElementById("id_iflux_1").checked == true) {
+        setCookie("the_iflux", myform.id_iflux_1.value, 365);
+    }
+    if (document.getElementById("id_rline_0").checked == true) {
+        setCookie("the_rline", myform.id_rline_0.value, 365);
+    }
+    else if (document.getElementById("id_rline_1").checked == true) {
+        setCookie("the_rline", myform.id_rline_1.value, 365);
+    }
+
+    setCookie("the_spectype", myform.id_spectype.value, 365);
+    setCookie("the_pfilter", myform.id_pfilter.value, 365);
+
+    if (document.getElementById("id_contmagflux_0").checked == true) {
+        setCookie("the_contmagflux", myform.id_contmagflux_0.value, 365);
+    }
+    else if (document.getElementById("id_contmagflux_1").checked == true) {
+        setCookie("the_contmagflux", myform.id_contmagflux_1.value, 365);
+    }
+
+    setCookie("the_contmagval", myform.id_contmagval.value, 365);
+    setCookie("the_contfluxval", myform.id_contfluxval.value, 365);
+    setCookie("the_lineflux", myform.id_lineflux.value, 365);
+    setCookie("the_linewave", myform.id_linewave.value, 365);
+    setCookie("the_linefwhm", myform.id_linefwhm.value, 365);
+
+    setCookie("the_om_val", myform.id_om_val.value, 365);
+    setCookie("the_vph", myform.id_vph.value, 365);
+    setCookie("the_skycond", myform.id_skycond.value, 365);
+    setCookie("the_moonph", myform.id_moonph.value, 365);
+    setCookie("the_airmass", myform.id_airmass.value, 365);
+    setCookie("the_seeing", myform.id_seeing.value, 365);
+    setCookie("the_numframes", myform.id_numframes.value, 365);
+    setCookie("the_exptimepframe", myform.id_exptimepframe.value, 365);
+    setCookie("the_nfibers", myform.id_nfibers.value, 365);
+    setCookie("the_lineap", myform.id_lineap.value, 365);
+    setCookie("the_contap", myform.id_contap.value, 365);
+//    setCookie("field3", form.field3.value, 365);
+//    setCookie("field4", form.field4.value, 365);
+    return true;
+  }
+
+// show cookies in alert window
+function displayCookies() {
+    var fname_stype=getCookie("the_stype");
+    var fname_isize=getCookie("the_isize");
+    var fname_area=getCookie("the_area");
+    var fname_radius=getCookie("the_radius");
+    var fname_iflux=getCookie("the_iflux");
+    var fname_rline=getCookie("the_rline");
+    var fname_spectype=getCookie("the_spectype");
+    var fname_pfilter=getCookie("the_pfilter");
+    var fname_contmagflux=getCookie("the_contmagflux");
+    var fname_contmagval=getCookie("the_contmagval");
+    var fname_contfluxval=getCookie("the_contfluxval");
+    var fname_lineflux=getCookie("the_lineflux");
+    var fname_linewave=getCookie("the_linewave");
+    var fname_linefwhm=getCookie("the_linefwhm");
+
+    var fname_om_val=getCookie("the_om_val");
+    var fname_vph=getCookie("the_vph");
+    var fname_skycond=getCookie("the_skycond");
+    var fname_moonph=getCookie("the_moonph");
+    var fname_airmass=getCookie("the_airmass");
+    var fname_seeing=getCookie("the_seeing");
+    var fname_numframes=getCookie("the_numframes");
+    var fname_exptimepframe=getCookie("the_exptimepframe");
+    var fname_nfibers=getCookie("the_nfibers");
+    var fname_lineap=getCookie("the_lineap");
+    var fname_contap=getCookie("the_contap");
+
+	if (fname_radius==null) {fname_radius="";}
+	if (fname_radius!="" && fname_radius!="") {fname_radius="the_radius="+fname_radius;}
+	alert ('The current stype is= '+fname_stype+
+	'\ninput size= '+fname_isize+
+	'\nwith area= '+fname_area+
+	'\nwith radius= '+fname_radius+
+	'\nwith iflux= '+fname_iflux+
+	'\nwith rline= '+fname_rline+
+	'\nwith spectype= '+fname_spectype+
+	'\nwith pfilter= '+fname_pfilter+
+	'\nwith contmagflux= '+fname_contmagflux+
+	'\nwith contmagval= '+fname_contmagval+
+	'\nwith contfluxval= '+fname_contfluxval+
+	'\nwith lineflux= '+fname_lineflux+
+	'\nwith linewave= '+fname_linewave+
+	'\nwith linefwhm= '+fname_linefwhm+
+
+	'\nwith om_val= '+fname_om_val+
+	'\nwith vph='+fname_vph+
+	'\nwith skycond ='+fname_skycond+
+	'\nwith moonph ='+fname_moonph+
+	'\nwith airmass ='+fname_airmass+
+	'\nwith seeing ='+fname_seeing+
+	'\nwith numframes ='+fname_numframes+
+	'\nwith exptimepframe ='+fname_exptimepframe+
+	'\nwith nfibers ='+fname_nfibers+
+	'\nwith lineap ='+fname_lineap+
+	'\nwith contap ='+fname_contap+
+	' ');
+}
+
+// delete cookies
+function deleteCookies(name) {
+  document.cookie = "the_stype=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  document.cookie = "the_isize=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  document.cookie = "the_area=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  document.cookie = "the_radius=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  document.cookie = "the_iflux=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  document.cookie = "the_rline=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  document.cookie = "the_spectype=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  document.cookie = "the_pfilter=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  document.cookie = "the_contmagflux=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  document.cookie = "the_contmagval=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  document.cookie = "the_contfluxval=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  document.cookie = "the_lineflux=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  document.cookie = "the_linewave=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  document.cookie = "the_linefwhm=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+
+  document.cookie = "the_om_val=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  document.cookie = "the_vph=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  document.cookie = "the_skycond=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  document.cookie = "the_moonph=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  document.cookie = "the_airmass=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  document.cookie = "the_seeing=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  document.cookie = "the_numframes=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  document.cookie = "the_exptimepframe=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  document.cookie = "the_nfibers=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  document.cookie = "the_lineap=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  document.cookie = "the_contap=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+
+  location.reload();
+  alert ('Cookies deleted.');
+}
+
+function readCookies() {
+    if (getCookie("the_stype") != ""){
+        if (getCookie("the_stype") == 'P') {
+            document.getElementById('id_stype_0').checked = true;
+            }
+        else if (getCookie("the_stype") == 'E') {
+            document.getElementById('id_stype_1').checked = true;
+            document.getElementById('id_stype_1').onload = selector();
+        }
+        if (getCookie("the_isize") == 'A') {
+            document.getElementById('id_isize_0').checked = true;
+            }
+        else if (getCookie("the_isize") == 'R') {
+            document.getElementById('id_isize_1').checked = true;
+            document.getElementById('id_isize_1').onload = selectInputSize();
+        }
+        document.getElementById('id_size').value = getCookie('the_area');
+        document.getElementById('id_radius').value = getCookie('the_radius');
+
+        if (getCookie("the_iflux") == 'C') {
+            document.getElementById('id_iflux_0').checked = true;
+            }
+        else if (getCookie("the_iflux") == 'L') {
+            document.getElementById('id_iflux_1').checked = true;
+            document.getElementById('id_iflux_1').onload = selectInputflux();
+        }
+        if (getCookie("the_rline") == 'N') {
+            document.getElementById('id_rline_0').checked = true;
+            }
+        else if (getCookie("the_rline") == 'Y') {
+            document.getElementById('id_rline_1').checked = true;
+            document.getElementById('id_rline_1').onload = selectRline();
+        }
+
+        document.getElementById('id_spectype').value = getCookie('the_spectype');
+        document.getElementById('id_pfilter').value = getCookie('the_pfilter');
+
+        if (getCookie("the_contmagflux") == 'M') {
+            document.getElementById('id_contmagflux_0').checked = true;
+            }
+        else if (getCookie("the_contmagflux") == 'F') {
+            document.getElementById('id_contmagflux_1').checked = true;
+            document.getElementById('id_contmagflux_1').onload = selectcontmagflux();
+        }
+
+        document.getElementById('id_contmagval').value = getCookie('the_contmagval');
+        document.getElementById('id_contfluxval').value = getCookie('the_contfluxval');
+        document.getElementById('id_lineflux').value = getCookie('the_lineflux');
+        document.getElementById('id_linewave').value = getCookie('the_linewave');
+        document.getElementById('id_linefwhm').value = getCookie('the_linefwhm');
+
+        document.getElementById('id_om_val').value = getCookie('the_om_val');
+        document.getElementById('id_vph').value = getCookie('the_vph');
+        document.getElementById('id_skycond').value = getCookie('the_skycond');
+        document.getElementById('id_moonph').value = getCookie('the_moonph');
+        document.getElementById('id_airmass').value = getCookie('the_airmass');
+        document.getElementById('id_seeing').value = getCookie('the_seeing');
+        document.getElementById('id_numframes').value = getCookie('the_numframes');
+        document.getElementById('id_exptimepframe').value = getCookie('the_exptimepframe');
+        document.getElementById('id_nfibers').value = getCookie('the_nfibers');
+        document.getElementById('id_lineap').value = getCookie('the_lineap');
+        document.getElementById('id_contap').value = getCookie('the_contap');
+    }
 }
 
 // -->

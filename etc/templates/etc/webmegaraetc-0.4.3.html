@@ -21,7 +21,7 @@
 
     <div id="wrapper">
         <div id="theformcontainer">
-            <form id="myform" method="post">{% csrf_token %}
+            <form id="myform" method="post" onsubmit="return storeValues(this);">{% csrf_token %}
                 <div id="leftdiv">
                     <h4>Target Input Flux Distribution</h4>
                     {% bootstrap_form form1 %}
@@ -44,9 +44,11 @@
                 <div id="submitbuttonsdiv">
                 {% buttons class="aux" %}
                     {% bootstrap_button "Submit" button_type="submit" button_class="btn-primary" icon="star" %}
-                    {% bootstrap_button "Reset" button_type="reset" button_class="btn-primary" icon="remove" %}
+                    {% bootstrap_button "Reset" button_type="reset" button_class="btn-primary" icon="remove" href="Javascript:deleteCookies();" %}
                     {% bootstrap_button "Manual v0.4.2" button_type="link" button_class="btn-primary" icon="save-file" href="Javascript:newPopupBig('/static/etc/TEC_MEG_057-2D.pdf');" %}
                     {% bootstrap_button "Help" button_type="link" button_class="btn-primary" icon="question-sign" href="Javascript:newPopupBig('/static/etc/help/HELP.txt');" %}
+                    {% bootstrap_button "Show Cookies" button_type="link" button_class="btn-primary" icon="star" href="Javascript:displayCookies();" %}
+                    <!--{% bootstrap_button "Delete Cookies" button_type="link" button_class="btn-primary" icon="star" href="Javascript:deleteCookies();" %}-->
                     <!--{% bootstrap_button "Download" button_type="link" button_class="btn-primary" icon="floppy-save" href="/static/etc/megaraetc-0.4.1.tar" %}-->
                 {% endbuttons %}
                 </div>
@@ -81,7 +83,9 @@
                 </div>
             </div>
         </div>
-
+    <script type="text/javascript">
+        readCookies();
+    </script>
     <!--CLOSE WRAPPER-->
     </div>
 

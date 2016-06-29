@@ -30,7 +30,7 @@ import mpld3
 
 def compute5(request):
     print request.POST['stype']
-    print 'LOG: Entered compute5'
+    print '### LOG: Entered compute5'
 
     if request.POST['stype'] == 'P':
         isize_val = 'A'
@@ -87,7 +87,7 @@ def compute5(request):
         texti = " "
         textoc = " "
         textol = " "
-        outputfilename = "etc/static/etc/outputcalc.txt"
+        outputfilename = "mect/static/etc/outputcalc.txt"
         with open(outputfilename, 'w') as f:
             print >> f, outtext
             print >> f, texti
@@ -170,6 +170,7 @@ def compute5(request):
 
     # cleanstring = [outtextstring,inputstring,coutputstring,loutputstring]
     print 'LOG: About to leave compute5 and return outputofcalc'
+    # print outputofcalc
     return outputofcalc
 
 
@@ -237,9 +238,9 @@ def etc_do(request):
         return HttpResponse("<html><body>It works!</body></html>")
 
     elif request.method == 'POST':
-        print 'LOG: VIEW'
+        print '### LOG: ETC_DO'
         outputofcalc = compute5(request)
-
+        print '### LOG: ETC_DO: OUTPUTOFCALC SUCCESSFULLY COMPUTED'
         tocheck = str(outputofcalc['outtext'])
         if not tocheck:
             outtextstring = ""  # No warning.
@@ -522,7 +523,7 @@ def etc_do(request):
             tablecoutstring = ''
             tableloutstring = ''
             tableinputstring = ''
-
+        print "### LOG: ABOUT TO QUIT ETC_DO"
         from django.http import JsonResponse
         return JsonResponse({'outtext': outtextstring,
                              'textinput': inputstring,
