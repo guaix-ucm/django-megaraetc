@@ -1,0 +1,3 @@
+** RESOLVED LINE **
+Choosing "Yes" allows the user to input the FWHM of the line,
+as well as the line aperture and continuum aperture.

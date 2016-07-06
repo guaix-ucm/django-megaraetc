@@ -1,4 +1,4 @@
-** INPUT SPECTRUM **
+** Continuum Band **
 IF "Input flux" is "Line + Continuum",
 then
 "Sc" becomes "Sc (smooth)",

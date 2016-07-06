@@ -1,0 +1,4 @@
+** NUMBER OF FRAMES **
+Put an integer.
+Each frame is assumed to have the same exposure time given in the row
+"Exposure Time per frame".

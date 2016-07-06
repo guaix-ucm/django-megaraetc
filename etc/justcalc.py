@@ -142,7 +142,7 @@ def outtextinp(om_val, bandc_val, sourcet_val, mag_val, netflux, isize_val,
 
     text = text + '* Sky: \n  Condition = %15s \n  Moon = %6s\n  Airmass: X = %3.2f\n  Seeing(@X=1) = %4.2f\n' % (skycond_val, moon_val, airmass_val, seeing_zenith)
     text = text + '  Sky-flux(%s,@X) = %7.3e cgs\n  Seeing(@X) = %4.2f\n' % (bandsky, fsky, seeingx)
-    text = text + '* Observation: \n  Num. of frames = %6i\n  Exptime/frame = %7.1f\n  Total Exptime = %7.1f\n  NP_Dark = %6i\n  Sky-bundles = %i, Fibers = %i\n' % (numframe_val, exptimepframe_val, exptime_val, npdark_val, nsbundles_val, nsfib_val)
+    text = text + '* Observation: \n  Num. of frames = %6i\n  Exptime/frame = %7.1f\n  Total Exptime = %7.1f\n  NP_Dark = %6i\n  Sky-bundles = %i, Bundles = %i\n' % (numframe_val, exptimepframe_val, exptime_val, npdark_val, nsbundles_val, nsfib_val)
 
     if fluxt_val == "L":
         text =  text + '  Spectral apertures:\n    For line=%2i\n    For continuum=%2i\n' % (nfwhmline_val, cnfwhmline_val)
@@ -626,7 +626,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val,\
     npdark_val = 65500.
 
     # Sky fibres
-    nsfib_val = isafloat(nsbundles_val*7,92.0) # convert from number of bundles to number of fibers
+    nsfib_val = isafloat(nsbundles_val*7,92.0) # convert from number of bundles to number of fibers. These are SKY FIBERS
     if nsfib_val <= 0. or nsfib_val > 644:
         nsfib_val = 56.
         outtext = outmessage(110)
@@ -962,7 +962,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val,\
         for xit in items:
 
             # Deriving spectroscopic parameters for each case:
-            deltalambda, omegasource, npixx, npixy, nfib, nfib1, omegaskysource, omegasource = specpar(om_val, xit, disp, ps,
+            deltalambda, omegasource, npixx, npixy, nfib, nfib1, omegaskysource = specpar(om_val, xit, disp, ps,
              nfibres, nfibresy, areafibre, rfibre,  deltab, areasource, diamsource, areaseeing, seeingx)
 
             # Number of pixels in detector under consideration: just counting the factor in area
@@ -1058,7 +1058,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val,\
         items = [9, 0]
         for xit in items:
             # Deriving spectroscopic parameters for each case:
-            deltalambda, omegasource, npixx, npixy, nfib, nfib1, omegaskysource, omegasource = specpar(om_val, xit, disp, ps,
+            deltalambda, omegasource, npixx, npixy, nfib, nfib1, omegaskysource = specpar(om_val, xit, disp, ps,
              nfibres, nfibresy, areafibre, rfibre,  deltab, areasource, diamsource, areaseeing, seeingx)
 
             # Number of pixels in detector under consideration: just counting the factor in area
@@ -1281,19 +1281,27 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val,\
 
                 if xit == 0: # All area
                     snline_all = snline
+                    tsnline_all = snline_all * numpy.sqrt(numframe_val)
 
                 elif xit == 1: # Seeing
                     snline_seeing = snline
+                    tsnline_seeing = snline_seeing * numpy.sqrt(numframe_val)
 
                 elif xit == 2: # 1 arcsec**2
                     snline_1 = snline
+                    tsnline_1 = snline_1 * numpy.sqrt(numframe_val)
                     snline_1_aa = snlineperAA
+                    tsnline_1_aa = snline_1_aa * numpy.sqrt(numframe_val)
 
                 elif xit == 3: # 1 fibre
                     snline_fibre = snline
+                    tsnline_fibre = snline_fibre * numpy.sqrt(numframe_val) # all frames
                     snline_fibre1aa = snlinefibreperAA
+                    tsnline_fibre1aa = snline_fibre1aa * numpy.sqrt(numframe_val) # all frames
                     snline_spaxel = snlinespaxel
+                    tsnline_spaxel = snline_spaxel * numpy.sqrt(numframe_val) # all frames
                     snline_pspp = snline1pix
+                    tsnline_pspp = snline_pspp * numpy.sqrt(numframe_val) #total SNR per detector pixel
 
             # End of FOR loop for computations
             pass
@@ -1301,13 +1309,21 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val,\
         # Ending if line
         else:
             snline_all = 0.
+            tsnline_all = 0.
             snline_seeing = 0.
+            tsnline_seeing = 0.
             snline_1 = 0.
+            tsnline_1 = 0.
             snline_1_aa = 0.
+            tsnline_1_aa = 0.
             snline_fibre = 0.
+            tsnline_fibre = 0.
             snline_pspp = 0.
+            tsnline_pspp = 0.
             snline_spaxel = 0.
+            tsnline_spaxel = 0.
             snline_fibre1aa = 0.
+            tsnline_fibre1aa = 0.
 
         ##############################
         # Output of input parameters #
@@ -1409,10 +1425,14 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val,\
                 'sncont_psp_pspp' : sncont_psp_pspp, 'tsncont_psp_pspp' : tsncont_psp_pspp,\
                 'lambdaeff' : lambdaeff,\
 
-                'snline_all' : snline_all, 'snline_fibre' : snline_fibre,\
-                'snline_pspp' : snline_pspp, 'snline_1_aa' : snline_1_aa,\
-                'snline_seeing' : snline_seeing, 'snline_1' : snline_1,\
-                'snline_spaxel' : snline_spaxel, 'snline_fibre1aa': snline_fibre1aa
+                'snline_all' : snline_all, 'tsnline_all' : tsnline_all,\
+                'snline_fibre' : snline_fibre, 'tsnline_fibre' : tsnline_fibre,\
+                'snline_pspp' : snline_pspp, 'tsnline_pspp' : tsnline_pspp,\
+                'snline_1_aa' : snline_1_aa, 'tsnline_1_aa' : tsnline_1_aa,\
+                'snline_seeing' : snline_seeing, 'tsnline_seeing' : tsnline_seeing,\
+                'snline_1' : snline_1, 'tsnline_1' : tsnline_1,\
+                'snline_spaxel' : snline_spaxel, 'tsnline_spaxel' : tsnline_spaxel,\
+                'snline_fibre1aa': snline_fibre1aa, 'tsnline_fibre1aa' : tsnline_fibre1aa
                 }     # ADDED FOR DJANGO
     # Avoiding computations in case of exception of errind
     else:

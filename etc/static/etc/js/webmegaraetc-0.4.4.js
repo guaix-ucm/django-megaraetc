@@ -47,7 +47,7 @@ url,'popUpWindow','height=400,width=300,left=10,top=10,resizable=yes,scrollbars=
 // bigger pop-up window
 function newPopupBig(url) {
 popupWindow = window.open(
-url,'popUpWindow','height=800,width=740,left=10,top=10,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')
+url,'popUpWindow','height=900,width=740,left=10,top=10,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')
 }
 
 // close window alert
@@ -329,7 +329,7 @@ function storeValues(form)
     setCookie("the_seeing", myform.id_seeing.value, 365);
     setCookie("the_numframes", myform.id_numframes.value, 365);
     setCookie("the_exptimepframe", myform.id_exptimepframe.value, 365);
-    setCookie("the_nfibers", myform.id_nfibers.value, 365);
+    setCookie("the_nsbundles", myform.id_nsbundles.value, 365);
     setCookie("the_lineap", myform.id_lineap.value, 365);
     setCookie("the_contap", myform.id_contap.value, 365);
 //    setCookie("field3", form.field3.value, 365);
@@ -362,7 +362,7 @@ function displayCookies() {
     var fname_seeing=getCookie("the_seeing");
     var fname_numframes=getCookie("the_numframes");
     var fname_exptimepframe=getCookie("the_exptimepframe");
-    var fname_nfibers=getCookie("the_nfibers");
+    var fname_nsbundles=getCookie("the_nsbundles");
     var fname_lineap=getCookie("the_lineap");
     var fname_contap=getCookie("the_contap");
 
@@ -391,7 +391,7 @@ function displayCookies() {
 	'\nwith seeing ='+fname_seeing+
 	'\nwith numframes ='+fname_numframes+
 	'\nwith exptimepframe ='+fname_exptimepframe+
-	'\nwith nfibers ='+fname_nfibers+
+	'\nwith nsbundles ='+fname_nsbundles+
 	'\nwith lineap ='+fname_lineap+
 	'\nwith contap ='+fname_contap+
 	' ');
@@ -422,7 +422,7 @@ function deleteCookies(name) {
   document.cookie = "the_seeing=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
   document.cookie = "the_numframes=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
   document.cookie = "the_exptimepframe=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
-  document.cookie = "the_nfibers=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  document.cookie = "the_nsbundles=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
   document.cookie = "the_lineap=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
   document.cookie = "the_contap=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
 
@@ -489,10 +489,32 @@ function readCookies() {
         document.getElementById('id_seeing').value = getCookie('the_seeing');
         document.getElementById('id_numframes').value = getCookie('the_numframes');
         document.getElementById('id_exptimepframe').value = getCookie('the_exptimepframe');
-        document.getElementById('id_nfibers').value = getCookie('the_nfibers');
+        document.getElementById('id_nsbundles').value = getCookie('the_nsbundles');
         document.getElementById('id_lineap').value = getCookie('the_lineap');
         document.getElementById('id_contap').value = getCookie('the_contap');
     }
 }
 
+//compute number of free ("target") bundles from nsbundle
+function calculateNtbund() {
+    var nsbundles_var = document.getElementById('id_nsbundles').value;
+    if (document.getElementById('id_om_val').value=='LCB') {
+        var ntbundles = 89 - nsbundles_var;
+    }
+    else if (document.getElementById('id_om_val').value=='MOS') {
+        var ntbundles = 92 - nsbundles_var;
+    }
+    document.getElementById('id_ntbundles').value = parseInt(ntbundles);
+}
+//compute number of sky bundles from ntbundle
+function calculateNsbund() {
+    var ntbundles_var = document.getElementById('id_ntbundles').value;
+    if (document.getElementById('id_om_val').value=='LCB') {
+        var nsbundles = 89 - ntbundles_var;
+    }
+    else if (document.getElementById('id_om_val').value=='MOS') {
+        var nsbundles = 92 - ntbundles_var;
+    }
+    document.getElementById('id_nsbundles').value = parseInt(nsbundles);
+}
 // -->

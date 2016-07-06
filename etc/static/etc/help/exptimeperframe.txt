@@ -1,0 +1,3 @@
+** EXPSOURE TIME PER FRAME **
+Exposure time per frame in second.
+Each frame is assumed to have this exposure time.

@@ -1,0 +1,5 @@
+** INPUT SIZE **
+Only works when 'Source type' is set to 'Extended'.
+Switch between 'area' (in square-arcsec) or 'radius' (in arcsec) to compute
+the size of the target.
+If radius is selected,

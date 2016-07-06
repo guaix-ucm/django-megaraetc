@@ -205,7 +205,7 @@ def specpar(om_val, xit, disp, ps, nfibres, nfibresy, areafibre, rfibre,  deltab
         nfib1 = 0. # Default value
     
 
-    return deltalambda, omegasource, npixx, npixy, nfib, nfib1, omegaskysource, omegasource    
+    return deltalambda, omegasource, npixx, npixy, nfib, nfib1, omegaskysource
 
 # ********************************
 # Function to derive spectroscopic parameters according to the case selected for line output.

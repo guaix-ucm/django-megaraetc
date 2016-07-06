@@ -1,0 +1,20 @@
+** NUMBER OF TARGET BUNDLES **
+Number of bundles (also called "mini-bundles") used to compute the sky (not the target).
+Each bundle is made of a set of 7 fibres.
+
+
+VALUE RANGE:
+If OBSERVING MODE=LCB:
+    default = 8 bundles = 56 fibers
+    maximum = 8 + 81 bundles = 89 bundles = 56 + 567 = 623 fibers
+    minimum = 1 bundle = 7 fibers
+IF OBSERVING MODE=MOS:
+    default = 92 bundles = 644 fibers
+    maximum = 92 bundles = 644 fibers
+    minimum = 1 bundle = 7 fibers
+
+The bundles of 8 robotic actuators (56 fibers), located at the corners of the
+MOS FoV, are used to measure the sky when in the LCB observing mode.
+They are projected at different positions along the pseudo-slit to estimate
+projection effects and different transmissions of instrument depending on the
+spectrum position in the detector.

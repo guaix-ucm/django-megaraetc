@@ -1,0 +1,3 @@
+** SOURCE TYPE **
+Choose "Point" if your target is a point source (for e.g. stars).
+Choose "Extended" if your target is an extended source (for e.g. galaxies).

@@ -1,0 +1,66 @@
+** INPUT SPECTRUM **
+Choose an input source spectrum template.
+
+NOTES:
+    IF "Input flux" is "Line + Continuum",
+    then
+    "Sc" becomes "Sc (smooth)",
+    "NGC1068" becomes "NGC1068 (smooth)",
+    "Orion" becomes "Orion (smooth)",
+    "PN" becomes "PN (smooth)",
+    "Sy2" becomes "Sy2 (smooth)",
+    "Starburst1" becomes "Starburst1 (smooth)",
+    "Starburst2" becomes "Starburst2 (smooth)",
+    "Starburst3" becomes "Starburst3 (smooth)",
+    "Starburst4" becomes "Starburst4 (smooth)",
+    "Starburst5" becomes "Starburst5 (smooth)",
+    "Starburst6" becomes "Starburst6 (smooth)",
+    where a continuum fit has been performed to remove spectral lines.
+
+Template options are the following:
+Uniform (default) = Constant continuum flux
+Elliptical = Elliptical galaxy
+S0 = S0 galaxy
+Sa = Sa galaxy
+Sb = Sb galaxy
+Sc = Sc galaxy
+NGC1068 = galaxy NGC1068 (obscured AGN)
+M2 I = Star of spectral type M2, luminosity class I (supergiant)
+Starburst1 = Starburst galaxy
+Starburst2 = Starburst galaxy
+Starburst3 = Starburst galaxy
+Starburst4 = Starburst galaxy
+Starburst5 = Starburst galaxy
+Starburst6 = Starburst galaxy
+Bulge = Galaxy bulge
+Liner = Low-Ionization Nuclear Emission-line Region
+QSO = Quasi-Stellar Object
+Sy1 = Seyfert 1
+Sy2 = Seyfert 2
+Orion = Orion nebula region
+PN = Planetary Nebula
+O5 V = Star of spectral type O5, luminosity class V (main sequence)
+O7 V = Star of spectral type O7, luminosity class V (main sequence)
+O9 V = Star of spectral type O9, luminosity class V (main sequence)
+B0 V = Star of spectral type B0, luminosity class V (main sequence)
+B1 V = Star of spectral type B1, luminosity class V (main sequence)
+B3 V = Star of spectral type B3, luminosity class V (main sequence)
+B5 V = Star of spectral type B5, luminosity class V (main sequence)
+B8 V = Star of spectral type B8, luminosity class V (main sequence)
+A1 V = Star of spectral type A1, luminosity class V (main sequence)
+A3 V = Star of spectral type A3, luminosity class V (main sequence)
+A5 V = Star of spectral type A5, luminosity class V (main sequence)
+F0 V = Star of spectral type F0, luminosity class V (main sequence)
+F2 V = Star of spectral type F2, luminosity class V (main sequence)
+F5 V = Star of spectral type F5, luminosity class V (main sequence)
+F8 V = Star of spectral type F8, luminosity class V (main sequence)
+G2 V = Star of spectral type G2, luminosity class V (main sequence)
+G5 I = Star of spectral type G5, luminosity class I (supergiant)
+G5 V = Star of spectral type G5, luminosity class V (main sequence)
+G8 V = Star of spectral type G8, luminosity class V (main sequence)
+K0 V = Star of spectral type K0, luminosity class V (main sequence)
+K4 V = Star of spectral type K4, luminosity class V (main sequence)
+K7 V = Star of spectral type K7, luminosity class V (main sequence)
+M2 V = Star of spectral type M2, luminosity class V (main sequence)
+M4 V = Star of spectral type M4, luminosity class V (main sequence)
+M6 V = Star of spectral type M6, luminosity class V (main sequence)

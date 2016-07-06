@@ -1,0 +1,5 @@
+Press tab or click somewhere else to see updated values.
+The number of "SKY" vs "FREE" bundles are complementary
+and are calculated automatically when one of the entry is set by the user.
+SKY + FREE = 89 for LCB.
+SKY + FREE = 92 for MOS.

@@ -56,64 +56,89 @@ class HorizontalRadioRenderer(forms.RadioSelect.renderer):
 
 
 class TargetForm(forms.Form):
-    botton = "<a class=\"\" href=\"Javascript:newPopupBig('/static/etc/help/%s.txt');\" type=\"link\"><span class=\"glyphicon glyphicon-question-sign\"></span></a>"
-    size_help = botton % "size"
-    radius_help = botton % "radius"
-    contfluxval_help = botton % "continuumflux"
-    contmagval_help = botton % "continuummagnitude"
-    lineflux_help = botton % "lineflux"
-    linewave_help = botton % "linewavelength"
-    linefwhm_help = botton % "linefwhm"
-    spectype_help = botton % "spectype"
+    botton2 = "<a class=\"\" href=\"Javascript:newPopupBig('/static/etc/help/%s.txt');\" type=\"link\"><span class=\"glyphicon glyphicon-question-sign\"></span></a>"
+    stype_help2 = botton2 % "sourcetype"
 
-    stype = forms.ChoiceField(label="Source type", initial="P", choices=STYPE, widget=forms.RadioSelect(renderer=HorizontalRadioRenderer, attrs={'onclick':'selector()'}))
-    isize = forms.ChoiceField(label="Input Size", initial="A", choices=ISIZE, widget=forms.RadioSelect(renderer=HorizontalRadioRenderer, attrs={'onclick':'selectInputSize()','disabled':'true'}))
-    size = forms.FloatField(label="Area", initial=1.0, min_value=0.0, max_value=3600, help_text=size_help, widget=forms.TextInput(attrs={'size':'7','disabled':'true'}))
-    radius = forms.FloatField(label="Radius", initial=1.0, min_value=0.0, max_value=3600, help_text=radius_help, widget=forms.TextInput(attrs={'size':'7','disabled':'true'}))
+    botton = "<a class=\"splinkcol\" href=\"Javascript:newPopupBig('/static/etc/help/%s.txt');\" type=\"link\" >"
+    suf = "Radius</a>"
+    stype_help = botton % "sourcetype" + "Source Type</a>"
+    inputsize_help = botton % "inputsize" + "Input Size</a>"
+    size_help = botton % "size" + "Area (sq.arcsec)</a>"
+    radius_help = botton % "radius" + "Radius (arcsec)</a>"
+    inputflux_help = botton % "inputflux" + "Input flux</a>"
+    rline_help = botton % "rline" + "Resolved line?</a>"
+    inputspectrum_help = botton % "inputspectrum" + "Input spectrum</a>"
+    spectype_help = botton % "spectype" + "Continuum band</a>"
 
-    iflux = forms.ChoiceField(label="Input flux", initial="C", choices=IFLUX, widget=forms.RadioSelect(renderer=HorizontalRadioRenderer, attrs={'onclick':'selectInputflux()'}))
-    rline = forms.ChoiceField(label="Resolved line?", initial="N", choices=RLINECHOICES, widget=forms.RadioSelect(renderer=HorizontalRadioRenderer, attrs={'onclick':'selectRline()','disabled':'true'})) #attrs={'disabled':'disabled'}
+    contmagflux_help = botton % "contmagflux" + "</a>"
+    contmagval_help = botton % "continuummagnitude" + "Continuum mag</a>"
+    contfluxval_help = botton % "continuumflux" + "Continuum flux</a>"
+    lineflux_help = botton % "lineflux" + "Line flux (cgs units)</a>"
+    linewave_help = botton % "linewavelength" + "Line wavelength (Angstrom)</a>"
+    linefwhm_help = botton % "linefwhm" + "Line FWHM (Angstrom)</a>"
 
-    spectype = forms.ChoiceField(label="Input spectrum", initial=1, choices=template_choice(iflux), help_text=spectype_help)  # , widget=forms.Select(attrs={'size':'4', 'style':'width:100px' }))
-    pfilter = forms.ChoiceField(label="Continuum band", initial=3, choices=filter_choice())  # , widget=forms.Select(attrs={'size':'5', 'style':'width:100px' }))
+    testarea = "<a href=\"Javascript:newPopupBig('/static/etc/help/size.txt');\" type=\"link\" >Area</a>"
 
-    contmagflux = forms.ChoiceField(label=" ", initial="M", choices=CONTMAGFLUX, widget=forms.RadioSelect(renderer=HorizontalRadioRenderer, attrs={'onclick':'selectcontmagflux()'}))
-    contmagval = forms.FloatField(label="Continuum mag", help_text=contmagval_help, initial=20.0, widget=forms.TextInput(attrs={'size':'7'}))
-    contfluxval = forms.FloatField(label="Continuum flux", help_text=contfluxval_help, initial=1e-16, widget=forms.TextInput(attrs={'size':'7','disabled':'true'}))
+    # stype = forms.ChoiceField(label="Source type", help_text=stype_help2, initial="P", choices=STYPE, widget=forms.RadioSelect(renderer=HorizontalRadioRenderer, attrs={'onclick':'selector()'}))
+    stype = forms.ChoiceField(label=mark_safe(stype_help), initial="P", choices=STYPE, widget=forms.RadioSelect(renderer=HorizontalRadioRenderer, attrs={'onclick':'selector()'}))
+    isize = forms.ChoiceField(label=mark_safe(inputsize_help), initial="A", choices=ISIZE, widget=forms.RadioSelect(renderer=HorizontalRadioRenderer, attrs={'onclick':'selectInputSize()','disabled':'true', 'placeholder':'inputsize'}))
+    size = forms.FloatField(label=mark_safe(size_help), initial=1.0, min_value=0.0, max_value=3600, widget=forms.TextInput(attrs={'disabled':'true', 'placeholder':'Area'}))
+    radius = forms.FloatField(label=mark_safe(radius_help), initial=1.0, min_value=0.0, max_value=3600, widget=forms.TextInput(attrs={'disabled':'true', 'placeholder':'Radius (arcsec)'}))
 
-    lineflux = forms.FloatField(label="Line flux (cgs units)", help_text=lineflux_help, initial=1e-13, widget=forms.TextInput(attrs={'size':'7','disabled':'true'}))
-    linewave = forms.FloatField(label="Line wavelength (Angstroms)", help_text=linewave_help, initial=6562.8, widget=forms.TextInput(attrs={'size':'7','disabled':'true'}))
-    linefwhm = forms.FloatField(label="Line FWHM (Angstroms)", help_text=linefwhm_help, initial=6, widget=forms.TextInput(attrs={'size':'7','disabled':'true'}))
+    iflux = forms.ChoiceField(label=mark_safe(inputflux_help), initial="C", choices=IFLUX, widget=forms.RadioSelect(renderer=HorizontalRadioRenderer, attrs={'onclick':'selectInputflux()'}))
+    rline = forms.ChoiceField(label=mark_safe(rline_help), initial="N", choices=RLINECHOICES, widget=forms.RadioSelect(renderer=HorizontalRadioRenderer, attrs={'onclick':'selectRline()','disabled':'true'})) #attrs={'disabled':'disabled'}
+
+    spectype = forms.ChoiceField(label=mark_safe(inputspectrum_help), initial=1, choices=template_choice(iflux))  # , widget=forms.Select(attrs={'size':'4', 'style':'width:100px' }))
+    pfilter = forms.ChoiceField(label=mark_safe(spectype_help), initial=3, choices=filter_choice())  # , widget=forms.Select(attrs={'size':'5', 'style':'width:100px' }))
+
+    contmagflux = forms.ChoiceField(label=" ", initial="M", choices=CONTMAGFLUX, help_text=contmagflux_help, widget=forms.RadioSelect(renderer=HorizontalRadioRenderer, attrs={'onclick':'selectcontmagflux()'}))
+    contmagval = forms.FloatField(label=mark_safe(contmagval_help), initial=20.0, widget=forms.TextInput(attrs={'size':'7', 'placeholder':'Continuum mag'}))
+    contfluxval = forms.FloatField(label=mark_safe(contfluxval_help), initial=1e-16, widget=forms.TextInput(attrs={'size':'7','disabled':'true', 'placeholder':'Continuum flux'}))
+
+    lineflux = forms.FloatField(label=mark_safe(lineflux_help), initial=1e-13, widget=forms.TextInput(attrs={'size':'7','disabled':'true', 'placeholder':'lineflux'}))
+    linewave = forms.FloatField(label=mark_safe(linewave_help), initial=6562.8, widget=forms.TextInput(attrs={'size':'7','disabled':'true', 'placeholder':'linewave'}))
+    linefwhm = forms.FloatField(label=mark_safe(linefwhm_help), initial=6, widget=forms.TextInput(attrs={'size':'7','disabled':'true', 'placeholder':'Linefwhm'}))
 
 
 class InstrumentForm(forms.Form):
-    botton = "<a class=\"\" href=\"Javascript:newPopupBig('/static/etc/help/%s');\" type=\"link\"><span class=\"glyphicon glyphicon-question-sign\"></span></a>"
-    om_val_help = botton % "observingmodes.txt"
-    vph_help = botton % "vphsetup.html"
+    # botton = "<a class=\"\" href=\"Javascript:newPopupBig('/static/etc/help/%s');\" type=\"link\"><span class=\"glyphicon glyphicon-question-sign\"></span></a>"
+    botton = "<a class=\"splinkcol\" href=\"Javascript:newPopupBig('/static/etc/help/%s');\" >"
+    om_val_help = botton % "observingmodes.txt" + "Observing mode</a>"
+    vph_help = botton % "vphsetup.html" +"VPH setup</a>"
 
-    om_val = forms.ChoiceField(label="Observing mode", help_text=om_val_help, initial="LCB", choices=OMODE)  # , widget=forms.Select(attrs={'size':'2', 'style':'width:100px' }))
-    vph = forms.ChoiceField(label="VPH setup", help_text=vph_help, initial=1, choices=vph_choice())
+    om_val = forms.ChoiceField(label=mark_safe(om_val_help), initial="LCB", choices=OMODE) #, widget=forms.Select(attrs={'placeholder':'Observing mode'}))
+    vph = forms.ChoiceField(label=mark_safe(vph_help), initial=1, choices=vph_choice())
 
 class AtmosphericConditionsForm(forms.Form):
-    botton = "<a class=\"\" href=\"Javascript:newPopupBig('/static/etc/help/%s');\" type=\"link\"><span class=\"glyphicon glyphicon-question-sign\"></span></a>"
-    airmass_help = botton % "airmass.txt"
-    seeing_help = botton % "seeing.txt"
+    # botton = "<a class=\"\" href=\"Javascript:newPopupBig('/static/etc/help/%s.txt');\" type=\"link\"><span class=\"glyphicon glyphicon-question-sign\"></span></a>"
+    botton = "<a class=\"splinkcol\" href=\"Javascript:newPopupBig('/static/etc/help/%s.txt');\" >"
+    skycond_help = botton % "skycond" + "Sky condition</a>"
+    moonph_help = botton % "moonph" + "Moon phase</a>"
+    airmass_help = botton % "airmass" + "Airmass</a>"
+    seeing_help = botton % "seeing" + "Seeing</a>"
 
-    skycond = forms.ChoiceField(label="Sky condition", initial="Photometric", choices=SKYCOND)
-    moonph = forms.ChoiceField(label="Moon phase", initial="Dark", choices=MOONPH)
-    airmass = forms.FloatField(label="Airmass", help_text=airmass_help, initial=1.0, min_value=0.0, max_value=5, widget=forms.TextInput(attrs={'size':'7'}))
-    seeing = forms.FloatField(label="Seeing", help_text=seeing_help, initial=0.5, min_value=0.0, max_value=5, widget=forms.TextInput(attrs={'size':'7'}))
+    skycond = forms.ChoiceField(label=mark_safe(skycond_help), initial="Photometric", choices=SKYCOND)
+    moonph = forms.ChoiceField(label=mark_safe(moonph_help), initial="Dark", choices=MOONPH)
+    airmass = forms.FloatField(label=mark_safe(airmass_help), initial=1.0, min_value=0.0, max_value=5, widget=forms.TextInput(attrs={'placeholder':'Airmass'}))
+    seeing = forms.FloatField(label=mark_safe(seeing_help), initial=0.5, min_value=0.0, max_value=5, widget=forms.TextInput(attrs={'placeholder':'Seeing'}))
 
 class ObservationalSetupForm(forms.Form):
-    botton = "<a class=\"\" href=\"Javascript:newPopupBig('/static/etc/help/%s');\" type=\"link\"><span class=\"glyphicon glyphicon-question-sign\"></span></a>"
-    nfibers_help = botton % "skyfiber.txt"
-    lineap_help = botton % "lineaperture.txt"
-    contap_help = botton % "continuumaperture.txt"
+    hintbotton = "<a class=\"\" href=\"Javascript:newPopupBig('/static/etc/help/%s.txt');\" type=\"link\"><span class=\"glyphicon glyphicon-question-sign\"></span></a>"
+    ntbundles_hint = hintbotton % "hint_bundles"
 
-    numframes = forms.IntegerField(label="Number of exp. frames", initial=1, min_value=1, widget=forms.TextInput(attrs={'size':'7'}))
-    exptimepframe = forms.FloatField(label="Exptime per frame (s)", initial=3600.0, min_value=1.0, widget=forms.TextInput(attrs={'size':'7'}))
-    # LCB: default=8 bundles (56 fibers), max=89 bundles (623 fibers); min= 1 bundle.
-    # MOS: default=max=92 bundles (644 fibers), min= 1 bundle (7 fibers);
-    nfibers = forms.IntegerField(label="Number of bundles", help_text=nfibers_help, initial=8, min_value=1, max_value=89, widget=forms.TextInput(attrs={'size':'6'}))
-    lineap = forms.FloatField(label="Line aperture", help_text=lineap_help, initial=1.0, widget=forms.TextInput(attrs={'size':'5','disabled':'true'}))
-    contap = forms.FloatField(label="Continuum aperture", help_text=contap_help, initial=1.0, widget=forms.TextInput(attrs={'size':'5','disabled':'true'}))
+    botton = "<a class=\"splinkcol\" href=\"Javascript:newPopupBig('/static/etc/help/%s.txt');\" >"
+    numframes_help = botton % "numframes" + "Number of exp. frames</a>"
+    exptimepframe_help = botton % "exptimepframe" + "Exptime per frame (s)</a>"
+    nsbundles_help = botton % "skybundle" + "Number of sky bundles</a>"
+    ntbundles_help = botton % "targetbundle" + "Number of free bundles</a>"
+    lineap_help = botton % "lineaperture" + "Line aperture</a>"
+    contap_help = botton % "continuumaperture" + "Continuum aperture</a>"
+
+    numframes = forms.IntegerField(label=mark_safe(numframes_help), initial=1, min_value=1, widget=forms.TextInput(attrs={'placeholder':'numframes'}))
+    exptimepframe = forms.FloatField(label=mark_safe(exptimepframe_help), initial=3600.0, min_value=1.0, widget=forms.TextInput(attrs={'placeholder':'exptime'}))
+    # LCB: default=8 sky bundles (56 fibers), max=89 sky bundles (623 fibers); min= 1 bundle.
+    # MOS: default=max=92 sky bundles (644 fibers), min= 1 bundle (7 fibers);
+    nsbundles = forms.IntegerField(label=mark_safe(nsbundles_help), initial=8, min_value=1, max_value=89, widget=forms.TextInput(attrs={'placeholder':'8', 'onblur':'calculateNtbund()'}))
+    ntbundles = forms.IntegerField(label=mark_safe(ntbundles_help), help_text=ntbundles_hint, initial=81, min_value=1, max_value=89, widget=forms.TextInput(attrs={'placeholder':'8', 'onblur':'calculateNsbund()'}))
+    lineap = forms.FloatField(label=mark_safe(lineap_help), initial=1.0, widget=forms.TextInput(attrs={'disabled':'true', 'placeholder':'lineap'}))
+    contap = forms.FloatField(label=mark_safe(contap_help), initial=1.0, widget=forms.TextInput(attrs={'disabled':'true', 'placeholder':'contap'}))

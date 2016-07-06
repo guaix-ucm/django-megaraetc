@@ -1,0 +1,3 @@
+** CONTINUUM MAG OR FLUX **
+Choose "Continuum magnitude" to give the continuum height in magnitude units.
+Choose "Continuum flux" to give the continuum height in flux units.

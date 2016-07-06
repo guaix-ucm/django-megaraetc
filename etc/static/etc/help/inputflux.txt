@@ -1,0 +1,7 @@
+** INPUT FLUX **
+Switch between "Continuum" and "Line + Continuum".
+Choose "Continuum" for displaying the continuum of the input source template.
+Choose "Line + Continuum" for displaying a virtual emission line on top of
+the input source template continuum. Checking this button allows you to input
+the emission line central flux and central wavelength in the rows "Line flux"
+and "Line wavelength".

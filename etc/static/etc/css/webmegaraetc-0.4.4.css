@@ -1,6 +1,27 @@
 /*CSS*/
 /* this is a comment */
 
+//a:link {
+//    color: white;
+//}
+
+a.splinkcol:link {text-decoration: none; color: black;}
+A.splinkcol:visited {text-decoration: none; color: hotpink;}
+A.splinkcol:hover {text-decoration: underline; color: blue;}
+A.splinkcol:active {text-decoration: none; color: red;}
+
+a:visited {
+    color: green;
+}
+
+a:hover {
+    color: hotpink;
+}
+
+a:active {
+    color: blue;
+}
+
 h4{
     background-color: #A8C9FF;
     text-align: center;
@@ -16,6 +37,7 @@ span.help-block{
     display: initial;
     float: right;
 }
+
 div#theformcontainer{
     margin-bottom: 1%;
 }
@@ -38,13 +60,13 @@ div#submitbuttonsdiv{
 }
 
 label.control-label{
-    width: 40%;
+    width: 48%;
     float: left;
 }
 
 .form-control{
-    float: left;
-    width: 45% !important;
+  float: left;
+    width: 40% !important;
     margin-bottom: 10px;
 }
 

@@ -56,6 +56,9 @@ def plot_and_save_new(tempname, x, y, mu_var, fwhm_var, linef_var,
     ymax = max(filty)
 
     ax.set_xlim(xmin, xmax)
+    if ymin==ymax:
+        ymax=ymin+0.1
+
     ax.set_ylim(ymin, ymax)
 
     # DETAILED BUT SLOW
@@ -74,18 +77,18 @@ def plot_and_save_new(tempname, x, y, mu_var, fwhm_var, linef_var,
     string2 = "Cont. mag: " + str("{:1.3f}".format(label2))
     string3 = "Cont. band: " + str(label3)
     # text = string1 + '\n' + string2 + '\n' + string3
-    plt.annotate(string1, xy=(0.8, 0.6), xytext=(0, +7.5), fontsize=18,
-                 xycoords='axes fraction', textcoords='offset points',
-                 bbox=dict(edgecolor='none', facecolor='white', alpha=0.8),
-                 horizontalalignment='left', verticalalignment='center')
-    plt.annotate(string2, xy=(0.8, 0.5), xytext=(0, +7.5), fontsize=18,
-                 xycoords='axes fraction', textcoords='offset points',
-                 bbox=dict(edgecolor='none', facecolor='white', alpha=0.8),
-                 horizontalalignment='left', verticalalignment='center')
-    plt.annotate(string3, xy=(0.8, 0.4), xytext=(0, +7.5), fontsize=18,
-                 xycoords='axes fraction', textcoords='offset points',
-                 bbox=dict(edgecolor='none', facecolor='white', alpha=0.8),
-                 horizontalalignment='left', verticalalignment='center')
+    # plt.annotate(string1, xy=(0.8, 0.6), xytext=(0, +7.5), fontsize=18,
+    #              xycoords='axes fraction', textcoords='offset points',
+    #              bbox=dict(edgecolor='none', facecolor='white', alpha=0.8),
+    #              horizontalalignment='left', verticalalignment='center')
+    # plt.annotate(string2, xy=(0.8, 0.5), xytext=(0, +7.5), fontsize=18,
+    #              xycoords='axes fraction', textcoords='offset points',
+    #              bbox=dict(edgecolor='none', facecolor='white', alpha=0.8),
+    #              horizontalalignment='left', verticalalignment='center')
+    # plt.annotate(string3, xy=(0.8, 0.4), xytext=(0, +7.5), fontsize=18,
+    #              xycoords='axes fraction', textcoords='offset points',
+    #              bbox=dict(edgecolor='none', facecolor='white', alpha=0.8),
+    #              horizontalalignment='left', verticalalignment='center')
 
     ### PLOT GAUSSIAN ###
     import matplotlib.mlab as mlab
@@ -187,23 +190,23 @@ def plot_and_save2_new(tempname, x2, y2, x2b, y2b,
 
     # ax.legend(loc='center right', bbox_to_anchor=(1.5, 1.0))
     import pylab
-    pylab.legend(loc='best')
+    pylab.legend(loc=4)
     string1 = "Source: " + label1
     string2 = "VPH: " + label2
     string3 = "Cont. band: " + label3
     # text = string1 + '\n' + string2 + '\n' + string3
-    ax.annotate(string1, xy=(0.8, 0.6), xytext=(+0, +7.5), fontsize=18,
-                xycoords='axes fraction', textcoords='offset points',
-                bbox=dict(edgecolor='none', facecolor='white', alpha=0.8),
-                horizontalalignment='left', verticalalignment='center')
-    ax.annotate(string2, xy=(0.8, 0.5), xytext=(+0, +7.5), fontsize=18,
-                xycoords='axes fraction', textcoords='offset points',
-                bbox=dict(edgecolor='none', facecolor='white', alpha=0.8),
-                horizontalalignment='left', verticalalignment='center')
-    ax.annotate(string3, xy=(0.8, 0.4), xytext=(+0, +7.5), fontsize=18,
-                xycoords='axes fraction', textcoords='offset points',
-                bbox=dict(edgecolor='none', facecolor='white', alpha=0.8),
-                horizontalalignment='left', verticalalignment='center')
+    # ax.annotate(string1, xy=(0.8, 0.6), xytext=(+0, +7.5), fontsize=18,
+    #             xycoords='axes fraction', textcoords='offset points',
+    #             bbox=dict(edgecolor='none', facecolor='white', alpha=0.8),
+    #             horizontalalignment='left', verticalalignment='center')
+    # ax.annotate(string2, xy=(0.8, 0.5), xytext=(+0, +7.5), fontsize=18,
+    #             xycoords='axes fraction', textcoords='offset points',
+    #             bbox=dict(edgecolor='none', facecolor='white', alpha=0.8),
+    #             horizontalalignment='left', verticalalignment='center')
+    # ax.annotate(string3, xy=(0.8, 0.4), xytext=(+0, +7.5), fontsize=18,
+    #             xycoords='axes fraction', textcoords='offset points',
+    #             bbox=dict(edgecolor='none', facecolor='white', alpha=0.8),
+    #             horizontalalignment='left', verticalalignment='center')
 
     # ADJUST THE PLOT
     leftval = 0.12
