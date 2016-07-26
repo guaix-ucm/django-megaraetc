@@ -1,29 +1,29 @@
 
-def plot_gaussian(tempname, linef_var, mu_var, sigma_var):
-    import matplotlib.pyplot as plt
-    import numpy as np
-    import matplotlib.mlab as mlab
-    import math
-
-    fig, ax = plt.subplots()
-
-    amplitude = linef_var
-    mean = mu_var
-    variance = sigma_var**2
-    sigma = math.sqrt(variance)
-    numpoints = 100000
-
-    # PLOT FROM MATPLOTLIB FUNCTION
-    x = np.linspace(-5*sigma, 5*sigma, numpoints)
-    y = amplitude*mlab.normpdf(x, mean, sigma)
-    plt.plot(x, y, color='b')
-    ### ADJUST THE PLOT
-    # leftval=0.12
-    # bottomval=0.12
-    # rightval=0.7
-    # topval=0.89
-    # plt.subplots_adjust(left=leftval, bottom=bottomval, right=rightval, top=topval, wspace=0.20, hspace=0.0)#almost default#
-    return fig
+# def plot_gaussian(tempname, linef_var, mu_var, sigma_var):
+#     import matplotlib.pyplot as plt
+#     import numpy as np
+#     import matplotlib.mlab as mlab
+#     import math
+#
+#     fig, ax = plt.subplots()
+#
+#     amplitude = linef_var
+#     mean = mu_var
+#     variance = sigma_var**2
+#     sigma = math.sqrt(variance)
+#     numpoints = 100000
+#
+#     # PLOT FROM MATPLOTLIB FUNCTION
+#     x = np.linspace(-5*sigma, 5*sigma, numpoints)
+#     y = amplitude*mlab.normpdf(x, mean, sigma)
+#     plt.plot(x, y, color='b')
+#     ### ADJUST THE PLOT
+#     # leftval=0.12
+#     # bottomval=0.12
+#     # rightval=0.7
+#     # topval=0.89
+#     # plt.subplots_adjust(left=leftval, bottom=bottomval, right=rightval, top=topval, wspace=0.20, hspace=0.0)#almost default#
+#     return fig
 
 
 def plot_and_save_new(tempname, x, y, mu_var, fwhm_var, linef_var,
@@ -76,19 +76,19 @@ def plot_and_save_new(tempname, x, y, mu_var, fwhm_var, linef_var,
     string1 = "Source: " + str(label1)
     string2 = "Cont. mag: " + str("{:1.3f}".format(label2))
     string3 = "Cont. band: " + str(label3)
-    # text = string1 + '\n' + string2 + '\n' + string3
-    # plt.annotate(string1, xy=(0.8, 0.6), xytext=(0, +7.5), fontsize=18,
-    #              xycoords='axes fraction', textcoords='offset points',
-    #              bbox=dict(edgecolor='none', facecolor='white', alpha=0.8),
-    #              horizontalalignment='left', verticalalignment='center')
-    # plt.annotate(string2, xy=(0.8, 0.5), xytext=(0, +7.5), fontsize=18,
-    #              xycoords='axes fraction', textcoords='offset points',
-    #              bbox=dict(edgecolor='none', facecolor='white', alpha=0.8),
-    #              horizontalalignment='left', verticalalignment='center')
-    # plt.annotate(string3, xy=(0.8, 0.4), xytext=(0, +7.5), fontsize=18,
-    #              xycoords='axes fraction', textcoords='offset points',
-    #              bbox=dict(edgecolor='none', facecolor='white', alpha=0.8),
-    #              horizontalalignment='left', verticalalignment='center')
+    text = string1 + '\n' + string2 + '\n' + string3
+    plt.annotate(string1, xy=(0.8, 0.6), xytext=(0, +7.5), fontsize=18,
+                 xycoords='axes fraction', textcoords='offset points',
+                 bbox=dict(edgecolor='none', facecolor='white', alpha=0.8),
+                 horizontalalignment='left', verticalalignment='center')
+    plt.annotate(string2, xy=(0.8, 0.5), xytext=(0, +7.5), fontsize=18,
+                 xycoords='axes fraction', textcoords='offset points',
+                 bbox=dict(edgecolor='none', facecolor='white', alpha=0.8),
+                 horizontalalignment='left', verticalalignment='center')
+    plt.annotate(string3, xy=(0.8, 0.4), xytext=(0, +7.5), fontsize=18,
+                 xycoords='axes fraction', textcoords='offset points',
+                 bbox=dict(edgecolor='none', facecolor='white', alpha=0.8),
+                 horizontalalignment='left', verticalalignment='center')
 
     ### PLOT GAUSSIAN ###
     import matplotlib.mlab as mlab
@@ -120,6 +120,7 @@ def plot_and_save_new(tempname, x, y, mu_var, fwhm_var, linef_var,
                 color='g', ls='--')
 
         ax.plot(gaux, gauy, color='purple')  # gaussian plot
+
         plt.plot([vph_minval_var, vph_minval_var], [ymin/2, ymax*2],
                  ls='--', color='red')  # vph-limit
         plt.plot([vph_maxval_var, vph_maxval_var], [ymin/2, ymax*2],
@@ -195,18 +196,18 @@ def plot_and_save2_new(tempname, x2, y2, x2b, y2b,
     string2 = "VPH: " + label2
     string3 = "Cont. band: " + label3
     # text = string1 + '\n' + string2 + '\n' + string3
-    # ax.annotate(string1, xy=(0.8, 0.6), xytext=(+0, +7.5), fontsize=18,
-    #             xycoords='axes fraction', textcoords='offset points',
-    #             bbox=dict(edgecolor='none', facecolor='white', alpha=0.8),
-    #             horizontalalignment='left', verticalalignment='center')
-    # ax.annotate(string2, xy=(0.8, 0.5), xytext=(+0, +7.5), fontsize=18,
-    #             xycoords='axes fraction', textcoords='offset points',
-    #             bbox=dict(edgecolor='none', facecolor='white', alpha=0.8),
-    #             horizontalalignment='left', verticalalignment='center')
-    # ax.annotate(string3, xy=(0.8, 0.4), xytext=(+0, +7.5), fontsize=18,
-    #             xycoords='axes fraction', textcoords='offset points',
-    #             bbox=dict(edgecolor='none', facecolor='white', alpha=0.8),
-    #             horizontalalignment='left', verticalalignment='center')
+    ax.annotate(string1, xy=(0.8, 0.6), xytext=(+0, +7.5), fontsize=18,
+                xycoords='axes fraction', textcoords='offset points',
+                bbox=dict(edgecolor='none', facecolor='white', alpha=0.8),
+                horizontalalignment='left', verticalalignment='center')
+    ax.annotate(string2, xy=(0.8, 0.5), xytext=(+0, +7.5), fontsize=18,
+                xycoords='axes fraction', textcoords='offset points',
+                bbox=dict(edgecolor='none', facecolor='white', alpha=0.8),
+                horizontalalignment='left', verticalalignment='center')
+    ax.annotate(string3, xy=(0.8, 0.4), xytext=(+0, +7.5), fontsize=18,
+                xycoords='axes fraction', textcoords='offset points',
+                bbox=dict(edgecolor='none', facecolor='white', alpha=0.8),
+                horizontalalignment='left', verticalalignment='center')
 
     # ADJUST THE PLOT
     leftval = 0.12

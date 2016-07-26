@@ -64,7 +64,7 @@ def outmessage(textcode):
     elif textcode == 13:
         outtext = "** INPUT PARAMETERS **\nA summary of the selected input parameters is provided here, with some warnings and extra information about the input source flux distribution (as if line FWHM is dominated by the VPH FWHM, if the seeing determines the image area instead of the projected area of source, the continuum flux equivalent to an input magnitude, or the sky flux considered)."
     elif textcode == 14:
-        outtext = "** OUTPUT CONTINUUM SNRs **\n\nThe SNRs of the continuum input flux distribution expected for the input observational and instrumental setup, and for the input atmospheric conditions are provided.\n\nIn case the input source is punctual, the provided SNRs are for:\n * one fibre, in one spectral FWHM(*2), in 1 Angstrom, in the total collapsed spectrum;\n * per detector pixel;\n * the total source area(*1), in one spectral FWHM (*2), in 1 Angstrom, in the total collapsed spectrum.\n\nIn case of extended sources, the following outputs are additionally provided:  \n * for 1 seeing disk, in one spectral FWHM(*2), in 1 Angstrom, in the total collapsed spectrum;\n * for 1 arcsec**2, in one spectral FWHM(*2), in 1 Angstrom, in the total collapsed spectrum.\n\n Note: (*1) The number of fibres required to sample the whole source is also provided.\n         (*2) At least, 3.6 spectral pixels in LCB/MOS modes are required to fulfill the Nyquist-Shanon sampling theorem in spectral direction (the VPH FWHM is projected onto 3.6 spectral pixels for all VPHs in LCB/MOS, by construction)."
+        outtext = "** OUTPUT CONTINUUM SNRs **\n\nThe SNRs of the continuum input flux distribution expected for the input observational and instrumental setup, and for the input atmospheric conditions are provided.\n\nIn case the input source is punctual, the provided SNRs are for:\n * one fibre, in one spectral FWHM(*2), in 1 Angstrom, in the total integrated spectrum;\n * per detector pixel;\n * the total source area(*1), in one spectral FWHM (*2), in 1 Angstrom, in the total integrated spectrum.\n\nIn case of extended sources, the following outputs are additionally provided:  \n * for 1 seeing disk, in one spectral FWHM(*2), in 1 Angstrom, in the total integrated spectrum;\n * for 1 arcsec**2, in one spectral FWHM(*2), in 1 Angstrom, in the total integrated (integrated) spectrum.\n\n Note: (*1) The number of fibres required to sample the whole source is also provided.\n         (*2) At least, 3.6 spectral pixels in LCB/MOS modes are required to fulfill the Nyquist-Shanon sampling theorem in spectral direction (the VPH FWHM is projected onto 3.6 spectral pixels for all VPHs in LCB/MOS, by construction)."
     elif textcode == 15:
         outtext = "** OUTPUT LINE SNRs **\n\nThe SNRs of the line input flux distribution expected for the input observational and instrumental setup, and for the input atmospheric conditions are provided.\n\nIn case the input source is punctual, the provided SNRs are for(*1):\n * per arcsec and per Angstrom in the detector(*2);\n * in one fibre, in the selected line spectral aperture(*3);\n * in one fibre per Angstrom(*2);\n * per voxel(*4,*5);\n * per detector pixel(*6);\n * the total source area, in the selected line spectral aperture(*3).\n\nIn case of extended sources, the following outputs are additionally provided:  \n * for 1 seeing disk, in the selected line spectral aperture(*); \n * for 1 arcsec**2, in the selected line spectral aperture(*).\n\n Note: (*1) Considering that all the line flux is completely enclosed into the FWHM of the line.\n         (*2) Assuming a spectral aperture of 1 Angstrom.\n         (*3) Assuming the selected spectral apertures for line and continuum subtraction indicated as inputs. If you want to know exactly the SNR in 1 line FWHM, set the spectral apertures of line to 1 (i.e., to one line FWHM).\n         (*4) Assuming one spectral FWHM as spectral aperture (i.e., the FWHM of the selected VPH).\n         (*5) A voxel is the minimum spatial and spectral resolution element sampled. In our case, a voxel is the projection of the whole fibre (minimum spatial resolution element) into the FWHM of the VPH in the spectral direction (minimum spectral resolution element according to the Nyquist-Shanon sampling theorem). The FWHM of all VPHs in MEGARA is projected onto 3.6 spectral pixels in LCB/MOS and onto 2.5 pixels by design.\n         (*6) Assuming 1 spectral pixel as spectral aperture."
     elif textcode == 16:
@@ -198,7 +198,7 @@ def outtextoutc(sourcet_val,nfibres, nfib, nfib1,
                   % (sncont_p2sp_fibre, tsncont_p2sp_fibre,\
                      sncont_1aa_fibre, tsncont_1aa_fibre)
                      # sncont_band_fibre, tsncont_band_fibre)
-                  # '%4.2f // %4.2f collapsed spectrum (spaxel)\n' \
+                  # '%4.2f // %4.2f integrated spectrum (spaxel)\n' \
 
 
     # Output in all spectrum
@@ -218,7 +218,7 @@ def outtextoutc(sourcet_val,nfibres, nfib, nfib1,
             text = text + ' (no. of fibres~%5.1f)\n' % nfib
         text = text + ' %4.2f // %4.2f per spectral FWHM\n' \
                       ' %4.2f // %4.2f per AA\n' \
-                      ' %4.2f // %4.2f collapsed spectrum (spaxel)\n' \
+                      ' %4.2f // %4.2f integrated spectrum (spaxel)\n' \
                       % (sncont_p2sp_seeing, tsncont_p2sp_seeing,\
                          sncont_1aa_seeing, tsncont_1aa_seeing,\
                          sncont_band_seeing, tsncont_band_seeing)
@@ -230,7 +230,7 @@ def outtextoutc(sourcet_val,nfibres, nfib, nfib1,
         if nfib1 > 0.:
             text = text + ' %4.2f // %4.2f per spectral FWHM\n' \
                           ' %4.2f // %4.2f per AA\n    ' \
-                          ' %4.2f // %4.2f collapsed spectrum (spaxel)\n' \
+                          ' %4.2f // %4.2f integrated spectrum (spaxel)\n' \
                           % (sncont_p2sp_1, tsncont_p2sp_1,\
                              sncont_1aa_1, tsncont_1aa_1,\
                              sncont_band_1, tsncont_band_1)
@@ -886,7 +886,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val,\
             flineparc = fline_val / areaseeing
 
         # Source spectrum scaled to totalflux in continuum
-        normc, fc = sclspect (fcont, lamb, lc1, lc2, sourcespectrum, tfilterc)
+        normc, fc = sclspect(fcont, lamb, lc1, lc2, sourcespectrum, tfilterc)
         # plot_and_save(lambdacm, fc, spect_val)
         # Sky magnitude and scaled flux. Sky flux scaled to the airmass per arcsec**2
         # We consider the brightness due to moon phase
@@ -911,7 +911,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val,\
         tfiltercvph = numpy.array(tfiltercvph)
 
         # Sky spectrum scaled to totalflux in input filter
-        norms, fs = sclspect (fsky, lamb, ls1, ls2, skyspectrum, tfiltercvph)
+        norms, fs = sclspect(fsky, lamb, ls1, ls2, skyspectrum, tfiltercvph)
 
         # Source projected area (arcsec**2) and projected diameter (arcsec)
 
@@ -1143,12 +1143,11 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val,\
             for xit in items:
 
                 # Deriving spectroscopic parameters for each case:
-                omegasource, npixy, omegaskysource, nfiby, npixx = specparline(om_val, xit, areasource,
-                  diamsource, ps, disp, nfibres, areafibre, rfibre, nfibresy, areaseeing,
-                  seeingx, npixx)
+                omegasource, npixy, omegaskysource, nfiby, npixx = \
+                    specparline(om_val, xit, areasource, diamsource, ps, disp, nfibres, areafibre, rfibre, nfibresy, areaseeing, seeingx, npixx)
 
                 # Line signal in defined spatial resolution element: only in the line
-                # Line flux is given already integrated (not per AA)--> bandwidth = 1 AA
+                # Line flux is given already integrated (not per AA)--> bandwidth deltalambda = 1 AA
                 signalline = linesignal(flineparc, 1.0, effsys, stel, omegasource, exptime_val, wline_val, lamb)
 
                 # Continuum signal in defined spatial resolution element, in deltalambda.
@@ -1157,8 +1156,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val,\
                 ind = numpy.where(lamb == wline_val)
                 contatline= fc[ind]
 
-                signalcont_line = linesignal(contatline, deltalambda, effsys, stel, omegasource,
-                  exptime_val, wline_val, lamb)
+                signalcont_line = linesignal(contatline, deltalambda, effsys, stel, omegasource, exptime_val, wline_val, lamb)
 
                 # Number of pixels in detector under consideration: just counting the factor in area
                 # when we consider the used sky minibundles
@@ -1224,7 +1222,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val,\
                     if xit == 2:
                         snlineperAA = signallineperAA / noiselineperAA
                     if xit == 3:
-                        snlinefibreperAA = signallineperAA / noiselineperAA
+                        snlinefibreperAA = signallineperAA / noiselineperAA     ### SAME AS snlineperAA ???
 
                 # 1 spaxel, (1 fibre diameter * 4 pix in spectral direction)
                 if xit == 3:
