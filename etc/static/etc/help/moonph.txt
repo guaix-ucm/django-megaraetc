@@ -1,4 +1,39 @@
 ** MOON PHASE **
-Bright =
-Grey =
-Dark =
+The following options for the night brightness are available: dark/grey/bright.
+The sky magnitude at a dark night in La Palma is initially set in the
+photometric band nearest to the user-selected VPH (consult Table 2).
+The typical average extra brightness between a dark and grey or bright night
+is added, depending on the user-selected moon phase (consult Table 3),
+assuming that the difference of emission between dark-bright and dark-grey does
+not depend on the optical band. The average emission due to zodiacal light,
+airglow, and starlight are also considered.
+Atmospheric extinction will be considered in next versions.
+
+Table 2: Near-zenith dark-of-moon broad-band sky brightness at
+La Palma for different bands in mag/arcsec**2
+(C.R.Benn & S.L. Ellison 1997, La Palma technical note 115.)
+-------------------------------
+# Band # Magnitude/arcsec**2 (*1)
+-------------------------------
+U  22.0
+B  22.7
+V  21.9
+R  21.0
+I  20.0
+-------------------------------
+(*1) Values found to be independent of atmospheric extinction,
+usually do not vary appreciably during the night, but with solar cycle,
+latitude and airmass.
+
+
+Table 3: Extra magnitudes to be added to reference values of sky emission in
+Table 2, for bright, grey, and dark nights in La Palma, in mag/arcsec**2 in
+the V-band, in order to account for zodiacal light, airglow, and starlight
+(I. Skillen, 2002, ING Technical Note 127)
+--------------------------------------------------
+# Moon phase  # Extra emission in mag/arcsec**2
+--------------------------------------------------
+Bright  3.1
+Grey    1.5
+Dark    0.5
+--------------------------------------------------

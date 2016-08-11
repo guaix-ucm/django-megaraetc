@@ -1,4 +1,8 @@
 ** SKY CONDITION **
-Photometric =
-Clear =
-Spectroscopic =
+Options	are	Photometric, Clear, and	Spectroscopic.
+In magnitudes,
+Photometric	= +0,
+Clear = +0.4, Spectroscopic = +1.
+This value is added to the overall system efficiency,
+and	corresponds to 100% efficiency for photometric,
+69.2% for clear, and 39.8% for spectroscopic sky condition.

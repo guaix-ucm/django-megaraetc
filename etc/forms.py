@@ -68,7 +68,7 @@ class TargetForm(forms.Form):
     inputflux_help = botton % "inputflux" + "Input flux</a>"
     rline_help = botton % "rline" + "Resolved line?</a>"
     inputspectrum_help = botton % "inputspectrum" + "Input spectrum</a>"
-    spectype_help = botton % "spectype" + "Continuum band</a>"
+    spectype_help = botton % "contband" + "Continuum band</a>"
 
     contmagflux_help = botton % "contmagflux" + "</a>"
     contmagval_help = botton % "continuummagnitude" + "Continuum mag</a>"
@@ -128,9 +128,9 @@ class ObservationalSetupForm(forms.Form):
 
     botton = "<a class=\"splinkcol\" href=\"Javascript:newPopupBig('/static/etc/help/%s.txt');\" >"
     numframes_help = botton % "numframes" + "Number of exp. frames</a>"
-    exptimepframe_help = botton % "exptimepframe" + "Exptime per frame (s)</a>"
-    nsbundles_help = botton % "skybundle" + "Number of sky bundles</a>"
-    ntbundles_help = botton % "targetbundle" + "Number of free bundles</a>"
+    exptimepframe_help = botton % "exptimeperframe" + "Exptime per frame (s)</a>"
+    nsbundles_help = botton % "skybundle" + "Number of sky fibers</a>"
+    ntbundles_help = botton % "targetbundle" + "Number of free fibers</a>"
     lineap_help = botton % "lineaperture" + "Line aperture</a>"
     contap_help = botton % "continuumaperture" + "Continuum aperture</a>"
 
