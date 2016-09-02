@@ -1,7 +1,6 @@
-** NUMBER OF SKY BUNDLES **
-Number of bundles used to compute the sky (not the target).
-Each bundle is made of a set of 7 fibres.
-
+** NUMBER OF SKY FIBERS (BUNDLES for MOS mode) **
+In LCB mode, the default is 56 fibers.
+In MOS mode, the default is 8 bundles.
 
 VALUE RANGE:
 If OBSERVING MODE=LCB:

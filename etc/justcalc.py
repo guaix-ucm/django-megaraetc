@@ -142,7 +142,10 @@ def outtextinp(om_val, bandc_val, sourcet_val, mag_val, netflux, isize_val,
 
     text = text + '* Sky: \n  Condition = %15s \n  Moon = %6s\n  Airmass: X = %3.2f\n  Seeing(@X=1) = %4.2f\n' % (skycond_val, moon_val, airmass_val, seeing_zenith)
     text = text + '  Sky-flux(%s,@X) = %7.3e cgs\n  Seeing(@X) = %4.2f\n' % (bandsky, fsky, seeingx)
-    text = text + '* Observation: \n  Num. of frames = %6i\n  Exptime/frame = %7.1f\n  Total Exptime = %7.1f\n  NP_Dark = %6i\n  Sky-bundles = %i, Bundles = %i\n' % (numframe_val, exptimepframe_val, exptime_val, npdark_val, nsbundles_val, nsfib_val)
+    if om_val == 'MOS':
+        text = text + '* Observation: \n  Num. of frames = %6i\n  Exptime/frame = %7.1f\n  Total Exptime = %7.1f\n  NP_Dark = %6i\n  Sky-Bundles = %i\n  Sky-Fibers = %i\n' % (numframe_val, exptimepframe_val, exptime_val, npdark_val, nsbundles_val, nsfib_val)
+    elif om_val == 'LCB':
+        text = text + '* Observation: \n  Num. of frames = %6i\n  Exptime/frame = %7.1f\n  Total Exptime = %7.1f\n  NP_Dark = %6i\n  Target-Fibers = %i\n' % (numframe_val, exptimepframe_val, exptime_val, npdark_val, nsfib_val)
 
     if fluxt_val == "L":
         text =  text + '  Spectral apertures:\n    For line=%2i\n    For continuum=%2i\n' % (nfwhmline_val, cnfwhmline_val)
@@ -626,7 +629,10 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val,\
     npdark_val = 65500.
 
     # Sky fibres
-    nsfib_val = isafloat(nsbundles_val*7,92.0) # convert from number of bundles to number of fibers. These are SKY FIBERS
+    if om_val == 'LCB':
+        nsfib_val = isafloat(nsbundles_val,644.0)
+    elif om_val == 'MOS':
+        nsfib_val = isafloat(nsbundles_val*7,92.0) # convert from number of bundles to number of fibers. These are SKY FIBERS
     if nsfib_val <= 0. or nsfib_val > 644:
         nsfib_val = 56.
         outtext = outmessage(110)
@@ -1395,7 +1401,8 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val,\
                 'airmass_val' : airmass_val, 'seeing_zenith' : seeing_zenith,\
                 'fsky' : fsky, 'numframe_val' : numframe_val,\
                 'exptimepframe_val' : exptimepframe_val, 'exptime_val' : exptime_val,\
-                'npdark_val' : npdark_val, 'nsbundles_val' : nsbundles_val, 'nsfib_val' : nsfib_val,\
+                'npdark_val' : npdark_val,\
+                'nsbundles_val' : nsbundles_val, 'nsfib_val' : nsfib_val,\
                 'nfwhmline_val' : nfwhmline_val, 'cnfwhmline_val' : cnfwhmline_val,\
                 'resolvedline_val' : resolvedline_val, 'bandsky' : bandsky,\
 

@@ -248,6 +248,26 @@ function selectRline() {
 
 }
 
+//change 'fibers' (in LCB mode) to 'bundles' (in MOS mode)
+function selectorOmode() {
+    if (document.getElementById('id_om_val').value=='LCB') {
+        var nst = 'Number of Sky Fibers';
+        var nsdefval = 56;
+        var ntdefval = 567;
+        var ntt = 'Number of Target Fibers';
+    }
+    else if (document.getElementById('id_om_val').value=='MOS') {
+        var nst = 'Number of Sky Bundles';
+        var nsdefval = 8;
+        var ntdefval = 84;
+        var ntt = 'Number of Target Bundles';
+    }
+    document.getElementById('id_nst').innerHTML = nst;
+    document.getElementById('id_ntt').innerHTML = ntt;
+    document.getElementById('id_nsbundles').value = nsdefval;
+    document.getElementById('id_ntbundles').value = ntdefval;
+}
+
 // FOR COOKIES
 // get cookie = read cookie and return
 function getCookie(cname) {
@@ -517,4 +537,5 @@ function calculateNsbund() {
     }
     document.getElementById('id_nsbundles').value = parseInt(nsbundles);
 }
+
 // -->

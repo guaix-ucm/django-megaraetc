@@ -106,7 +106,7 @@ class InstrumentForm(forms.Form):
     om_val_help = botton % "observingmodes.txt" + "Observing mode</a>"
     vph_help = botton % "vphsetup.html" +"VPH setup</a>"
 
-    om_val = forms.ChoiceField(label=mark_safe(om_val_help), initial="LCB", choices=OMODE) #, widget=forms.Select(attrs={'placeholder':'Observing mode'}))
+    om_val = forms.ChoiceField(label=mark_safe(om_val_help), initial="LCB", choices=OMODE, widget=forms.Select(attrs={'placeholder':'OM', 'oninput':'selectorOmode()'})) #, widget=forms.Select(attrs={'placeholder':'Observing mode'}))
     vph = forms.ChoiceField(label=mark_safe(vph_help), initial=1, choices=vph_choice())
 
 class AtmosphericConditionsForm(forms.Form):
@@ -129,8 +129,8 @@ class ObservationalSetupForm(forms.Form):
     botton = "<a class=\"splinkcol\" href=\"Javascript:newPopupBig('/static/etc/help/%s.txt');\" >"
     numframes_help = botton % "numframes" + "Number of exp. frames</a>"
     exptimepframe_help = botton % "exptimeperframe" + "Exptime per frame (s)</a>"
-    nsbundles_help = botton % "skybundle" + "Number of sky fibers</a>"
-    ntbundles_help = botton % "targetbundle" + "Number of free fibers</a>"
+    nsbundles_help = botton % "skybundle" + "<span id='id_nst'>Number of Sky Fibers</span></a>"
+    ntbundles_help = botton % "targetbundle" + "<span id='id_ntt'>Number of Target Fibers</span></a>"
     lineap_help = botton % "lineaperture" + "Line aperture</a>"
     contap_help = botton % "continuumaperture" + "Continuum aperture</a>"
 
@@ -138,7 +138,7 @@ class ObservationalSetupForm(forms.Form):
     exptimepframe = forms.FloatField(label=mark_safe(exptimepframe_help), initial=3600.0, min_value=1.0, widget=forms.TextInput(attrs={'placeholder':'exptime'}))
     # LCB: default=8 sky bundles (56 fibers), max=89 sky bundles (623 fibers); min= 1 bundle.
     # MOS: default=max=92 sky bundles (644 fibers), min= 1 bundle (7 fibers);
-    nsbundles = forms.IntegerField(label=mark_safe(nsbundles_help), initial=8, min_value=1, max_value=89, widget=forms.TextInput(attrs={'placeholder':'8', 'onblur':'calculateNtbund()'}))
-    ntbundles = forms.IntegerField(label=mark_safe(ntbundles_help), help_text=ntbundles_hint, initial=81, min_value=1, max_value=89, widget=forms.TextInput(attrs={'placeholder':'8', 'onblur':'calculateNsbund()'}))
+    nsbundles = forms.IntegerField(label=mark_safe(nsbundles_help), initial=56, min_value=1, max_value=567, widget=forms.TextInput(attrs={'placeholder':'56', 'oninput':'calculateNtbund()'}))
+    ntbundles = forms.IntegerField(label=mark_safe(ntbundles_help), help_text=ntbundles_hint, initial=567, min_value=1, max_value=567, widget=forms.TextInput(attrs={'placeholder':'56', 'oninput':'calculateNsbund()'}))
     lineap = forms.FloatField(label=mark_safe(lineap_help), initial=1.0, widget=forms.TextInput(attrs={'disabled':'true', 'placeholder':'lineap'}))
     contap = forms.FloatField(label=mark_safe(contap_help), initial=1.0, widget=forms.TextInput(attrs={'disabled':'true', 'placeholder':'contap'}))

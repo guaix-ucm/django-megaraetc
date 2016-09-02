@@ -503,6 +503,11 @@ def etc_do(request):
             else:
                 tableloutstring = 'No line input<br /><br />'
 
+            if om_val_string == 'MOS':
+                switchstring = 'Sky-bundles:'
+            elif om_val_string == 'LCB':
+                switchstring = 'Sky-fibers:'
+
             tableinputstring = '<table border=1>' + \
                                '<tr><td>INPUT PARAMETERS:</td><td></td></tr>' + \
                                '<tr><td>Area:</td><td>' + size_val_string + ' arcsec^2</td></tr>' + \
@@ -522,7 +527,7 @@ def etc_do(request):
                                '<tr><td>Exptime per frame:</td><td>' + exptimepframe_val_string + ' s</td></tr>' + \
                                '<tr><td>Total exptime:</td><td>' + exptime_val_string + ' s</td></tr>' + \
                                '<tr><td>NP_Dark:</td><td>' + npdark_val_string + '</td></tr>' + \
-                               '<tr><td>Sky-bundles:</td><td>' + nsbundles_val_string + '</td></tr>' + \
+                               '<tr><td>'+switchstring+'</td><td>' + nsbundles_val_string + '</td></tr>' + \
                                '</table><br />'
         else:
             tablecoutstring = ''
