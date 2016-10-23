@@ -266,6 +266,7 @@ def plot_and_save2_new(tempname, x2, y2, x2b, y2b,
 ### PLOT CENTRAL WAVELENGTH
     plt.plot([mu_var, mu_var], [ymin/2, ymax*2], c='g', ls='--')
 
+
     # ADJUST THE PLOT
     leftval = 0.12
     bottomval = 0.12
