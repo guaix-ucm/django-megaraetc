@@ -19,6 +19,7 @@
 
 import math
 import numpy
+import matplotlib.mlab as mlab
 
 ### ADDED FOR TESTING DJANGO WEB FRAMEWORK ###
 def thisisatest(somevalue):
@@ -275,7 +276,7 @@ def specparline(om_val, xit, areasource, diamsource, ps, disp, nfibres, areafibr
 # ispect - Input spectrum template to normalize
 # iband - Input filter transmission
 #
-def sclspect (iflux, wv, wv1, wv2, ispect, iband):
+def sclspect (iflux, wv, wv1, wv2, ispect, iband, wline, fline, fwhml):
 
     wv1 = numpy.array(wv1)
     wv2 = numpy.array(wv2)
@@ -323,7 +324,7 @@ def sclspect (iflux, wv, wv1, wv2, ispect, iband):
 
     wvrange = wv[ind1:ind2]
     srange = ispect[ind1:ind2]
- 
+
     # Extract filter transmission in wavelength range
     iband = iband[ind1:ind2]
 
@@ -335,6 +336,56 @@ def sclspect (iflux, wv, wv1, wv2, ispect, iband):
 
     # Scaled spectrum
     scspect = norm * ispect
+
+    # Create Gaussian
+    amplitude = fline
+    mean = wline
+    sigma = fwhml/(2*numpy.sqrt(2*numpy.log(2)))
+    gauxmin = mean-5*sigma
+    gauxmax = mean+5*sigma
+
+    print 'gauxmin=', gauxmin
+    print 'gauxmax=', gauxmax
+    insidegaux = []
+    insidegauy = []
+    for idx, val in enumerate(wv):
+        if gauxmin < wv[idx] < gauxmax:
+            insidegaux.append(wv[idx])
+            insidegauy.append(ispect[idx])
+
+    numpoints = len(insidegaux)
+
+
+    if isinstance(gauxmin, float) :
+        minxindex = min(range(len(wv)), key=lambda i: abs(wv[i]-gauxmin))
+        maxxindex = min(range(len(wv)), key=lambda i: abs(wv[i]-gauxmax))
+        # meanxindex = int(round((minxindex+maxxindex)/2))    # central value index
+        # meany = (ispect[minxindex] + ispect[maxxindex]) / 2
+        if numpoints < maxxindex+1-minxindex:
+            numpoints = numpoints+2
+        gaux = numpy.linspace(gauxmin, gauxmax, numpoints, endpoint=True)
+        gauy = mlab.normpdf(gaux, mean, sigma)  # gaussian y
+
+    scspect[minxindex : maxxindex] = scspect[minxindex : maxxindex] + gauy[0: -1] * amplitude
+
+
+    print 'amplitude=', amplitude
+    print 'numpoints=', numpoints
+    print 'minxindex=', minxindex
+    print 'maxxindex=', maxxindex
+    print 'deltaindex=', maxxindex-minxindex
+    print 'len(gaux)=', len(gaux)
+    print 'len(gauy)=', len(gauy)
+    print 'len(ispect)=', len(ispect[minxindex : maxxindex])
+    print 'len(scscpect)=', len(scspect[minxindex : maxxindex])
+    print ''
+    print 'len(insidegaux)=', numpoints
+    print 'len(wv)=',len(wv)
+    print 'len(ispect)=', len(ispect)
+    # print 'len(newispect)=', len(newispect)
+    # print 'type(newispect)=', type(newispect)
+    # print 'scspect=', scspect
+    print ''
 
     return norm, scspect
 

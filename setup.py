@@ -21,6 +21,6 @@ setup(name='django-megaraetc',
          'Topic :: Internet :: WWW/HTTP',
          'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
          ],
-      long_description=open('README.rst').read()
-     )
+      long_description=open('README.rst').read(), requires=['numpy', 'numpy']
+      )
 

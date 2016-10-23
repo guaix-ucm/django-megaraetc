@@ -13,6 +13,7 @@ import matplotlib
 matplotlib.use('Agg')
 
 import mpld3
+from mpld3 import plugins
 # /home/pica/Documents/virt_django/django_megara
 
 
@@ -186,7 +187,7 @@ def get_info(request):
         form3 = AtmosphericConditionsForm()
         form4 = ObservationalSetupForm()
 
-    return render(request, 'etc/webmegaraetc-0.4.5.html', {
+    return render(request, 'etc/webmegaraetc-0.5.0.html', {
         'form1': form1,
         'form2': form2,
         'form3': form3,
@@ -207,7 +208,7 @@ def etc_form(request):
                    'form4': form4,
                    }
 
-    return render(request, 'etc/webmegaraetc-0.4.5.html', total_formu)
+    return render(request, 'etc/webmegaraetc-0.5.0.html', total_formu)
 
 
 # LOADS THIS AFTER PRESSING "COMPUTE" webmegaraetc.html and
@@ -315,10 +316,13 @@ def etc_do(request):
         figura = plot_and_save_new('', x, y, x3, y3, z3,
                                    vph_minval, vph_maxval,
                                    label1, label2, label3)
+
         html = mpld3.fig_to_html(figura)
 
         figura2 = plot_and_save2_new('', x2, y2, x2b, y2b,
                                      x2c, y2c, x2d, y2d,
+                                     x3, y3, z3,
+                                     vph_minval, vph_maxval,
                                      label2a, label2b, label2c)
         html += mpld3.fig_to_html(figura2)
 
@@ -328,9 +332,9 @@ def etc_do(request):
             om_val_string = str(outputofcalc['om_val'])
             bandc_val_string = str(outputofcalc['bandc_val'])
             sourcet_val_string = str(outputofcalc['sourcet_val'])
-            mag_val_string = str(outputofcalc['mag_val'])
+            mag_val_string = str('%.2f' % outputofcalc['mag_val'])
             netflux_string = '%.3e' % outputofcalc['netflux']
-            size_val_string = str(outputofcalc['size_val'])
+            size_val_string = str('%.2f' % outputofcalc['size_val'])
             seeingx_string = str(outputofcalc['seeingx'])
             fluxt_val_string = outputofcalc['fluxt_val']
             wline_val_string = str(outputofcalc['wline_val'])
@@ -509,7 +513,7 @@ def etc_do(request):
                 switchstring = 'Sky-fibers:'
 
             tableinputstring = '<table border=1>' + \
-                               '<tr><td>INPUT PARAMETERS:</td><td></td></tr>' + \
+                               '<tr><td width=50%>INPUT PARAMETERS:</td><td></td></tr>' + \
                                '<tr><td>Area:</td><td>' + size_val_string + ' arcsec^2</td></tr>' + \
                                '<tr><td>Observing mode:</td><td>' + om_val_string + '</td></tr>' + \
                                '<tr><td>VPH:</td><td>' + vph_val_string + '</td></tr>' + \

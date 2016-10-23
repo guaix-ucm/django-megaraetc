@@ -892,7 +892,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val,\
             flineparc = fline_val / areaseeing
 
         # Source spectrum scaled to totalflux in continuum
-        normc, fc = sclspect(fcont, lamb, lc1, lc2, sourcespectrum, tfilterc)
+        normc, fc = sclspect(fcont, lamb, lc1, lc2, sourcespectrum, tfilterc, wline_val, fline_val, fwhmline_val)
         # plot_and_save(lambdacm, fc, spect_val)
         # Sky magnitude and scaled flux. Sky flux scaled to the airmass per arcsec**2
         # We consider the brightness due to moon phase
@@ -917,7 +917,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val,\
         tfiltercvph = numpy.array(tfiltercvph)
 
         # Sky spectrum scaled to totalflux in input filter
-        norms, fs = sclspect(fsky, lamb, ls1, ls2, skyspectrum, tfiltercvph)
+        norms, fs = sclspect(fsky, lamb, ls1, ls2, skyspectrum, tfiltercvph, wline_val, fline_val, fwhmline_val)
 
         # Source projected area (arcsec**2) and projected diameter (arcsec)
 
