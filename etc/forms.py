@@ -3,6 +3,7 @@ from django import forms
 
 from .models import SpectralTemplate, VPHSetup
 from .models import PhotometricFilter
+from .models import SeeingTemplate
 
 from django.utils.safestring import mark_safe
 
@@ -48,6 +49,9 @@ def vph_choice():
 
 def filter_choice():
     return [(o.pk, o.name) for o in PhotometricFilter.objects.all()]
+
+def seeing_choice():
+    return [(o.pk, o.name) for o in SeeingTemplate.objects.all()]
 
 
 class HorizontalRadioRenderer(forms.RadioSelect.renderer):
@@ -106,21 +110,23 @@ class InstrumentForm(forms.Form):
     om_val_help = botton % "observingmodes.txt" + "Observing mode</a>"
     vph_help = botton % "vphsetup.html" +"VPH setup</a>"
 
-    om_val = forms.ChoiceField(label=mark_safe(om_val_help), initial="LCB", choices=OMODE, widget=forms.Select(attrs={'placeholder':'OM', 'oninput':'selectorOmode()'})) #, widget=forms.Select(attrs={'placeholder':'Observing mode'}))
+    om_val = forms.ChoiceField(label=mark_safe(om_val_help), initial="LCB", choices=OMODE, widget=forms.Select(attrs={'placeholder':'OM', 'onload':'selectorOmode()', 'oninput':'selectorOmode()'})) #, widget=forms.Select(attrs={'placeholder':'Observing mode'}))
     vph = forms.ChoiceField(label=mark_safe(vph_help), initial=1, choices=vph_choice())
 
 class AtmosphericConditionsForm(forms.Form):
-    # botton = "<a class=\"\" href=\"Javascript:newPopupBig('/static/etc/help/%s.txt');\" type=\"link\"><span class=\"glyphicon glyphicon-question-sign\"></span></a>"
+    hintbotton = "<a class=\"\" href=\"Javascript:newPopupBig('/static/etc/help/%s.pdf');\" type=\"link\"><span class=\"glyphicon glyphicon-question-sign\"></span></a>"
+    seeing_hint = hintbotton % "seeing_values.xlsx"
     botton = "<a class=\"splinkcol\" href=\"Javascript:newPopupBig('/static/etc/help/%s.txt');\" >"
     skycond_help = botton % "skycond" + "Sky condition</a>"
     moonph_help = botton % "moonph" + "Moon phase</a>"
     airmass_help = botton % "airmass" + "Airmass</a>"
-    seeing_help = botton % "seeing" + "Seeing</a>"
+    seeing_help = botton % "seeing" + "Seeing (arcsec)</a>"
 
     skycond = forms.ChoiceField(label=mark_safe(skycond_help), initial="Photometric", choices=SKYCOND)
     moonph = forms.ChoiceField(label=mark_safe(moonph_help), initial="Dark", choices=MOONPH)
     airmass = forms.FloatField(label=mark_safe(airmass_help), initial=1.0, min_value=0.0, max_value=5, widget=forms.TextInput(attrs={'placeholder':'Airmass'}))
-    seeing = forms.FloatField(label=mark_safe(seeing_help), initial=0.5, min_value=0.0, max_value=5, widget=forms.TextInput(attrs={'placeholder':'Seeing'}))
+    # seeing = forms.FloatField(label=mark_safe(seeing_help), initial=0.5, min_value=0.5, max_value=2.0, widget=forms.TextInput(attrs={'placeholder':'Seeing'}))
+    seeing = forms.ChoiceField(label=mark_safe(seeing_help), help_text=seeing_hint, initial=6, choices=seeing_choice())
 
 class ObservationalSetupForm(forms.Form):
     hintbotton = "<a class=\"\" href=\"Javascript:newPopupBig('/static/etc/help/%s.txt');\" type=\"link\"><span class=\"glyphicon glyphicon-question-sign\"></span></a>"

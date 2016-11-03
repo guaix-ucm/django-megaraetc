@@ -63,6 +63,7 @@ def plot_and_save_new(tempname, x, y, mu_var, fwhm_var, linef_var,
 
     # DETAILED BUT SLOW
     ax.plot(filtx, filty, '-b', label=label1)
+    # points = ax.scatter(filtx[::10], filty[::10], marker='o', color=None, s=200)
 
     # SMOOTH AND FAST
     # spline = UnivariateSpline(x, y)

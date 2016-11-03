@@ -1,0 +1,18 @@
+### MEGARA ONLINE ETC HISTORY ###
+
+2016/11/03 v0.6.0 Implemented seeing values of spaxel rings + minor bug fixes.
+2016/10/24 v0.5.0 Line+Continuum graphics and calculations updates
+2016/09/02 v0.4.5 Updated MOS/LCB IFU --> Bundles/Fibers
+2016/08/11 v0.4.5 Help updated
+2016/07/26 v0.4.5 Manual, quick guide, icons updated. Bug fixes
+2016/07/06 v0.4.4 changed help buttons, added hint button, add Output Line SNR (all frames)
+2016/06/29 v0.4.3 Fixed css. Cookies! Modified HTML
+2016/06/24 v0.4.3 Added radius
+2016/05/14 v0.4.2 Modified input spectrum
+2016/05/13 v0.4.2 Added Gaussian
+2016/04/20 v0.4.2 Fixed help
+2016/04/01 v0.4.2 Updated forms. Latest version with d3.js
+2016/02/06 v0.4.2 Manual download buttons updates
+2016/02/05 v0.4.2 Bug fix: contfluxval fixed
+2016/01/31 v0.4.2 MEGARA Online ETC first release
+

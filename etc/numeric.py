@@ -43,6 +43,8 @@ def flux2mag(magvega,fvega,inputf):
 # Function to derive spectroscopic parameters according to the case selected for continuum output.
 # Args: 
 #
+
+
 def specpar(om_val, xit, disp, ps, nfibres, nfibresy, areafibre, rfibre,  deltab, areasource, 
             diamsource, areaseeing, seeingx):
 

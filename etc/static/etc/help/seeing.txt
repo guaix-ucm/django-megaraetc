@@ -1,3 +1,27 @@
 ** SEEING **
-Seeing in arcsec.
+FWHM of the seeing in arcsec.
 The seeing is assumed to be provided at the given airmass. No correction for airmass is performed.
+
+We have performed Monte Carlo simulations of the PSF to see how much light falls onto
+the central spaxel, then onto the first spaxel ring (6 spaxels) around it, and finally onto the second spaxel ring (12 spaxels).
+To do so, we have used FiberSpecSim (available at http://t-rex.fis.ucm.es/fiberspecsim/wform.html) (Author: Belén Alcalde Pampliega).
+We used the following input parameters:
+The spectrograph: GTC [MEGARA] (in Firefox, choosing this autofills the form to some extent)
+Seeing FWHM [arcsec]: 0.5" to 2.0"
+Airmass: 1.0
+Initial lambda [nm]: 350
+Final lambda [nm]: 450
+Fiber-core size [µm]: 100
+Rings/[rows/cols]: 2
+Spaxel size [arcsec]: 0.62
+Spaxel shape: Hexagonal
+Number of Monte Carlo particles: 1000
+Speed factor: 1000
+
+Since FiberSpecSim does not allow very large number of particles,
+we made 20 simulations each with a 1000 particles for each of the seeing value.
+Averaging the results, we get the mean, the standard deviation, and the standard deviation of the mean
+of the percentage of the enclosed light within each region (central, ring1, ring2) for each seeing.
+In any case, the standard deviation of the mean is less than 0.5%.
+Hence, we use the mean (of the 20 trials) as fixed values.
+

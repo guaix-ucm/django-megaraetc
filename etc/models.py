@@ -4,6 +4,9 @@ from django.db import models
 class SpectralTemplate(models.Model):
     name = models.CharField(max_length=10)
     path = models.CharField(max_length=100)
+    class Meta:
+        managed = True
+        db_table = 'etc_spectraltemplate'
 
     def __str__(self):
         return self.name
@@ -18,6 +21,9 @@ class PhotometricFilter(models.Model):
     lambda_e = models.FloatField()
     mvega = models.FloatField()
     fvega = models.FloatField()
+    class Meta:
+        managed = True
+        db_table = 'etc_photometricfilter'
 
     def __str__(self):
         return self.name
@@ -32,8 +38,22 @@ class VPHSetup(models.Model):
     lambda_b = models.FloatField()
     lambda_e = models.FloatField()
     specconf = models.CharField(max_length=10)
-
+    class Meta:
+        managed = True
+        db_table = 'etc_vphsetup'
 
     def __str__(self):
         return self.name
 
+class SeeingTemplate(models.Model):
+    name = models.FloatField()
+    centermean = models.FloatField()
+    ring1mean = models.FloatField()
+    ring2mean = models.FloatField()
+    total = models.FloatField()
+    class Meta:
+        managed = True
+        db_table = 'etc_seeingtemplate'
+
+    def __str__(self):
+        return  self.name

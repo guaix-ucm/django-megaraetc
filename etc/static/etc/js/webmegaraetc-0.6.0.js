@@ -56,7 +56,6 @@ function closeWin() {
 }
 
 
-
 // for source type
 function selector() {
     if (document.getElementById("id_stype_0").checked == true) {
@@ -346,10 +345,21 @@ function storeValues(form)
     setCookie("the_skycond", myform.id_skycond.value, 365);
     setCookie("the_moonph", myform.id_moonph.value, 365);
     setCookie("the_airmass", myform.id_airmass.value, 365);
-    setCookie("the_seeing", myform.id_seeing.value, 365);
+    setCookie("the_seeing", myform.id_seeing.options[myform.id_seeing.selectedIndex].text, 365);
+    setCookie("the_seeing_pk", myform.id_seeing.value, 365);
+
     setCookie("the_numframes", myform.id_numframes.value, 365);
     setCookie("the_exptimepframe", myform.id_exptimepframe.value, 365);
     setCookie("the_nsbundles", myform.id_nsbundles.value, 365);
+    setCookie("the_ntbundles", myform.id_ntbundles.value, 365);
+    if (document.getElementById("id_om_val").value == 'MOS') {
+        setCookie("the_nst", "Number of Sky Bundles", 365);
+        setCookie("the_ntt", "Number of Target Bundles", 365);
+    }
+    else if (document.getElementById('id_om_val').value == 'LCB') {
+        setCookie("the_nst", "Number of Sky Fibers", 365);
+        setCookie("the_ntt", "Number of Target Fibers", 365);
+    }
     setCookie("the_lineap", myform.id_lineap.value, 365);
     setCookie("the_contap", myform.id_contap.value, 365);
 //    setCookie("field3", form.field3.value, 365);
@@ -380,40 +390,50 @@ function displayCookies() {
     var fname_moonph=getCookie("the_moonph");
     var fname_airmass=getCookie("the_airmass");
     var fname_seeing=getCookie("the_seeing");
+    var fname_seeing_pk=getCookie("the_seeing_pk");
+
     var fname_numframes=getCookie("the_numframes");
     var fname_exptimepframe=getCookie("the_exptimepframe");
     var fname_nsbundles=getCookie("the_nsbundles");
+    var fname_ntbundles=getCookie("the_ntbundles");
+    var fname_nst=getCookie("the_nst");
+    var fname_ntt=getCookie("the_ntt");
+
     var fname_lineap=getCookie("the_lineap");
     var fname_contap=getCookie("the_contap");
 
 	if (fname_radius==null) {fname_radius="";}
 	if (fname_radius!="" && fname_radius!="") {fname_radius="the_radius="+fname_radius;}
-	alert ('The current stype is= '+fname_stype+
-	'\ninput size= '+fname_isize+
-	'\nwith area= '+fname_area+
-	'\nwith radius= '+fname_radius+
-	'\nwith iflux= '+fname_iflux+
-	'\nwith rline= '+fname_rline+
-	'\nwith spectype= '+fname_spectype+
-	'\nwith pfilter= '+fname_pfilter+
-	'\nwith contmagflux= '+fname_contmagflux+
-	'\nwith contmagval= '+fname_contmagval+
-	'\nwith contfluxval= '+fname_contfluxval+
-	'\nwith lineflux= '+fname_lineflux+
-	'\nwith linewave= '+fname_linewave+
-	'\nwith linefwhm= '+fname_linefwhm+
+	alert ('These are the cookies currently stored in your browser:'+
+	'\nstype = '+fname_stype+
+	'\ninput size = '+fname_isize+
+	'\nwith area = '+fname_area+
+	'\nwith radius = '+fname_radius+
+	'\nwith iflux = '+fname_iflux+
+	'\nwith rline = '+fname_rline+
+	'\nwith spectype = '+fname_spectype+
+	'\nwith pfilter = '+fname_pfilter+
+	'\nwith contmagflux = '+fname_contmagflux+
+	'\nwith contmagval = '+fname_contmagval+
+	'\nwith contfluxval = '+fname_contfluxval+
+	'\nwith lineflux = '+fname_lineflux+
+	'\nwith linewave = '+fname_linewave+
+	'\nwith linefwhm = '+fname_linefwhm+
 
-	'\nwith om_val= '+fname_om_val+
-	'\nwith vph='+fname_vph+
-	'\nwith skycond ='+fname_skycond+
-	'\nwith moonph ='+fname_moonph+
-	'\nwith airmass ='+fname_airmass+
-	'\nwith seeing ='+fname_seeing+
-	'\nwith numframes ='+fname_numframes+
-	'\nwith exptimepframe ='+fname_exptimepframe+
-	'\nwith nsbundles ='+fname_nsbundles+
-	'\nwith lineap ='+fname_lineap+
-	'\nwith contap ='+fname_contap+
+	'\nwith om_val = '+fname_om_val+
+	'\nwith vph = '+fname_vph+
+	'\nwith skycond = '+fname_skycond+
+	'\nwith moonph = '+fname_moonph+
+	'\nwith airmass = '+fname_airmass+
+	'\nwith seeing = '+fname_seeing+' (pk='+fname_seeing_pk+')'+
+	'\nwith numframes = '+fname_numframes+
+	'\nwith exptimepframe = '+fname_exptimepframe+
+	'\nwith nsbundles = '+fname_nsbundles+
+	'\nwith ntbundles = '+fname_ntbundles+
+	'\nwith nst = '+fname_nst+
+
+	'\nwith lineap = '+fname_lineap+
+	'\nwith contap = '+fname_contap+
 	' ');
 }
 
@@ -440,14 +460,19 @@ function deleteCookies(name) {
   document.cookie = "the_moonph=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
   document.cookie = "the_airmass=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
   document.cookie = "the_seeing=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  document.cookie = "the_seeing_pk=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
   document.cookie = "the_numframes=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
   document.cookie = "the_exptimepframe=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
   document.cookie = "the_nsbundles=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  document.cookie = "the_ntbundles=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  document.cookie = "the_nst=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  document.cookie = "the_ntt=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
   document.cookie = "the_lineap=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
   document.cookie = "the_contap=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
 
-  location.reload();
   alert ('Cookies deleted.');
+  window.location.reload();
+  myform.reset();
 }
 
 function readCookies() {
@@ -503,13 +528,19 @@ function readCookies() {
 
         document.getElementById('id_om_val').value = getCookie('the_om_val');
         document.getElementById('id_vph').value = getCookie('the_vph');
+
         document.getElementById('id_skycond').value = getCookie('the_skycond');
         document.getElementById('id_moonph').value = getCookie('the_moonph');
         document.getElementById('id_airmass').value = getCookie('the_airmass');
-        document.getElementById('id_seeing').value = getCookie('the_seeing');
+        document.getElementById('id_seeing').value = getCookie('the_seeing_pk');
+
         document.getElementById('id_numframes').value = getCookie('the_numframes');
         document.getElementById('id_exptimepframe').value = getCookie('the_exptimepframe');
         document.getElementById('id_nsbundles').value = getCookie('the_nsbundles');
+        document.getElementById('id_ntbundles').value = getCookie('the_ntbundles');
+        document.getElementById('id_nst').innerHTML = getCookie('the_nst');
+        document.getElementById('id_ntt').innerHTML = getCookie('the_ntt');
+
         document.getElementById('id_lineap').value = getCookie('the_lineap');
         document.getElementById('id_contap').value = getCookie('the_contap');
     }
@@ -519,7 +550,7 @@ function readCookies() {
 function calculateNtbund() {
     var nsbundles_var = document.getElementById('id_nsbundles').value;
     if (document.getElementById('id_om_val').value=='LCB') {
-        var ntbundles = 89 - nsbundles_var;
+        var ntbundles = 623 - nsbundles_var;
     }
     else if (document.getElementById('id_om_val').value=='MOS') {
         var ntbundles = 92 - nsbundles_var;
@@ -530,12 +561,13 @@ function calculateNtbund() {
 function calculateNsbund() {
     var ntbundles_var = document.getElementById('id_ntbundles').value;
     if (document.getElementById('id_om_val').value=='LCB') {
-        var nsbundles = 89 - ntbundles_var;
+        var nsbundles = 623 - ntbundles_var;
     }
     else if (document.getElementById('id_om_val').value=='MOS') {
         var nsbundles = 92 - ntbundles_var;
     }
     document.getElementById('id_nsbundles').value = parseInt(nsbundles);
 }
+
 
 // -->

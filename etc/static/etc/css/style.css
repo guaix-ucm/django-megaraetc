@@ -145,6 +145,7 @@ div.maintitletd {
 }
 
 div#footer{
+    margin: 0 auto;
     float: left;
     width: 100%;
 }
@@ -155,4 +156,8 @@ div#footer > p{
 
 div.release{
     float:right;
+}
+
+div#recommendation{
+    text-align: center;
 }

@@ -1,5 +1,10 @@
-Press tab or click somewhere else to see updated values.
-The number of "SKY" vs "FREE" bundles are complementary
+Note: changing the observing mode (from LCB IFU to MOS or vice versa) will reset the fields to their default values.
+
+The number of "SKY" vs "TARGET" bundles/fibers are complementary
 and are calculated automatically when one of the entry is set by the user.
-SKY + FREE = 89 for LCB.
-SKY + FREE = 92 for MOS.
+
+In the case of LCB IFU, we deal with FIBERS:
+SKY + TARGET = 623 fibers.
+
+In the case of MOS, we deal with BUNDLES:
+SKY + TARGET = 92 bundles.

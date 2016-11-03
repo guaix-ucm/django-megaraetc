@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from .forms import AtmosphericConditionsForm, ObservationalSetupForm
 from .forms import TargetForm, InstrumentForm
-from .models import PhotometricFilter
+from .models import PhotometricFilter, SeeingTemplate
 from .models import SpectralTemplate, VPHSetup
 
 from justcalc import calc
@@ -125,14 +125,15 @@ def compute5(request):
                 spec = '57'  # Sy2 (smooth)
         queryspec = SpectralTemplate.objects.filter(pk=spec).values()
         entry_spec_name = queryspec[0]['name']
-        # entry_spec_path = queryspec[0]['path']
-        # spectdat = [entry_spec_name,entry_spec_path]
         spect_val = entry_spec_name
 
         skycond_val = request.POST['skycond']
         moon_val = request.POST['moonph']
         airmass_val = float(request.POST['airmass'])
-        seeing_val = float(request.POST['seeing'])
+
+        queryseeing = SeeingTemplate.objects.filter(pk=request.POST['seeing']).values()
+        seeing_val = queryseeing[0]['name']
+
         numframes_val = float(request.POST['numframes'])
         exptimepframe_val = float(request.POST['exptimepframe'])
         nsbundles_val = int(request.POST['nsbundles'])
@@ -187,7 +188,7 @@ def get_info(request):
         form3 = AtmosphericConditionsForm()
         form4 = ObservationalSetupForm()
 
-    return render(request, 'etc/webmegaraetc-0.5.0.html', {
+    return render(request, 'etc/webmegaraetc-0.6.0.html', {
         'form1': form1,
         'form2': form2,
         'form3': form3,
@@ -208,7 +209,7 @@ def etc_form(request):
                    'form4': form4,
                    }
 
-    return render(request, 'etc/webmegaraetc-0.5.0.html', total_formu)
+    return render(request, 'etc/webmegaraetc-0.6.0.html', total_formu)
 
 
 # LOADS THIS AFTER PRESSING "COMPUTE" webmegaraetc.html and
@@ -317,6 +318,8 @@ def etc_do(request):
                                    vph_minval, vph_maxval,
                                    label1, label2, label3)
 
+        # tooltip = mpld3.plugins.PointLabelTooltip(points)
+        # plugins.connect(figura, tooltip)
         html = mpld3.fig_to_html(figura)
 
         figura2 = plot_and_save2_new('', x2, y2, x2b, y2b,
@@ -372,6 +375,7 @@ def etc_do(request):
             nfib1def_string = str(outputofcalc['nfib1def'])
             sncont_p2sp_all_string = "{0:.2f}".format(
                 float(outputofcalc['sncont_p2sp_all']) / 2)
+            tsncont_p2sp_all_val = float(outputofcalc['tsncont_p2sp_all']/2)
             tsncont_p2sp_all_string = "{0:.2f}".format(
                 float(outputofcalc['tsncont_p2sp_all']) / 2)
             sncont_pspfwhm_all_string = "{0:.2f}".format(
@@ -459,7 +463,25 @@ def etc_do(request):
             tsnline_fibre1aa_string = "{0:.2f}".format(
                 float(outputofcalc['tsnline_fibre1aa']))
 
-            tablecoutstring = 'OUTPUT CONTINUUM SNR:' + \
+            seeing_centermean_val = outputofcalc['seeing_centermean']
+            seeing_centermean_string = str(seeing_centermean_val)
+            seeing_ring1mean_val = outputofcalc['seeing_ring1mean']
+            seeing_ring1mean_string = str(seeing_ring1mean_val)
+            seeing_ring2mean_val = outputofcalc['seeing_ring2mean']
+            seeing_ring2mean_string = str(seeing_ring2mean_val)
+            seeing_total_val = outputofcalc['seeing_total']
+            seeing_total_string = str(seeing_total_val)
+            tsncont_centermean = "{0:.2f}".format((seeing_centermean_val/100) * tsncont_p2sp_all_val)
+            tsncont_ring1mean = "{0:.2f}".format((seeing_ring1mean_val/100) * tsncont_p2sp_all_val)
+            tsncont_ring2mean = "{0:.2f}".format((seeing_ring2mean_val/100) * tsncont_p2sp_all_val)
+            tsncont_total = "{0:.2f}".format((seeing_total_val/100) * tsncont_p2sp_all_val)
+
+            tablecoutstring = 'testing: SNR in total source area (all frames) with PSF:<br />' + \
+                              'C: ' + tsncont_centermean + ' (' + seeing_centermean_string + '%),<br />' + \
+                              'R1: ' + tsncont_ring1mean + ' (' + seeing_ring1mean_string + '%),<br />' + \
+                              'R2: ' + tsncont_ring2mean + ' (' + seeing_ring2mean_string + '%),<br />' + \
+                              'C+R1+R2: ' + tsncont_total + ' (' + seeing_total_string + '%)<br /><br />' + \
+                              'OUTPUT CONTINUUM SNR:' + \
                               '<br />(at lambda_c(VPH) = ' + lambdaeff_string + ' AA)' + \
                               '<table border=1>' + \
                               '<tr><th class="iconcolumn" scope="col"> </th><th scope="col" colspan="2">* SNR per fibre:</th><th scope="col"></th></tr>' + \
