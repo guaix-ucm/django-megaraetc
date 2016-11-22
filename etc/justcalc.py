@@ -634,7 +634,8 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
 
     seeingfeatures = seeingchar[seeing_list.index(seeing_val)]
 
-    seeing_val = float(seeingfeatures[0].encode('utf-8'))  # may need to get rid of encode in some versions of Django
+    # seeing_val = float(seeingfeatures[0].encode('utf-8'))
+    seeing_val = float(seeingfeatures[0])  # may need to get rid of encode in some versions of Django
     seeing_centermean = seeingfeatures[1]
     seeing_ring1mean = seeingfeatures[2]
     seeing_ring2mean = seeingfeatures[3]
