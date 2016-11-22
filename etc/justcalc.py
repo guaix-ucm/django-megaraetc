@@ -10,7 +10,7 @@ from .numeric import linesignal
 from .models import PhotometricFilter, SeeingTemplate
 from .models import SpectralTemplate, VPHSetup
 
-from .mathtext import textcalcout
+# from .mathtext import textcalcout
 
 ####################
 def reading(filename, skipline):
