@@ -10,6 +10,7 @@ from .numeric import linesignal
 from .models import PhotometricFilter, SeeingTemplate
 from .models import SpectralTemplate, VPHSetup
 
+from .mathtext import textcalcout
 
 ####################
 def reading(filename, skipline):
@@ -339,10 +340,11 @@ def warn(outtext, framex, title):
 
 
 # Initializing strings of output
-global texti, textoc, textol
+global texti, textoc, textol, textcalc
 texti = ""
 textoc = ""
 textol = ""
+textcalc = ""
 
 # Global definitions
 # Constants
@@ -369,6 +371,15 @@ npy = 4096.0
 # Dimensions of detector (Vertical direction). Plus 16 rows devoted to dark? npy = 4112
 npx = 4096.0
 
+# IMPORTANT NOTE FOR DJANGO USERS:
+# queries to the SQL database in the code will interfere with
+# the migration process of Django (1.9), when tables in the database are dropped.
+# If you encounter such migration error when rebuilding the tables,
+# do not forget to "comment out" the queries to the models of models.py,
+# i.e. in our code, everything that is related to VPHSetup, SpectralTemplate,
+# PhotometricFilter and SeeingTemplate.
+#
+#
 # vph_list = list( [o.name for o in VPHSetup.objects.all()] )
 # reads the database every time it is called, so better not use it too much.
 # To avoid multiple database loads,
@@ -503,7 +514,7 @@ tcond = [1,  # Photometric
 #          0
 #          ]
 
-# Seeing read from database
+# Seeing data read from database
 queryseeing = SeeingTemplate.objects.all()
 seeing_list = list([p.name for p in queryseeing])
 seeingchar = list(
@@ -523,12 +534,12 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
          om_val, vph_val, \
          skycond_val, moon_val, airmass_val, seeing_val, \
          numframe_val, exptimepframe_val, nsbundles_val):
-    global texti, textoc, textol
+    global texti, textoc, textol, textcalc
     # Clear previous outputs
     # Warning
     errind = 0
     frame0 = 0
-
+    textcalc = ""
     # Source type
 
     # Magnitude continuum; checking float
@@ -538,13 +549,14 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
             mag_val = 20.0
             outtext = outmessage(100)
             errind = warn(outtext, frame0, 'MEGARA ETC Warning')
-
+        textcalc += "Continuum is in mag mode and continuum mag = %s <br />" % mag_val
     else:
         fc_val = isafloat(fc_val, 1.0e-16)
         if fc_val <= 0.0:
             fc_val = 1.0e-16
             outtext = outmessage(101)
             errind = warn(outtext, frame0, 'MEGARA ETC Warning')
+        textcalc += "Continuum is in flux mode and continuum flux = %s erg/s/cm$^{2}$ <br />" % fc_val
 
     # Size if extended in arcsec**2; checking float
     size_val = isafloat(size_val, 1.0)
@@ -552,6 +564,9 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
     if sourcet_val == "P":
         size_val = 0.
         radius_val = 0.
+    textcalc += "Type of source is %s <br />" % sourcet_val
+    textcalc += "Area of source is %s <br />" % size_val
+    textcalc += "Radius of source is %s <br />" % radius_val
 
     # Type of computation: continuum or line+continuum
     # Input parameters related to Line
@@ -599,6 +614,10 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
         fwhmline_val = 0.
         nfwhmline_val = 0.
         cnfwhmline_val = 0.
+    textcalc += "Type of flux is %s <br />" % fluxt_val
+    textcalc += "Line: Integrated flux is %s $\\rm{erg/s/cm^{2}}$ <br />" % fline_val
+    textcalc += 'Line: Central wavelength is %s Angstroms <br />' % wline_val
+    textcalc += 'Line: FWHM of gaussian is %s Angstroms <br />' % fwhmline_val
 
     # Airmass
     airmass_val = isafloat(airmass_val, 1.0)
@@ -606,19 +625,29 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
         airmass_val = 1.0
         outtext = outmessage(107)
         errind = warn(outtext, frame0, 'MEGARA ETC Warning')
+    textcalc += "Arimass is %s <br />" % airmass_val
 
     # Seeing
     # seeing_val = isafloat(seeing_val,0.5)
+    # New flux dispersion over central, ring1, ring2 spaxels, due to seeing in percentages of total flux from source
+    # Results of FiberSpecSim.
+
     seeingfeatures = seeingchar[seeing_list.index(seeing_val)]
 
-    seeing_val = seeingfeatures[0]
-    seeing_val = float(seeing_val.encode('utf-8'))
+    seeing_val = float(seeingfeatures[0].encode('utf-8'))  # may need to get rid of encode in some versions of Django
     seeing_centermean = seeingfeatures[1]
     seeing_ring1mean = seeingfeatures[2]
     seeing_ring2mean = seeingfeatures[3]
     seeing_total = seeingfeatures[4]
+    textcalc += "Seeing FWHM is %s arcsec <br />" % seeing_val
+    textcalc += "Percentage of enclosed light in 1 spaxel C = %s %% <br />" % seeing_centermean
+    textcalc += "Percentage of enclosed light in 6 spaxels R1 = %s %% <br />" % seeing_ring1mean
+    textcalc += "Percentage of enclosed light in 12 spaxels R2 = %s %% <br />" % seeing_ring2mean
+    textcalc += "Percentage of enclosed light in 19 spaxels C+R1+R2 = %s %% <br />" % seeing_total
 
     if seeing_val < 0.5 or seeing_val > 2.0:
+        print 'seeing_val =', seeing_val
+        print 'seeing_val type = ', type(seeing_val)
         seeing_val = 0.5
         outtext = outmessage(108)
         errind = warn(outtext, frame0, 'MEGARA ETC Warning')
@@ -629,6 +658,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
         numframe_val = 1
         outtext = outmessage(113)
         errind = warn(outtext, frame0, 'MEGARA ETC Warning')
+    textcalc += "Number of frames is %s <br />" % numframe_val
 
     # Exptime per frame
     exptimepframe_val = isafloat(exptimepframe_val, 1)
@@ -636,6 +666,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
         exptimepframe_val = 3600.
         outtext = outmessage(114)
         errind = warn(outtext, frame0, 'MEGARA ETC Warning')
+    textcalc += "Exposure time per frame is %s <br />" % exptimepframe_val
 
     # Exptime
     exptime_val = numframe_val * exptimepframe_val
@@ -645,9 +676,11 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
         exptime_val = 3600.
         outtext = outmessage(109)
         errind = warn(outtext, frame0, 'MEGARA ETC Warning')
+    textcalc += "Total exposure time = Number of frames * Exp.Time per frame = %s $\\times$ %s = %s <br />" % (numframe_val, exptimepframe_val, exptime_val)
 
     # Dark
     npdark_val = 65500.
+    textcalc += "npdark_val = %s <br />" % npdark_val
 
     # Sky fibres
     if om_val == 'LCB':
@@ -655,26 +688,27 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
     elif om_val == 'MOS':
         nsfib_val = isafloat(nsbundles_val * 7,
                              92.0)  # convert from number of bundles to number of fibers. These are SKY FIBERS
+    textcalc += "Observing mode is %s <br />" % om_val
+    textcalc += "Total number of fibers is %s <br />" % nsfib_val
+
     if nsfib_val <= 0. or nsfib_val > 644:
         nsfib_val = 56.
         outtext = outmessage(110)
         errind = warn(outtext, frame0, 'MEGARA ETC Warning')
 
+
     # Setting dispersion, bandwidth, central wavelength, band for estimating sky flux from VPH setup,
     # and spectrograph configuration for setting instrument transmission.
-
     vph_val = vph_val.encode('utf-8')  # need it to get rid of unicode
     vphfeatures = vphchar[vph_list.index(vph_val)]
     # vphfeatures = VPHSetup.objects.filter
+    #
     # queryfwhmvph = list( VPHSetup.objects.filter(name=vph_val).values('fwhm') )
     # fwhmvph = queryfwhmvph[0]['fwhm']
-    #
     # querydisp = list( VPHSetup.objects.filter(name=vph_val).values('dispersion') )
     # disp = querydisp[0]['dispersion']
-    #
     # querydeltab = list( VPHSetup.objects.filter(name=vph_val).values('deltab') )
     # deltab = querydeltab[0]['deltab']
-    #
     # queryset = list( VPHSetup.objects.filter(name=vph_val).values('lambdac') )
     # lambdaeff = queryset[0]['lambdac']
     # bandskyquery = list( VPHSetup.objects.filter(name=vph_val).values('relatedband') )
@@ -696,6 +730,16 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
     lvph1 = vphfeatures[5]
     lvph2 = vphfeatures[6]
 
+    textcalc += "VPH: name = %s <br />" % vph_val
+    textcalc += "VPH: FWHM = %s <br />" % fwhmvph
+    textcalc += "VPH: dispersion = %s <br />" % disp
+    textcalc += "VPH: delta_b = %s <br />" % deltab
+    textcalc += "VPH: $\lambda_{eff}$ = %s <br />" % lambdaeff
+    textcalc += "VPH: band sky = %s <br />" % bandsky
+    textcalc += "VPH: spectrograph conf = %s <br />" % spectrograph_conf
+    textcalc += "VPH: lvph1 = %s <br />" % lvph1
+    textcalc += "VPH: lvph2 = %s <br />" % lvph2
+
     if fluxt_val == "L":
         if (wline_val <= lvph1 or wline_val >= lvph2):
             outtext = outmessage(111)
@@ -703,7 +747,6 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
 
     # Avoiding computations if exception found
     if errind == 0:
-
         # Reading template
         spectdat = specttmplt_list[spect_list.index(spect_val)]
         lamb, sourcespectrum = reading(spectdat, 2)
@@ -714,6 +757,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
         # Reading template of sky emission [code to be done HERE]
         skyspectrum = sourcespectrum
 
+        textcalc += "Source spectrum template is %s <br />" % spect_val
         # Characteristics depending on observing mode:
         # Plate scale (arcsec/pix) - ps
         # Total number of fibres in one CCD  - ntotalfibres
@@ -739,9 +783,13 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
             ntotalfibres = 567
             ntotalfibresins = 567
             rfibre = 0.620 / 2.0
+        textcalc += "Plate-scale is %s <br />" % ps
+        textcalc += "Total number of fibers in %s mode is %s <br />" % (om_val, ntotalfibresins)
+        textcalc += "Radius of 1 fiber is %s <br />" % rfibre
 
         lhex = rfibre * math.sqrt(3)
         afibre = rfibre / 2.0
+        textcalc += "$A_{fiber} = \\frac{r_{fiber}}{2} = \\frac{%s}{2} = %s$ <br />" % (rfibre, afibre)
 
         # Total transmission curves of telescope + MEGARA as intended on October, 2013
         # They include: GTC 3-mirrors + FC subsystem + spectrograph (main optics + detector QE) + grating subsystem
@@ -750,138 +798,201 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
 
         if spectrograph_conf == 'HR' and vph_val == 'HR-R' and om_val == 'LCB':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH665.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH665.dat'
         elif spectrograph_conf == 'HR' and vph_val == 'HR-R' and om_val == 'MOS':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH665.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH665.dat'
         elif spectrograph_conf == 'HR' and vph_val == 'HR-I' and om_val == 'LCB':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH863.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH863.dat'
         elif spectrograph_conf == 'HR' and vph_val == 'HR-I' and om_val == 'MOS':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH863.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH863.dat'
         elif spectrograph_conf == 'MR' and vph_val == 'MR-U' and om_val == 'LCB':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH410.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH410.dat'
         elif spectrograph_conf == 'MR' and vph_val == 'MR-U' and om_val == 'MOS':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH410.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH410.dat'
         elif spectrograph_conf == 'MR' and vph_val == 'MR-UB' and om_val == 'LCB':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH443.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH443.dat'
         elif spectrograph_conf == 'MR' and vph_val == 'MR-UB' and om_val == 'MOS':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH443.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH443.dat'
         elif spectrograph_conf == 'MR' and vph_val == 'MR-B' and om_val == 'LCB':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH481.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH481.dat'
         elif spectrograph_conf == 'MR' and vph_val == 'MR-B' and om_val == 'MOS':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH481.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH481.dat'
         elif spectrograph_conf == 'MR' and vph_val == 'MR-G' and om_val == 'LCB':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH521.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH521.dat'
         elif spectrograph_conf == 'MR' and vph_val == 'MR-G' and om_val == 'MOS':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH521.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH521.dat'
         elif spectrograph_conf == 'MR' and vph_val == 'MR-V' and om_val == 'LCB':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH567.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH567.dat'
         elif spectrograph_conf == 'MR' and vph_val == 'MR-V' and om_val == 'MOS':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH567.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH567.dat'
         elif spectrograph_conf == 'MR' and vph_val == 'MR-VR' and om_val == 'LCB':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH617.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH617.dat'
         elif spectrograph_conf == 'MR' and vph_val == 'MR-VR' and om_val == 'MOS':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH617.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH617.dat'
         elif spectrograph_conf == 'MR' and vph_val == 'MR-R' and om_val == 'LCB':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH656.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH656.dat'
         elif spectrograph_conf == 'MR' and vph_val == 'MR-R' and om_val == 'MOS':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH656.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH656.dat'
         elif spectrograph_conf == 'MR' and vph_val == 'MR-RI' and om_val == 'LCB':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH712.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH712.dat'
         elif spectrograph_conf == 'MR' and vph_val == 'MR-RI' and om_val == 'MOS':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH712.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH712.dat'
         elif spectrograph_conf == 'MR' and vph_val == 'MR-I' and om_val == 'LCB':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH777.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH777.dat'
         elif spectrograph_conf == 'MR' and vph_val == 'MR-I' and om_val == 'MOS':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH777.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH777.dat'
         elif spectrograph_conf == 'MR' and vph_val == 'MR-Z' and om_val == 'LCB':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH926.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH926.dat'
         elif spectrograph_conf == 'MR' and vph_val == 'MR-Z' and om_val == 'MOS':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH926.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH926.dat'
         elif spectrograph_conf == 'LR' and vph_val == 'LR-U' and om_val == 'LCB':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH405.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH405.dat'
         elif spectrograph_conf == 'LR' and vph_val == 'LR-U' and om_val == 'MOS':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH405.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH405.dat'
         elif spectrograph_conf == 'LR' and vph_val == 'LR-B' and om_val == 'LCB':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH480.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH480.dat'
         elif spectrograph_conf == 'LR' and vph_val == 'LR-B' and om_val == 'MOS':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH480.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH480.dat'
         elif spectrograph_conf == 'LR' and vph_val == 'LR-V' and om_val == 'LCB':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH570.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH570.dat'
         elif spectrograph_conf == 'LR' and vph_val == 'LR-V' and om_val == 'MOS':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH570.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH570.dat'
         elif spectrograph_conf == 'LR' and vph_val == 'LR-R' and om_val == 'LCB':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH675.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH675.dat'
         elif spectrograph_conf == 'LR' and vph_val == 'LR-R' and om_val == 'MOS':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH675.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH675.dat'
         elif spectrograph_conf == 'LR' and vph_val == 'LR-I' and om_val == 'LCB':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH799.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH799.dat'
         elif spectrograph_conf == 'LR' and vph_val == 'LR-I' and om_val == 'MOS':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH799.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH799.dat'
         elif spectrograph_conf == 'LR' and vph_val == 'LR-Z' and om_val == 'LCB':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH890.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH890.dat'
         elif spectrograph_conf == 'LR' and vph_val == 'LR-Z' and om_val == 'MOS':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH890.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH890.dat'
         else:
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH570.dat', 2)
+            vphtranspath = 'MEGARA_TRANSM_0.1aa/t_LCB_VPH570.dat'
 
         tgtcinst = numpy.array(tgtcinst)
+
+        textcalc += "VPH transmission file path: %s <br />" % vphtranspath
 
         # Filter transmission for the continuum
         filtercdat = filterc_list[bandc_list.index(bandc_val)]
         lamb, tfilterc = reading(filtercdat, 2)
         tfilterc = numpy.array(tfilterc)
+        textcalc += "Filter band is %s <br />" % bandc_val
 
         # Wavelength array
         lamb = numpy.array(lamb)
+        textcalc += "Filter: $\lambda$ array goes from min = %s to max = %s Angstroms <br />" % (numpy.min(lamb), numpy.max(lamb))
 
         # Initial and final lambda of continuum filter:
         filtercar = filterchar_list[bandc_list.index(bandc_val)]
         lc1 = filtercar[2]
         lc2 = filtercar[3]
+        textcalc += "Initial lambda of continuum filter: %s <br />" % lc1
+        textcalc += "Final lambda of continuum filter: %s <br />" % lc2
 
         # Initial and final lambda of sky band (included in the VPH range):
         filtercar = filterchar_list[bandc_list.index(bandsky)]
         ls1 = filtercar[2]
         ls2 = filtercar[3]
+        textcalc += "Initial lambda of sky band (included in the VPH range): %s <br />" % ls1
+        textcalc += "Final lambda of sky band (included in the VPH range): %s <br />" % ls2
 
-        # Seeing at selected airmass:
+        # Seeing FWHM in arcsec at selected airmass:
         seeingx = seeing_val
-        seeing_zenith = seeing_val / (
-        airmass_val ** (3. / 5.))  # seeing at airmass=1.0
+        seeing_zenith = seeing_val / (airmass_val ** (3. / 5.))  # seeing at airmass=1.0
         areaseeing = pi * ((seeingx / 2.0) ** 2.)
         rseeingx = seeingx / 2.0
+        textcalc += "Seeingx = seeing_val = %s <br />" % seeing_val
+        textcalc += "$\\textrm{Seeing at zenith} = \\frac{seeingval}{airmassval^{3/5}} = %s $<br />" % seeing_zenith
+        textcalc += "$\\textrm{Area seeing} = \pi \\times \left(\\frac{seeingx}{2}\\right)^{2}$<br />"
 
         # Setting line FWHM to VPH FWHM in case that the line is not resolved
+        textcalc += "Is line resolved? %s <br />" % resolvedline_val
         if resolvedline_val == "N":
             fwhmline_val = fwhmvph
+            textcalc += "Line FWHM is %s (= FWHM(VPH))<br />" % fwhmline_val
 
         # Setting line FWHM to VPH FWHM in case that the line is resolved, but input line fwhm
         # is < fwhmvph
         if resolvedline_val == "Y" and fwhmline_val < fwhmvph:
             fwhmline_val = fwhmvph
+            textcalc += "Line FWHM is %s (= FWHM(VPH) because FWHM(line) < FWHM(VPH))<br />" % fwhmline_val
 
         # Photon energy
         lambdaeffcm = lambdaeff * 1.e-8
         lambdacm = lamb * 1.e-8
-        enph = hplanck * lightv / lambdacm
         enpheff = hplanck * lightv / lambdaeffcm
+        enph = hplanck * lightv / lambdacm
+        textcalc += "Photon energy: <br />"
+        textcalc += "$\lambda_{eff}(cm) = \lambda_{eff}(Angstroms) \\times 10^{-8} = %s \\times 10^{-8} = %s $cm <br />" % (lambdaeff,lambdaeffcm)
+        textcalc += "$\\textrm{Effective photon energy} = \\frac{hplanck * lightv}{lambdaeffcm} = \\frac{%s \\times %s}{%s} $<br />" % (hplanck, lightv, lambdaeffcm)
 
         # System efficiency
         tcondmag = tcond[skycond_list.index(skycond_val)]
         effsys = tatm * tgtcinst * tcondmag
+        textcalc += "System efficiency: <br />"
+        textcalc += "Sky conditions: %s <br />" % skycond_val
+        textcalc += "System efficiency$ = tatm \\times tgtcinst \\times tcondmag$ <br />"
 
         # Telescope collecting area (cm**2)
         stel = pi * ((rt * 100.0) ** 2)
+        textcalc += "Telescope collecting area ($\\rm{cm}^{2}$) = $\pi (100rt)^{2} = \pi (100 \\times %s)^{2} = %s \\rm{cm}^{2}$ <br />" % (rt, stel)
+        textcalc += "where rt = telscope effective radius = %s meter<br />" % rt
 
         # Projected size of a hexagonal fibre (arcsec**2)
         areafibre = 3.0 * math.sqrt(3.0) * (rfibre ** 2) / 2.0
+        textcalc += "Projected area of a hexagonal fiber: $A_{fiber}=3\sqrt{3}\\frac{R_{fiber}^{2}}{2} = 3\sqrt{3}\\frac{%s^{2}}{2} = %s \\textrm{arcsec}^{2}$ <br />" % (rfibre, areafibre)
 
         # Projected source area in arcsec**2
         if isize_val == "A":
             realareasource = size_val
             realrsource = math.sqrt(size_val / pi)
+            textcalc += "The size is given in Area in $\\textrm{arcsec}^{2}$ <br />"
+            textcalc += "The radius of the source $R_{source} = \sqrt{\left(\\frac{A_{source}}{\pi}\\right)} = \sqrt{\left(\\frac{%s}{\pi}\\right)} = %s $ <br />" % (realareasource, realrsource)
         else:
             realareasource = pi * (radius_val ** 2)
             realrsource = radius_val
+            textcalc += "The size is given in Radius in arcsec <br />"
+            textcalc += "The area of the source $A_{source} = \pi R_{source}^{2} = \pi \\times %s = %s$ <br />" % (realrsource, realareasource)
 
         # Area equivalent to a seeing disk circunscribed in the hexagonal fibre
         areaeq = pi * (afibre ** 2.)
@@ -890,6 +1001,9 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
         vegafeatures = vegachar[bandc_list.index(bandc_val)]
         magvegac = vegafeatures[0]
         fvegac = vegafeatures[1]
+        textcalc += "Vega features at %s <br />" % bandc_val
+        textcalc += "mag: %s <br />" % magvegac
+        textcalc += "flux: %s <br />" % fvegac
 
         # Source continuum flux per arcsec**2 (erg/s/cm**2/AA)
         if inputcontt_val == "M":
@@ -897,6 +1011,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
         else:
             netflux = fc_val
             mag_val = flux2mag(magvegac, fvegac, fc_val)
+        textcalc += "Source continuum net flux $F_{net} = %s \\textrm{erg/s/cm}^{2}$ with magnitude %s <br />" % (netflux, mag_val)
 
         # Flux per arcsec**2
         if sourcet_val == "E":
@@ -906,46 +1021,123 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
             if rseeingx >= realrsource:
                 fcont = netflux * realareasource / areaseeing
                 flineparc = fline_val * realareasource / areaseeing
+                textcalc += "<font color='red'>Since source type is E and %s ($R_{seeing@x}$) $\geq$ %s ($R_{source}$) i.e. seeing-dominated </font><br />" % (rseeingx, realrsource)
+                textcalc += "# Converting flux/arcsec**2 in real source to the more disperse flux/arcsec**2 in case of seeing-dominated <br />"
+                textcalc += "continuum flux $F_{cont} = \\frac{F_{net} \\times A_{source}}{A_{seeing}} = \\frac{%s \\times %s}{%s} = %s \\textrm{erg/s/cm}^{2}$ <br />" % (netflux, realareasource, areaseeing, fcont)
+                textcalc += "integrated line flux $F_{line} = \\frac{F_{line} \\times A_{source}}{A_{seeing}} = \\frac{%s \\times %s}{%s} = %s \\textrm{erg/s/cm}^{2}$ <br />" % (netflux, realareasource, areaseeing, flineparc)
+                if om_val == "LCB":
+                    fcont_centerspaxel = netflux * (seeing_centermean/100) * (realareasource / areaseeing)
+                    fcont_ring1spaxel = netflux *  (seeing_ring1mean/100) * (realareasource / areaseeing) / 6
+                    fcont_ring2spaxel = netflux * (seeing_ring2mean/100) * (realareasource / areaseeing) / 12
+
+                    flineparc_centerspaxel = fline_val * (seeing_centermean/100) * (realareasource / areaseeing)
+                    flineparc_ring1spaxel = fline_val * (seeing_ring1mean/100) * (realareasource / areaseeing) / 6
+                    flineparc_ring2spaxel  = fline_val * (seeing_ring2mean/100) * (realareasource / areaseeing) / 12
+                    textcalc += "<font color='red'>Since OM is LCB, we show how the source flux is spatially dispersed over the spaxels due to seeing</font> <br />"
+                    textcalc += "<table border=1><tr><td>"
+                    textcalc += "$F_{center,spaxel} = F_{total} \\times (%s$ %% $) \\times \\frac{\Omega_{source}}{A_{seeing}} = %s \\times (%s / 100) \\times \\frac{%s}{%s} = %s $" % (seeing_centermean, fcont, seeing_centermean, realareasource, areaseeing, fcont_centerspaxel)
+                    textcalc += "</td></tr><tr><td>"
+                    textcalc += "$F_{ring1,spaxel} = F_{total} \\times (%s$ %% $) \\times \\frac{\Omega_{source}}{A_{seeing}} = %s \\times (%s / 100) \\times \\frac{%s}{%s} = %s $" % (seeing_ring1mean, fcont, seeing_ring1mean, realareasource, areaseeing,  fcont_ring1spaxel)
+                    textcalc += "</td></tr><tr><td>"
+                    textcalc += "$F_{ring2,spaxel} = F_{total} \\times (%s$ %% $) \\times \\frac{\Omega_{source}}{A_{seeing}}  = %s \\times (%s / 100) \\times \\frac{%s}{%s} = %s $" % (seeing_ring2mean, fcont, seeing_ring2mean, realareasource, areaseeing, fcont_ring2spaxel)
+                    textcalc += "</td></tr></table>"
+
+                    fcont_cr1 = fcont_centerspaxel + 6*fcont_ring1spaxel
+                    fcont_cr1r2 = fcont_centerspaxel + 6*fcont_ring1spaxel + 12*fcont_ring2spaxel
+                    flineparc_cr1 = flineparc_centerspaxel + 6*flineparc_ring1spaxel
+                    flineparc_cr1r2 = flineparc_centerspaxel + 6*flineparc_ring1spaxel + 12*flineparc_ring2spaxel
+
             else:
                 fcont = netflux
                 flineparc = fline_val
+                textcalc += "Since source type is E and %s ($R_{seeing@x}$) $<$ %s ($R_{source}$) <br />" % (rseeingx, realrsource)
+                textcalc += "continuum flux $F_{cont} = F_{net} = %s \\textrm{erg/s/cm}^{2}$ <br />" % fcont
+                textcalc += "integrated line flux $F_{line} = %s \\textrm{erg/s/cm}^{2}$ <br />" % flineparc
+                if om_val == "LCB":
+                    fcont_centerspaxel = netflux * (seeing_centermean/100)
+                    fcont_ring1spaxel = netflux * (seeing_ring1mean/100) / 6
+                    fcont_ring2spaxel = netflux * (seeing_ring2mean/100) / 12
+
+                    flineparc_centerspaxel = fline_val * (seeing_centermean/100)
+                    flineparc_ring1spaxel = fline_val * (seeing_ring1mean/100) / 6
+                    flineparc_ring2spaxel  = fline_val * (seeing_ring2mean/100) / 12
+                    textcalc += "<table border=1><tr><td>"
+                    textcalc += "$F_{center,spaxel} = F_{total} * %s$ %% $ = %s \\times %s / 100 = %s $" % (seeing_centermean, fcont, seeing_centermean, fcont_centerspaxel)
+                    textcalc += "</td></tr><tr><td>"
+                    textcalc += "$F_{ring1,spaxel} = F_{total} * %s$ %% $ = %s \\times %s / 100 = %s $" % (seeing_ring1mean, fcont, seeing_ring1mean, fcont_ring1spaxel)
+                    textcalc += "</td></tr><tr><td>"
+                    textcalc += "$F_{ring2,spaxel} = F_{total} * %s$ %% $ = %s \\times %s / 100 = %s $" % (seeing_ring2mean, fcont, seeing_ring2mean, fcont_ring2spaxel)
+                    textcalc += "</td></tr></table>"
+
+                    fcont_cr1 = fcont_centerspaxel + 6*fcont_ring1spaxel
+                    fcont_cr1r2 = fcont_centerspaxel + 6*fcont_ring1spaxel + 12*fcont_ring2spaxel
+                    flineparc_cr1 = flineparc_centerspaxel + 6*flineparc_ring1spaxel
+                    flineparc_cr1r2 = flineparc_centerspaxel + 6*flineparc_ring1spaxel + 12*flineparc_ring2spaxel
+
         else:
             fcont = netflux / areaseeing
             flineparc = fline_val / areaseeing
+            textcalc += "Since source type is P <br />"
+            textcalc += "continuum flux $F_{cont} = \\frac{F_{net}}{A_{seeing}} = \\frac{%s}{%s} = %s \\textrm{erg/s/cm}^{2}$ <br />" % (netflux, areaseeing, fcont)
+            textcalc += "integrated line flux $F_{line} = \\frac{F_{line,input}}{A_{seeing}} = \\frac{%s}{%s} = %s \\textrm{erg/s/cm}^{2}$ <br />" % (fline_val, areaseeing, flineparc)
+            if om_val == "LCB":
+                fcont_centerspaxel = netflux * seeing_centermean / areaseeing
+                fcont_ring1spaxel = (netflux *  seeing_ring1mean / 6) / areaseeing
+                fcont_ring2spaxel = (netflux * seeing_ring2mean / 12) / areaseeing
+
+                flineparc_centerspaxel = fline_val * seeing_centermean / areaseeing
+                flineparc_ring1spaxel = (fline_val * seeing_ring1mean / 6) / areaseeing
+                flineparc_ring2spaxel  = (fline_val * seeing_ring2mean / 12) / areaseeing
 
         # Source spectrum scaled to totalflux in continuum
         normc, fc = sclspect(fcont, lamb, lc1, lc2, sourcespectrum, tfilterc,
                              wline_val, fline_val, fwhmline_val)
-        # plot_and_save(lambdacm, fc, spect_val)
+        if om_val == "LCB":
+            normcctr, fcctr = sclspect(fcont_centerspaxel, lamb, lc1, lc2, sourcespectrum, tfilterc,
+                                 wline_val, fline_val, fwhmline_val)
+            normcr1, fcr1 = sclspect(fcont_ring1spaxel, lamb, lc1, lc2, sourcespectrum, tfilterc,
+                                 wline_val, fline_val, fwhmline_val)
+            normcr2, fcr2 = sclspect(fcont_ring2spaxel, lamb, lc1, lc2, sourcespectrum, tfilterc,
+                                 wline_val, fline_val, fwhmline_val)
+
+        textcalc += "Normalization factor: normc = %s <br />" % normc
+
         # Sky magnitude and scaled flux. Sky flux scaled to the airmass per arcsec**2
         # We consider the brightness due to moon phase
         # fsky is assumed to be valid in the wavelength range of the selected VPH, as it is derived in the
         # most similar band to the VPH range.
-        skybf = -0.000278719 * (airmass_val ** 3) - 0.0653841 * (
-        airmass_val ** 2) + 1.11979 * (airmass_val) - 0.0552132
-        skymag = skymag_list[bandsky_list.index(bandsky)]
-        skymag = skymag + extraskyemission[moon_list.index(moon_val)]
-
+        skybf = -0.000278719 * (airmass_val ** 3) - 0.0653841 * (airmass_val ** 2) + 1.11979 * (airmass_val) - 0.0552132
+        skymag1 = skymag_list[bandsky_list.index(bandsky)]
+        skymag = skymag1 + extraskyemission[moon_list.index(moon_val)]
+        textcalc += "skybf = -0.000278719 * (airmass_val ** 3) - 0.0653841 * (airmass_val ** 2) + 1.11979 * (airmass_val) - 0.0552132 <br />"
+        textcalc += "skybf = %s <br />" % skybf
+        textcalc += "bandsky = %s <br />" % bandsky
+        textcalc += "skymag = skymag(bandsky) + extraskyemission(moon_val) = %s + %s = %s <br />" % (skymag1, extraskyemission[moon_list.index(moon_val)], skymag)
         vegafeatures = vegachar[bandc_list.index(bandsky)]
         magvegas = vegafeatures[0]
         fvegas = vegafeatures[1]
-        fsky = mag2flux(magvegas, fvegas, skymag)
-        fsky = fsky * skybf
+        fskyvega = mag2flux(magvegas, fvegas, skymag)
+        fsky = fskyvega * skybf
+        textcalc += "SKY: vegafeatures@%s <br />" % bandsky
+        textcalc += "SKY: Vega mag = %s <br />" % magvegas
+        textcalc += "SKY: Vega flux = %s <br />" % fvegas
+        textcalc += "SKY: fskyvega = %s <br />" % fskyvega
+        textcalc += "SKY: flux sky = fskyvega * skybf %s <br />" % fsky
 
         # Filter transmission for continuum in VPH (or for sky).
         # It must be similar to the most similar band to the VPH wavelength range.
         # This is for changing continuum flux from input band to that similar to the selected VPH
         filtercvphdat = filterc_list[bandsky_list.index(bandsky)]
         lamb, tfiltercvph = reading(filtercvphdat, 2)
-
         tfiltercvph = numpy.array(tfiltercvph)
+        textcalc+= "Reading filter transmission file %s because bandsky= %s <br />" % (filtercvphdat, bandsky)
 
         # Sky spectrum scaled to totalflux in input filter
         norms, fs = sclspect(fsky, lamb, ls1, ls2, skyspectrum, tfiltercvph,
                              wline_val, fline_val, fwhmline_val)
+        textcalc += "Normalization factor for sky spectrum norms = %s <br />" % norms
 
         # Source projected area (arcsec**2) and projected diameter (arcsec)
-
         if sourcet_val == "E":  # Assuming that projected source area is circular
             diamsource = 2. * realrsource
             if isize_val == "A":
@@ -961,10 +1153,12 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
             areasource = areaseeing
 
         rsource = diamsource / 2.0
+        textcalc += "(note-to-self) Doing source size calc again here. <br />"
 
         # Number of fibres covered by the source:
         # Assuming that the fibres are completely packed and covering 100% of source area
         nfibres = areasource / areafibre
+        textcalc += "Number of fibers covering the source $N_{fiber} = \\frac{A_{source}}{A_{fiber}} = \\frac{%s}{%s} = %s$ <br />" % (areasource, areafibre, nfibres)
 
         if nfibres > ntotalfibresins:
             # ERROR
@@ -978,117 +1172,292 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
             pass
 
         nfibres = math.ceil(nfibres)
+        textcalc += "Note: $N_{fiber}$ is rounded up with ceil(). $N_{fiber} = %s $ <br />" % nfibres
 
         # Number of fibres covered by the source in Y direction in spectra
         nfibresy = math.ceil((2.0 * rsource) / (2. * afibre))
+        textcalc += "Number of fibers covering the source in Y direction in spectra $N_{fiber,y} = \\frac{2\\times R_{source}}{2\\times a_{fiber}} = \\frac{2\\times %s}{2\\times %s} = %s$ <br />" % (rsource, afibre, nfibresy)
 
         # Area in which sky has been measured
         nfibresky = nsfib_val
         nfibresky = math.ceil(nfibresky)
         omegasky = nfibresky * areafibre
+        textcalc += "Number of sky fibers $N_{fiber,sky} = %s $<br />" % nfibresky
+        textcalc += "Area in which sky has been measured $\Omega_{sky} = N_{fiber,sky} \\times A_{fiber} = %s \\times %s = %s \\textrm{arcsec}^{2}$ <br />" % (nfibresky, areafibre, omegasky)
 
         # Different spatial and resolution elements to consider, depending on whether the source is punctual or extended.
         # Starting FOR loop for computations of SNR per frame
-        items = range(12)
+        textcalc += "<br /><br />### SNR CALCULATIONS (per frame) ###<br />"
+        items = range(15)
         for xit in items:
 
             # Deriving spectroscopic parameters for each case:
-            deltalambda, omegasource, npixx, npixy, nfib, nfib1, omegaskysource = specpar(
+            deltalambda, omegasource, npixx, npixy, nfib, nfib1, omegaskysource, specparstring = specpar(
                 om_val, xit, disp, ps,
                 nfibres, nfibresy, areafibre, rfibre, deltab, areasource,
                 diamsource, areaseeing, seeingx)
+
+            textcalc += specparstring
+            textcalc += "# Summary of spectroscopic parameters derivation for XIT=%s: <br />" % xit
+            textcalc += "$\Delta\lambda = %s $ Angstroms<br />" % deltalambda
+            textcalc += "$\Omega_{source} = %s \\textrm{arcsec}^{2}$ <br />" % omegasource
+            textcalc += "$n_{pix,x} = %s $<br />" % npixx
+            textcalc += "$n_{pix,y} = %s $<br />" % npixy
+            textcalc += "$N_{fiber} = %s $<br />" % nfib
+            textcalc += "$N_{fiber,y} = %s $<br />" % nfib1
+            textcalc += "$\Omega_{sky,source} = %s \\textrm{arcsec}^{2}$ <br />" % omegaskysource
 
             # Number of pixels in detector under consideration: just counting the factor in area
             # when we consider the used sky minibundles
             npix = npixx * npixy
             npixsky = (omegasky / omegaskysource) * npix
+            textcalc += "<br />### CALCULATIONS USING EXTRACTED PARAMETERS @$\lambda_{eff}$ ### <br />"
+            textcalc += "# Number of pixels in detector under consideration: <br />"
+            textcalc += "$n_{pix} = n_{pix,x} \\times n_{pix,y} = %s \\times %s = %s $ <br />" % (npixx, npixy, npix)
+            textcalc += "$n_{pix,sky} = \\frac{\Omega_{sky}}{\Omega_{sky,source}} n_{pix} = \\frac{%s}{%s} \\times %s = %s $ <br />" % (omegasky, omegaskysource, npix, npixsky)
 
             # Source continuum signal in defined spectral and spatial resolution element
-            signalcont = signal(fc, deltalambda, lambdaeff, effsys, stel,
-                                omegasource, exptimepframe_val, enph, lamb)
+            signalcont, signalcontverb = signal(fc, deltalambda, lambdaeff, effsys, stel, omegasource, exptimepframe_val, enph, lamb)
+            textcalc += "Source continuum signal $S$ is computed @$\lambda_{eff} = %s$ Angstroms. $S = %s$ <br />" % (lambdaeff, signalcont)
+            textcalc += signalcontverb
 
+            if om_val=='LCB':
+                signalcont_c, signalcont_cverb = signal(fcctr, deltalambda, lambdaeff, effsys, stel, omegasource, exptimepframe_val, enph, lamb)
+                signalcont_r1, signalcont_r1verb = signal(fcr1, deltalambda, lambdaeff, effsys, stel, omegasource, exptimepframe_val, enph, lamb)
+                signalcont_r2, signalcont_r2verb = signal(fcr2, deltalambda, lambdaeff, effsys, stel, omegasource, exptimepframe_val, enph, lamb)
+            else:
+                signalcont_c = 1
+                signalcont_r1 = 1
+                signalcont_r2 = 1
             # Sky signal in defined spectral and spatial resolution element
-            signalsky = signal(fs, deltalambda, lambdaeff, effsys, stel,
-                               omegaskysource, exptimepframe_val, enph, lamb)
+            signalsky, signalskyverb = signal(fs, deltalambda, lambdaeff, effsys, stel, omegaskysource, exptimepframe_val, enph, lamb)
+            textcalc += "Sky signal $S_{sky}$ is computed. $S_{sky} = %s$ <br />" % signalsky
+            textcalc += signalskyverb
 
             # Dark signal
-            signaldark = dark(exptimepframe_val, dc, npix)
+            signaldark, sdverbose = dark(exptimepframe_val, dc, npix)
+            textcalc += "Dark signal $S_{dark}$ is computed. $S_{dark} = %s$ <br />" % signaldark
+            textcalc += sdverbose
 
             # Noise due to dark measurement to the square
-            noisedarksq = darknoisesq(npix, npdark_val, exptimepframe_val, dc,
-                                      ron)
+            noisedarksq, noisedarksqverb = darknoisesq(npix, npdark_val, exptimepframe_val, dc, ron)
+            textcalc += "Noise due to dark measurement (dark noise) to the square $N_{DM}^{2}$ is computed. $N_{DM}^{2} = %s$ <br />" % noisedarksq
+            textcalc += noisedarksqverb
 
             # RON
-            ronoise = readoutnoise(npix, ron)
+            ronoise, ronoiseverb = readoutnoise(npix, ron)
+            textcalc += "Readout noise $RON$ is computed. $RON = %s$ <br />" % ronoise
+            textcalc += ronoiseverb
 
             # Noise due to sky substraction
             # Sky signal *MEASURED* in defined spectral and spatial resolution element
-            signalskymeasured = signal(fs, deltalambda, lambdaeff, effsys,
-                                       stel, omegasky, exptimepframe_val, enph,
-                                       lamb)
-            ronoiseskymeasured = readoutnoise(npixsky, ron)
-            signaldarkskymeasured = dark(exptime_val, dc, npixsky)
-            noisedarksqskymeasured = darknoisesq(npixsky, npdark_val,
-                                                 exptimepframe_val, dc, ron)
+            signalskymeasured, signalskymeasuredverb = signal(fs, deltalambda, lambdaeff, effsys, stel, omegasky, exptimepframe_val, enph, lamb)
+            ronoiseskymeasured, ronoiseskymeasuredverb = readoutnoise(npixsky, ron)
+            signaldarkskymeasured, sdsmverbose = dark(exptime_val, dc, npixsky)
+            noisedarksqskymeasured, noisedarksqskymeasuredverb = darknoisesq(npixsky, npdark_val, exptimepframe_val, dc, ron)
+            noiseskysq = (omegaskysource / omegasky) ** 2 * (signalskymeasured + ronoiseskymeasured + signaldarkskymeasured + noisedarksqskymeasured)
 
-            noiseskysq = (omegaskysource / omegasky) ** 2 * (
-            signalskymeasured + ronoiseskymeasured + signaldarkskymeasured + noisedarksqskymeasured)
+            textcalc += "Measured sky signal $S_{SM}$ is computed. $S_{SM} = %s$ <br />" % signalskymeasured
+            textcalc += signalskymeasuredverb
+            textcalc += "Readout noise of measured sky signal $RON_{SM}$ is computed. $RON_{SM} = %s$ <br />" % ronoiseskymeasured
+            textcalc += ronoiseskymeasuredverb
+            textcalc += "Measured sky dark signal $S_{SM_{dark}}$ is computed. $S_{SM_{dark}} = %s$ <br />" % signaldarkskymeasured
+            textcalc += sdsmverbose
+            textcalc += "Noise due to measured sky dark signal (dark noise) to the square $N_{SM,DM}^{2}$ is computed. $N_{SM,DM}^{2} = %s$ <br />" % noisedarksqskymeasured
+            textcalc += noisedarksqskymeasuredverb
+            textcalc += "Overall measured sky noise squared $N_{SM}^{2} = \left(\\frac{\Omega_{sky,source}}{\Omega_{sky}}\\right)^{2} \\times (S_{SM} + RON_{SM} + S_{SM_{dark}} + N_{SM,DM}^{2}) = \
+             \left(\\frac{%s}{%s}\\right)^{2} \\times (%s + %s + %s + %s) = %s $ <br />" % (omegaskysource, omegasky, signalskymeasured, ronoiseskymeasured, signaldarkskymeasured, noisedarksqskymeasured, noiseskysq)
 
             # Source continuum noise in defined spectral and spatial resolution element
-            noisecont = math.sqrt(
-                signalcont + signalsky + signaldark + ronoise + noisedarksq + noiseskysq)
+            noisecont = math.sqrt(signalcont + signalsky + signaldark + ronoise + noisedarksq + noiseskysq)
+            textcalc += "Source continuum noise $N$ is computed @$\lambda_{eff} = %s$ Angstroms. <br />" % lambdaeff
+            textcalc += "$ N = \sqrt{S + S_{sky} + S_{dark} + RON + N_{DM}^{2} + N_{SM}^{2}} = \sqrt{%s + %s + %s + %s + %s + %s} = %s $ <br />" % (signalcont, signalsky, signaldark, ronoise, noisedarksq, noiseskysq, noisecont)
+            if om_val=='LCB':
+                noisecont_c = math.sqrt(signalcont_c + signalsky + signaldark + ronoise + noisedarksq + noiseskysq)
+                noisecont_r1 = math.sqrt(signalcont_r1 + signalsky + signaldark + ronoise + noisedarksq + noiseskysq)
+                noisecont_r2 = math.sqrt(signalcont_r2 + signalsky + signaldark + ronoise + noisedarksq + noiseskysq)
+            else:
+                noisecont_c = 1
+                noisecont_r1 = 1
+                noisecont_r2 = 1
 
             # Signal-to-noise of continuum
             sncont = signalcont / noisecont
-            # TEST TEST TEST
+
+            if om_val == 'LCB':
+                sncont_c = signalcont_c / noisecont_c
+                sncont_r1 = signalcont_r1 / noisecont_r1
+                sncont_r2 = signalcont_r2 / noisecont_r2
+            else:
+                sncont_c = 99999
+                sncont_r1 = 99999
+                sncont_r2 = 99999
+
+            textcalc += "<b>"
+            textcalc += "### XIT=%s RESULTS <br />" % xit
+            textcalc += "### SNR of continuum @$\lambda_{eff} = %s$ Angstroms ### <br />" % lambdaeff
+            textcalc += "### SNR of continuum = $\\frac{S}{N} = \\frac{%s}{%s} = %s $ <br />" % (signalcont, noisecont, sncont)
+
 
             if xit == 0:  # P2SP (per 2 spectral pixels), All area
                 sncont_p2sp_all = sncont
                 tsncont_p2sp_all = sncont * numpy.sqrt(numframe_val)
+                textcalc += "SNR per 2 spectral pixels, All area <br />"
+                textcalc += "per frame = %s <br />" % sncont_p2sp_all
+                textcalc += "all frames = %s <br />" % tsncont_p2sp_all
             elif xit == 1:  # 1AA, All area
                 sncont_1aa_all = sncont
                 tsncont_1aa_all = sncont * numpy.sqrt(numframe_val)
+                textcalc += "SNR per AA, All area <br />"
+                textcalc += "per frame = %s <br />" % sncont_1aa_all
+                textcalc += "all frame = %s <br />" % tsncont_1aa_all
             elif xit == 2:  # Bandwidth, All area
                 sncont_band_all = sncont
                 tsncont_band_all = sncont * numpy.sqrt(numframe_val)
+                textcalc += "SNR per bandwidth, All area <br />"
+                textcalc += "per frame = %s <br />" % sncont_band_all
+                textcalc += "all frame = %s <br />" % tsncont_band_all
             elif xit == 3:  # P2SP, seeing
                 sncont_p2sp_seeing = sncont
                 tsncont_p2sp_seeing = sncont * numpy.sqrt(numframe_val)
+                textcalc += "SNR per 2 spectral pixels, seeing area <br />"
+                textcalc += "per frame = %s <br />" % sncont_p2sp_seeing
+                textcalc += "all frame = %s <br />" % tsncont_p2sp_seeing
             elif xit == 4:  # 1AA, seeing
                 sncont_1aa_seeing = sncont
                 tsncont_1aa_seeing = sncont * numpy.sqrt(numframe_val)
+                textcalc += "SNR per AA, seeing area <br />"
+                textcalc += "per frame = %s <br />" % sncont_1aa_seeing
+                textcalc += "all frame = %s <br />" % tsncont_1aa_seeing
             elif xit == 5:  # Bandwidth, seeing
                 sncont_band_seeing = sncont
                 tsncont_band_seeing = sncont * numpy.sqrt(numframe_val)
+                textcalc += "SNR per bandwidth, seeing area <br />"
+                textcalc += "per frame = %s <br />" % sncont_band_seeing
+                textcalc += "all frame = %s <br />" % tsncont_band_seeing
             elif xit == 6:  # P2SP, 1 arcsec2
                 sncont_p2sp_1 = sncont
                 tsncont_p2sp_1 = sncont * numpy.sqrt(numframe_val)
                 nfib1def = nfib1
+                textcalc += "SNR per 2 spectral pixels, per $\\textrm{arcsec}^{2}$ <br />"
+                textcalc += "per frame = %s <br />" % sncont_p2sp_1
+                textcalc += "all frame = %s <br />" % tsncont_p2sp_1
+                textcalc += "nfib1def = %s <br />" % nfib1def
             elif xit == 7:  # 1AA, 1 arcsec2
                 sncont_1aa_1 = sncont
                 tsncont_1aa_1 = sncont * numpy.sqrt(numframe_val)
-                print 'xit=7 :', sncont
+                textcalc += "SNR per AA, per $\\textrm{arcsec}^{2}$ <br />"
+                textcalc += "per frame = %s <br />" % sncont_1aa_1
+                textcalc += "all frame = %s <br />" % tsncont_1aa_1
             elif xit == 8:  # Bandwidth, 1 arcsec2
                 sncont_band_1 = sncont
                 tsncont_band_1 = sncont * numpy.sqrt(numframe_val)
-                print 'xit=8 :', sncont
+                textcalc += "SNR per bandwidth, per $\\textrm{arcsec}^{2}$ <br />"
+                textcalc += "per frame = %s <br />" % sncont_band_1
+                textcalc += "all frame = %s <br />" % tsncont_band_1
             elif xit == 9:  # P2SP, 1 fibre
                 sncont_p2sp_fibre = sncont
                 tsncont_p2sp_fibre = sncont * numpy.sqrt(numframe_val)
-                print 'xit=9 :', sncont_p2sp_fibre
+                textcalc += "SNR per 2 spectral pixels, per fiber <br />"
+                textcalc += "per frame = %s <br />" % sncont_p2sp_fibre
+                textcalc += "all frame = %s <br />" % tsncont_p2sp_fibre
                 # PSP (per spectral pixel), per spatial pixel
                 sncont_psp_pspp = sncont / 4  # numpy.sqrt(16.)
                 tsncont_psp_pspp = sncont * numpy.sqrt(numframe_val) / 4
+                textcalc += "SNR per spectral pixel, per spatial pixel (i.e. per detector pixel) <br />"
+                textcalc += "per frame = sncont / 4 = %s <br />" % sncont_psp_pspp
+                textcalc += "all frame = sncont * sqrt(numframe) / 4 = %s <br />" % tsncont_psp_pspp
                 # PSP (per spectral pixel), all spatial pixel
                 sncont_psp_asp = sncont_psp_pspp * 2
                 tsncont_psp_asp = tsncont_psp_pspp * 2
             elif xit == 10:  # 1AA, 1 fibre
                 sncont_1aa_fibre = sncont
                 tsncont_1aa_fibre = sncont * numpy.sqrt(numframe_val)
-                print 'xit=10 :', sncont_1aa_fibre
+                textcalc += "SNR per AA, per fiber <br />"
+                textcalc += "per frame = %s <br />" % sncont_1aa_fibre
+                textcalc += "all frame = %s <br />" % tsncont_1aa_fibre
             elif xit == 11:  # Bandwidth, 1 fibre
                 sncont_band_fibre = sncont
                 tsncont_band_fibre = sncont * numpy.sqrt(numframe_val)
+                textcalc += "SNR per bandwidth, per fiber <br />"
+                textcalc += "per frame = %s <br />" % sncont_band_fibre
+                textcalc += "all frame = %s <br />" % tsncont_band_fibre
+
+            elif xit == 12:  # Center r1 r2 spaxels per voxel
+                print 'xit==12'
+                if om_val=='LCB':
+                    sncont_c_voxel = sncont_c
+                    sncont_r1_voxel = sncont_r1
+                    sncont_r2_voxel = sncont_r2
+                    sncont_cr1_voxel = math.sqrt(sncont_c_voxel**2 + 6*(sncont_r1_voxel)**2)
+                    sncont_cr1r2_voxel = math.sqrt(sncont_c_voxel**2 + 6*(sncont_r1_voxel)**2 + 12*(sncont_r2_voxel)**2)
+                    #
+                    tsncont_c_voxel = sncont_c_voxel * math.sqrt(numframe_val)
+                    tsncont_cr1_voxel = sncont_cr1_voxel * math.sqrt(numframe_val)
+                    tsncont_cr1r2_voxel = sncont_cr1r2_voxel * math.sqrt(numframe_val)
+                    #
+                    textcalc += "SNR in central spaxel per frame = %s <br />" % sncont_c_voxel
+                    textcalc += "SNR in C+R1 spaxels per frame = %s <br />" % sncont_cr1_voxel
+                    textcalc += "SNR in C+R1+R2 spaxels per frame = %s <br />" % sncont_cr1r2_voxel
+
+                else:
+                    sncont_c_voxel = 99999
+                    sncont_r1_voxel = 99999
+                    sncont_r2_voxel = 99999
+                    sncont_cr1_voxel = 99999
+                    sncont_cr1r2_voxel = 99999
+                    #
+                    tsncont_c_voxel = 99999
+                    tsncont_cr1_voxel = 99999
+                    tsncont_cr1r2_voxel = 99999
+            elif xit == 13: # C R1 and R2 spaxels SNR per AA
+                print 'xit==13'
+                if om_val=='LCB':
+                    sncont_c_aa = sncont_c
+                    sncont_r1_aa = sncont_r1
+                    sncont_r2_aa = sncont_r2
+                    sncont_cr1_aa = math.sqrt(sncont_c_aa**2 + 6*(sncont_r1_aa)**2)
+                    sncont_cr1r2_aa = math.sqrt(sncont_c_aa**2 + 6*(sncont_r1_aa)**2 + 12*(sncont_r2_aa)**2)
+
+                    tsncont_c_aa = sncont_c_aa * math.sqrt(numframe_val)
+                    tsncont_cr1_aa = sncont_cr1_aa * math.sqrt(numframe_val)
+                    tsncont_cr1r2_aa = sncont_cr1r2_aa * math.sqrt(numframe_val)
+                else:
+                    sncont_c_aa = 99999
+                    sncont_r1_aa = 99999
+                    sncont_r2_aa = 99999
+                    sncont_cr1_aa = 99999
+                    sncont_cr1r2_aa = 99999
+                    #
+                    tsncont_c_aa = 99999
+                    tsncont_cr1_aa = 99999
+                    tsncont_cr1r2_aa = 99999
+            elif xit == 14: # C R1 and R2 spaxels SNR TOTAL
+                print 'xit==14'
+                if om_val=='LCB':
+                    sncont_c_all = sncont_c
+                    sncont_r1_all = sncont_r1
+                    sncont_r2_all = sncont_r2
+                    sncont_cr1_all = math.sqrt(sncont_c_all**2 + 6*(sncont_r1_all)**2)
+                    sncont_cr1r2_all = math.sqrt(sncont_c_all**2 + 6*(sncont_r1_all)**2 + 12*(sncont_r2_all)**2)
+
+                    tsncont_c_all = sncont_c_all * math.sqrt(numframe_val)
+                    tsncont_cr1_all = sncont_cr1_all * math.sqrt(numframe_val)
+                    tsncont_cr1r2_all = sncont_cr1r2_all * math.sqrt(numframe_val)
+                else:
+                    sncont_c_all = 99999
+                    sncont_r1_all = 99999
+                    sncont_r2_all = 99999
+                    sncont_cr1_all = 99999
+                    sncont_cr1r2_all = 99999
+                    #
+                    tsncont_c_all = 99999
+                    tsncont_cr1_all = 99999
+                    tsncont_cr1r2_all = 99999
+
+            textcalc += "#########################################<br /><br />"
+            textcalc += "</b>"
+
         # End of FOR loop for computations of SNR per frame.
         pass
 
@@ -1096,10 +1465,11 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
         # we need to recompute the SNR as above but just for the case of SNR per detector pixel
         # and replacing in the function signal(), lambdaeff by lamb.
         # Then, for exptime per frame:
+        textcalc += "<br />### Compute SNR per detector pixel @ all $\lambda$ (used for plot) ### <br />"
         items = [9, 0]
         for xit in items:
             # Deriving spectroscopic parameters for each case:
-            deltalambda, omegasource, npixx, npixy, nfib, nfib1, omegaskysource = specpar(
+            deltalambda, omegasource, npixx, npixy, nfib, nfib1, omegaskysource, specparstring = specpar(
                 om_val, xit, disp, ps,
                 nfibres, nfibresy, areafibre, rfibre, deltab, areasource,
                 diamsource, areaseeing, seeingx)
@@ -1110,30 +1480,30 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
             npixsky = (omegasky / omegaskysource) * npix
 
             # Source continuum signal in defined spectral and spatial resolution element
-            signalcont = signal(fc, deltalambda, lamb, effsys, stel,
+            signalcont, _ = signal(fc, deltalambda, lamb, effsys, stel,
                                 omegasource, exptimepframe_val, enph, lamb)
 
             # Sky signal in defined spectral and spatial resolution element
-            signalsky = signal(fs, deltalambda, lamb, effsys, stel,
+            signalsky, _ = signal(fs, deltalambda, lamb, effsys, stel,
                                omegaskysource, exptimepframe_val, enph, lamb)
 
             # Dark signal
-            signaldark = dark(exptime_val, dc, npix)
+            signaldark, sdverb = dark(exptime_val, dc, npix)
 
             # Noise due to dark measurement to the square
-            noisedarksq = darknoisesq(npix, npdark_val, exptimepframe_val, dc,
+            noisedarksq, noisedarksqverb = darknoisesq(npix, npdark_val, exptimepframe_val, dc,
                                       ron)
 
             # RON
-            ronoise = readoutnoise(npix, ron)
+            ronoise, ronoiseverb = readoutnoise(npix, ron)
 
             # Noise due to sky substraction
             # Sky signal *MEASURED* in defined spectral and spatial resolution element
-            signalskymeasured = signal(fs, deltalambda, lamb, effsys, stel,
+            signalskymeasured, _ = signal(fs, deltalambda, lamb, effsys, stel,
                                        omegasky, exptimepframe_val, enph, lamb)
-            ronoiseskymeasured = readoutnoise(npixsky, ron)
-            signaldarkskymeasured = dark(exptimepframe_val, dc, npixsky)
-            noisedarksqskymeasured = darknoisesq(npixsky, npdark_val,
+            ronoiseskymeasured, ronoiseskymeasuredverb = readoutnoise(npixsky, ron)
+            signaldarkskymeasured, sdsmverb = dark(exptimepframe_val, dc, npixsky)
+            noisedarksqskymeasured, noisedarksqskymeasuredverb = darknoisesq(npixsky, npdark_val,
                                                  exptimepframe_val, dc, ron)
 
             noiseskysq = (omegaskysource / omegasky) ** 2 * (
@@ -1160,17 +1530,18 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                     tsncont_val = sncont_val * numpy.sqrt(
                         numframe_val)  # total SNR per detector pixel
                     allframesn_psp_asp.append(tsncont_val)
-            elif xit == 0:
+            elif xit == 0:  # dummy
                 # Source continuum noise in defined spectral and spatial resolution element
                 noisecont_psp_asp_all = []
                 pframesn_psp_asp_all = []  # SNR per frame per spectral pixel all source area
                 allframesn_psp_asp_all = []  # SNR total per spectral pixel all source area
                 for idxno, valno in enumerate(signalcont):
-                    noisecont_val = math.sqrt(signalcont[idxno] + signalsky[
-                        idxno] + signaldark + ronoise + noisedarksq +
-                                              noiseskysq[idxno])
+                    noisecont_val = math.sqrt(signalcont[idxno] +
+                                              signalsky[idxno] +
+                                              signaldark + ronoise +
+                                              noisedarksq + noiseskysq[idxno])
                     noisecont_psp_asp_all.append(noisecont_val)
-                    # Signal-to-noise of continuum
+                    # Signal-to-noise ratio of continuum
                     sncont_val = signalcont[idxno] / (
                     noisecont_val * 2)  # SNR per detector pixel
                     pframesn_psp_asp_all.append(sncont_val)
@@ -1205,9 +1576,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
 
                 # Line signal in defined spatial resolution element: only in the line
                 # Line flux is given already integrated (not per AA)--> bandwidth deltalambda = 1 AA
-                signalline = linesignal(flineparc, 1.0, effsys, stel,
-                                        omegasource, exptime_val, wline_val,
-                                        lamb)
+                signalline = linesignal(flineparc, 1.0, effsys, stel, omegasource, exptime_val, wline_val, lamb)
 
                 # Continuum signal in defined spatial resolution element, in deltalambda.
                 # (If no. of line FWHMs selected is deltalambda to derive the line signal).
@@ -1225,14 +1594,14 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                 npixcont = (cnfwhmline_val / nfwhmline_val) * npix
 
                 # Signal of dark current
-                signaldark_line = dark(exptime_val, dc, npix)
+                signaldark_line, sdlverb = dark(exptime_val, dc, npix)
 
                 # Noise due to dark measurement to the square
-                noisedarksq_line = darknoisesq(npix, npdark_val, exptime_val,
+                noisedarksq_line, noisedarksq_lineverb = darknoisesq(npix, npdark_val, exptime_val,
                                                dc, ron)
 
                 # RON
-                ronoiseline = readoutnoise(npix, ron)
+                ronoiseline, ronoiselineverb = readoutnoise(npix, ron)
 
                 # Noise due to continuum substraction
                 # Continuum signal *MEASURED* in spatial resolution element, in cnfwhmline_val
@@ -1240,9 +1609,9 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                                                 effsys, stel,
                                                 omegasource, exptime_val,
                                                 wline_val, lamb)
-                ronoisecontmeasured = readoutnoise(npixcont, ron)
-                signaldarkcontmeasured = dark(exptime_val, dc, npixcont)
-                noisedarksqcontmeasured = darknoisesq(npixcont, npdark_val,
+                ronoisecontmeasured, ronoisecontmeasuredverb = readoutnoise(npixcont, ron)
+                signaldarkcontmeasured, sdcmverb = dark(exptime_val, dc, npixcont)
+                noisedarksqcontmeasured, noisedarksqcontmeasuredverb = darknoisesq(npixcont, npdark_val,
                                                       exptime_val, dc, ron)
 
                 noisecontsq = (nfwhmline_val / cnfwhmline_val) ** 2 * (
@@ -1276,10 +1645,10 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                                                           wline_val, lamb)
 
                     # Common computations, independent on if FWHM > 1AA or not.
-                    signaldark_lineperAA = dark(exptime_val, dc, npixinAA)
-                    noisedarksq_lineperAA = darknoisesq(npixinAA, npdark_val,
+                    signaldark_lineperAA, sdlpaaverb = dark(exptime_val, dc, npixinAA)
+                    noisedarksq_lineperAA, noisedarksq_lineperAAverb = darknoisesq(npixinAA, npdark_val,
                                                         exptime_val, dc, ron)
-                    ronoiselineperAA = readoutnoise(npixinAA, ron)
+                    ronoiselineperAA, ronoiselineperAAverb = readoutnoise(npixinAA, ron)
 
                     # Noise in continuum measurement is the same as before, but the scaling is
                     # different according to the different number of pixels in 1 AA.
@@ -1307,11 +1676,11 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                     signallinespaxel = signalline / ratio
                     signalcont_linespaxel = signalcont_line / ratio
 
-                    signaldark_linespaxel = dark(exptime_val, dc, npixspaxel)
-                    noisedarksq_linespaxel = darknoisesq(npixspaxel,
+                    signaldark_linespaxel, sdlspaxverb = dark(exptime_val, dc, npixspaxel)
+                    noisedarksq_linespaxel, noisedarksq_linespaxelverb = darknoisesq(npixspaxel,
                                                          npdark_val,
                                                          exptime_val, dc, ron)
-                    ronoiselinespaxel = readoutnoise(npixspaxel, ron)
+                    ronoiselinespaxel, ronoiselinespaxelverb = readoutnoise(npixspaxel, ron)
 
                     # Noise in continuum measurement is the same as before, but the scaling is
                     # different according to the different number of pixels in 4 pixels.
@@ -1335,10 +1704,10 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                     signalline1pix = signalline / ratio
                     signalcont_line1pix = signalcont_line / ratio
 
-                    signaldark_line1pix = dark(exptime_val, dc, npix1pix)
-                    noisedarksq_line1pix = darknoisesq(npix1pix, npdark_val,
+                    signaldark_line1pix, sdl1pverbose = dark(exptime_val, dc, npix1pix)
+                    noisedarksq_line1pix, noisedarksq_line1pixverb = darknoisesq(npix1pix, npdark_val,
                                                        exptime_val, dc, ron)
-                    ronoiseline1pix = readoutnoise(npix1pix, ron)
+                    ronoiseline1pix, ronoiseline1pixverb = readoutnoise(npix1pix, ron)
 
                     # Noise in continuum measurement is the same as before, but the scaling is
                     # different according to the different number of pixels 1 pix.
@@ -1452,6 +1821,10 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                                         snline_seeing, snline_1, \
                                         snline_spaxel, snline_fibre1aa)
 
+        # Output of math using function textcalcout in mathtext.py
+        # textcalc = textcalcout(sourcet_val, inputcontt_val)
+        # print textcalc
+
         if errind == 0:  # ADDED FOR DJANGO
             # outtext="No Warnings."     # ADDED FOR DJANGO
             outtext = ""
@@ -1464,11 +1837,25 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
             print >> f, textoc
             print >> f, textol
 
+        outputfilename2 = "etc/static/etc/outputcalc2.html"
+        with open(outputfilename2, 'w') as f:
+            print >> f, '<script type="text/x-mathjax-config">MathJax.Hub.Config({' \
+                        'tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]},' \
+                        'jax: ["input/TeX","output/HTML-CSS"],' \
+                        'displayAlign: "left"});</script>'
+            print >> f, '<script type="text/javascript" async ' \
+                        'src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>'
+            print >> f, textcalc
+
+        # print 'globals=', globals()
+        # print 'locals=', locals()
+
         # FOR DJANGO: Finally, return these outputs.
         # Order: input values, Output Cont., Output Line.
         #
         return {'outtext': outtext, 'texti': texti, \
                 'textoc': textoc, 'textol': textol, \
+                'textcalc': textcalc,\
                 'om_val': om_val, 'bandc_val': bandc_val, \
                 'sourcet_val': sourcet_val, \
                 'mag_val': mag_val, 'netflux': netflux, \
@@ -1536,11 +1923,33 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                 'tsnline_spaxel': tsnline_spaxel, \
                 'snline_fibre1aa': snline_fibre1aa,
                 'tsnline_fibre1aa': tsnline_fibre1aa, \
+\
                 'seeing_centermean': seeing_centermean,
                 'seeing_ring1mean': seeing_ring1mean, \
-                'seeing_ring2mean': seeing_ring2mean,
-                'seeing_total': seeing_total
-                }  # ADDED FOR DJANGO
+                'seeing_ring2mean': seeing_ring2mean, \
+                'seeing_total': seeing_total, \
+\
+                'sncont_centerspaxel_voxel': sncont_c_voxel, \
+                'sncont_cr1spaxels_voxel': sncont_cr1_voxel, \
+                'sncont_cr1r2spaxels_voxel': sncont_cr1r2_voxel, \
+                'tsncont_centerspaxel_voxel': tsncont_c_voxel, \
+                'tsncont_cr1spaxels_voxel': tsncont_cr1_voxel, \
+                'tsncont_cr1r2spaxels_voxel': tsncont_cr1r2_voxel, \
+\
+                'sncont_centerspaxel_aa': sncont_c_aa, \
+                'sncont_cr1spaxels_aa': sncont_cr1_aa, \
+                'sncont_cr1r2spaxels_aa': sncont_cr1r2_aa, \
+                'tsncont_centerspaxel_aa': tsncont_c_aa, \
+                'tsncont_cr1spaxels_aa': tsncont_cr1_aa, \
+                'tsncont_cr1r2spaxels_aa': tsncont_cr1r2_aa, \
+\
+                'sncont_centerspaxel_all': sncont_c_all, \
+                'sncont_cr1spaxels_all': sncont_cr1_all, \
+                'sncont_cr1r2spaxels_all': sncont_cr1r2_all, \
+                'tsncont_centerspaxel_all': tsncont_c_all, \
+                'tsncont_cr1spaxels_all': tsncont_cr1_all, \
+                'tsncont_cr1r2spaxels_all': tsncont_cr1r2_all \
+                }  # ADDED FOR DJANGO (for views.py)
     # Avoiding computations in case of exception of errind
     else:
         spectdat = specttmplt_list[spect_list.index(spect_val)]
@@ -1549,10 +1958,11 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
         texti = " "  # ADDED FOR DJANGO
         textoc = " "  # ADDED FOR DJANGO
         textol = " "  # ADDED FOR DJANGO
+        textcalc = " "
         outtext = "** MEGARA ETC HELP " + outtext  # ADDED FOR DJANGO
         # return "\n** MEGARA ETC HELP **\n",outtext        # COMMENTED OUT FOR DJANGO
         return {'outtext': outtext, 'texti': texti, 'textoc': textoc,
-                'textol': textol, \
+                'textol': textol, 'textcalc': textcalc,\
                 'sourcespectrum': sourcespectrum,
                 'lamb': lamb}  # ADDED FOR DJANGO
         pass

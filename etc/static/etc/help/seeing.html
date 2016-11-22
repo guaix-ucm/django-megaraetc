@@ -1,0 +1,31 @@
+<script type="text/javascript" async
+                src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+<H2>** Seeing (arcsec) **</H2>
+<p>FWHM of the seeing in arcsec.
+The seeing is assumed to be provided at the given airmass. No correction for airmass is performed.
+</p>
+<p>We have performed Monte Carlo simulations of the PSF to see how much light falls onto
+the central spaxel, then onto the first spaxel ring (6 spaxels) around it, and finally onto the second spaxel ring (12 spaxels).
+To do so, we have used FiberSpecSim (available at <a href="http://t-rex.fis.ucm.es/fiberspecsim/wform.html" target="_blank">http://t-rex.fis.ucm.es/fiberspecsim/wform.html</a>)(Author: Belén Alcalde Pampliega).
+We used the following input parameters:
+The spectrograph: GTC [MEGARA] (in Firefox, choosing this autofills the form to some extent)
+<ul><li>Seeing FWHM [arcsec]: 0.5" to 2.0"</li>
+<li>Airmass: 1.0</li>
+<li>Initial lambda [nm]: 350</li>
+<li>Final lambda [nm]: 450</li>
+<li>Fiber-core size [µm]: 100</li>
+<li>Rings/[rows/cols]: 2</li>
+<li>Spaxel size [arcsec]: 0.62</li>
+<li>Spaxel shape: Hexagonal</li>
+<li>Number of Monte Carlo particles: 1000</li>
+<li>Speed factor: 1000</li></ul></p>
+
+<p>Since FiberSpecSim does not allow very large number of particles,
+we made 20 simulations each with a 1000 particles for each of the seeing value.
+Averaging the results, we get the mean, the standard deviation, and the standard deviation of the mean
+of the percentage of the enclosed light within each region (central, ring1, ring2) for each seeing.
+In any case, the standard deviation of the mean is less than 0.5%.
+Hence, we use the mean (of the 20 trials) as fixed values.</p>
+

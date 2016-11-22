@@ -56,4 +56,4 @@ class SeeingTemplate(models.Model):
         db_table = 'etc_seeingtemplate'
 
     def __str__(self):
-        return  self.name
+        return  str(self.name)

@@ -117,10 +117,12 @@ class AtmosphericConditionsForm(forms.Form):
     hintbotton = "<a class=\"\" href=\"Javascript:newPopupBig('/static/etc/help/%s.pdf');\" type=\"link\"><span class=\"glyphicon glyphicon-question-sign\"></span></a>"
     seeing_hint = hintbotton % "seeing_values.xlsx"
     botton = "<a class=\"splinkcol\" href=\"Javascript:newPopupBig('/static/etc/help/%s.txt');\" >"
+    bottonht = "<a class=\"splinkcol\" href=\"Javascript:newPopupBig('/static/etc/help/%s.html');\" >"
     skycond_help = botton % "skycond" + "Sky condition</a>"
     moonph_help = botton % "moonph" + "Moon phase</a>"
     airmass_help = botton % "airmass" + "Airmass</a>"
-    seeing_help = botton % "seeing" + "Seeing (arcsec)</a>"
+    # seeing_help = botton % "seeing" + "Seeing (arcsec)</a>"
+    seeing_help = bottonht % "seeing" + "Seeing (arcsec)</a>"
 
     skycond = forms.ChoiceField(label=mark_safe(skycond_help), initial="Photometric", choices=SKYCOND)
     moonph = forms.ChoiceField(label=mark_safe(moonph_help), initial="Dark", choices=MOONPH)

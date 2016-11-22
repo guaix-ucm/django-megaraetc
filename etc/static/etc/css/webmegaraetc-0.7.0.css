@@ -53,18 +53,18 @@ div#rightdiv{
     margin-left: 1%;
 }
 
-div#submitbuttonsdiv{
+div#submitbuttonsdiv {
     float: left;
     width: 100%;
     text-align: center;
 }
 
-label.control-label{
+label.control-label {
     width: 48%;
     float: left;
 }
 
-.form-control{
+.form-control {
   float: left;
     width: 40% !important;
     margin-bottom: 10px;
@@ -74,49 +74,72 @@ label.control-label{
     width: 90px;
 }
 
-#result3{
+#theoutput {
+    width: 100%;
+    float: left;
+    min-height: 1800px;     /* size of page */
+}
+
+#outbuttons {
     text-align: center;
 }
 
-#store_result{
+#store_result {
     visibility: hidden;
 }
 
-#result2{
-    width:35%;
+/* MPLD3 */
+#resultgraphic {
+    min-width: 20px;
+    width: 50%;
     height: 100%;
-    float:left
+    float:left !important;
 }
 
-#result2 > p{
+#buffer {
+    width: 5%;
+    height: 100%;
+    float: left;
+}
+
+#buffer > p{
     line-height: normal;
     text-align: left;
     background-color: transparent;
 }
 
+/* TABLES */
 #result4 {
-    width: 35%;
+    width: 40%;
     height: 100%;
-    float: left;
+    float: right;
 }
 
-#theoutput {
+#resultmath {
     width: 100%;
     float: left;
-    min-height: 972px;
 }
 
-
-#result{
-    min-width: 640px;
-    width:60%;
-    height: 100%;
-    float:left !important;
+#mathid {
+    font-size: 15pt;
 }
 
+#resultnewpsf {
+    margin-top: 100px;
+    width: 50%;
+    float: left;
+}
 
+/*#resultmathtext {
+    width: 100%;
+    float: left;
+    display: none;
+}
 
-
+#expandbutton {
+    float: left;
+}
+*/
 
 .modal {
     display:    none;
@@ -127,7 +150,7 @@ label.control-label{
     height:     100%;
     width:      100%;
     background: rgba( 255, 255, 255, .8 )
-                url('http://i.stack.imgur.com/FhHRx.gif')
+                url('../../out25.gif')
                 50% 50%
                 no-repeat;
 }

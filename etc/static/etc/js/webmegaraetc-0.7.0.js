@@ -1,8 +1,9 @@
 $( document ).ready(function() {
     console.log( "ready!" );
 
-    $('html').animate({scrollTop:0}, 1);
-    $('body').animate({scrollTop:0}, 1);
+//    $('html').animate({scrollTop:0}, 1);
+//    $('body').animate({scrollTop:0}, 1);
+    $(window).load(function(){ $("html,body").animate({scrollTop: 0}, 1); });
 
     $body = $("body");
     $(document).on({
@@ -25,18 +26,30 @@ $( document ).ready(function() {
                 console.log($(data))
                 $(data)[0]['graphic']
                 var content = $(data).find("#content");
-                $("#result").empty().append($(data)[0]['graphic']);
+                $("#resultgraphic").empty().append($(data)[0]['graphic']);
 //                $("#result2").empty().append($(data)[0]['outtext'] + $(data)[0]['textcout'] + $(data)[0]['textlout'] + $(data)[0]['textinput']);
                 $("#result4").empty().append($(data)[0]['outtext'] + $(data)[0]['tablecout'] + $(data)[0]['tablelout'] + $(data)[0]['tableinput']);
+
+                var newpsf = $(data)[0]['tablenewpsf'];
+                $("#resultnewpsf").empty().append(newpsf);
+
+                var mathtable = $(data)[0]['tablecalc'];
+                $("#resultmath").empty().append(mathtable);
+                var mathid = document.getElementById("mathid");
+                MathJax.Hub.Queue(["Typeset",MathJax.Hub, "mathid"]);
+
                 $("#store_result").css('visibility', 'visible');
                 //$('.btn-primary').css('color','#fff');
                 //$('.btn-primary').css('background-color','#337ab7');
                 //$('.btn-primary').css('border-color','#2e6da4');
+
             });
             $("input[type=submit]").css('visibility', 'hidden')
+
         }
     });
 });
+
 
 // pop-up window
 function newPopup(url) {
@@ -257,8 +270,8 @@ function selectorOmode() {
     }
     else if (document.getElementById('id_om_val').value=='MOS') {
         var nst = 'Number of Sky Bundles';
-        var nsdefval = 8;
-        var ntdefval = 84;
+        var nsdefval = 1;
+        var ntdefval = 91;
         var ntt = 'Number of Target Bundles';
     }
     document.getElementById('id_nst').innerHTML = nst;

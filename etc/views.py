@@ -188,7 +188,7 @@ def get_info(request):
         form3 = AtmosphericConditionsForm()
         form4 = ObservationalSetupForm()
 
-    return render(request, 'etc/webmegaraetc-0.6.0.html', {
+    return render(request, 'etc/webmegaraetc-0.7.0.html', {
         'form1': form1,
         'form2': form2,
         'form3': form3,
@@ -209,7 +209,7 @@ def etc_form(request):
                    'form4': form4,
                    }
 
-    return render(request, 'etc/webmegaraetc-0.6.0.html', total_formu)
+    return render(request, 'etc/webmegaraetc-0.7.0.html', total_formu)
 
 
 # LOADS THIS AFTER PRESSING "COMPUTE" webmegaraetc.html and
@@ -225,7 +225,7 @@ def etc_do(request):
         #
         # plt.plot([3,1,4,1,5], 'ks-', mec='w', mew=5, ms=20)
         # mpld3.save_html()
-        return HttpResponse("<html><body>It works!</body></html>")
+        return HttpResponse("<html><body>The GET method works!</body></html>")
 
     elif request.method == 'POST':
         print '### LOG: ETC_DO'
@@ -237,7 +237,18 @@ def etc_do(request):
         else:
             outtextstring = tocheck
 
-        # GET relevant data
+        ##############################################
+        ### TESTING AREA
+        ##############################################
+        inputstring = '<br /><p>' + str(outputofcalc['texti']) + '</p>'
+        coutputstring = '<br /><p>' + str(outputofcalc['textoc']) + '</p>'
+        loutputstring = '<br /><p>' + str(outputofcalc['textol']) + '</p>'
+        textcalcstring = '<br /><table border=1 id="mathtextid"><tr><td>' + str(outputofcalc['textcalc']) + '</td></tr></table>'
+
+        ######################
+        ### MPLD3 GRAPHICS ###
+        ######################
+        # Suck out relevant data from database
         vph = request.POST['vph']
         queryvph = VPHSetup.objects.filter(pk=vph).values()
         vph_val = queryvph[0]['name']
@@ -247,6 +258,7 @@ def etc_do(request):
         queryspec = SpectralTemplate.objects.filter(pk=spec).values()
         entry_spec_name = queryspec[0]['name']
 
+        # Check if computation outputs are conform
         if not tocheck:
             x = outputofcalc['lamb']
             y = outputofcalc['fc']
@@ -301,10 +313,7 @@ def etc_do(request):
         # newpath2 = '/static/etc/tmp/'
         # graphic2 = os.path.join(newpath2, basename2)
 
-        inputstring = '<br /><p>' + str(outputofcalc['texti']) + '</p>'
-        coutputstring = '<br /><p>' + str(outputofcalc['textoc']) + '</p>'
-        loutputstring = '<br /><p>' + str(outputofcalc['textol']) + '</p>'
-
+        # More things to check
         if not tocheck:
             x3 = outputofcalc['wline_val']
             y3 = outputofcalc['fwhmline_val']
@@ -320,6 +329,7 @@ def etc_do(request):
 
         # tooltip = mpld3.plugins.PointLabelTooltip(points)
         # plugins.connect(figura, tooltip)
+
         html = mpld3.fig_to_html(figura)
 
         figura2 = plot_and_save2_new('', x2, y2, x2b, y2b,
@@ -327,9 +337,13 @@ def etc_do(request):
                                      x3, y3, z3,
                                      vph_minval, vph_maxval,
                                      label2a, label2b, label2c)
+
         html += mpld3.fig_to_html(figura2)
 
         html = html.replace("None", "")  # No se xq introduce string None
+
+        import matplotlib.pyplot as plt
+        plt.clf()
 
         if not tocheck:
             om_val_string = str(outputofcalc['om_val'])
@@ -338,8 +352,13 @@ def etc_do(request):
             mag_val_string = str('%.2f' % outputofcalc['mag_val'])
             netflux_string = '%.3e' % outputofcalc['netflux']
             size_val_string = str('%.2f' % outputofcalc['size_val'])
+            radius_val_string = str('%.2f' % outputofcalc['radius_val'])
             seeingx_string = str(outputofcalc['seeingx'])
             fluxt_val_string = outputofcalc['fluxt_val']
+            if fluxt_val_string == "L":
+                fluxt_name_string = 'Line+Continuum'
+            else:
+                fluxt_name_string = 'Continuum'
             wline_val_string = str(outputofcalc['wline_val'])
             fline_val_string = str(outputofcalc['fline_val'])
             fwhmline_val_string = str(outputofcalc['fwhmline_val'])
@@ -471,17 +490,60 @@ def etc_do(request):
             seeing_ring2mean_string = str(seeing_ring2mean_val)
             seeing_total_val = outputofcalc['seeing_total']
             seeing_total_string = str(seeing_total_val)
+
+            seeing_cr1_val = seeing_centermean_val + seeing_ring1mean_val
+            seeing_cr1_string = "{0:.2f}".format(seeing_cr1_val)
+            seeing_cr1r2_val = seeing_centermean_val + seeing_ring1mean_val + seeing_ring2mean_val
+            seeing_cr1r2_string = "{0:.2f}".format(seeing_cr1r2_val)
+
             tsncont_centermean = "{0:.2f}".format((seeing_centermean_val/100) * tsncont_p2sp_all_val)
             tsncont_ring1mean = "{0:.2f}".format((seeing_ring1mean_val/100) * tsncont_p2sp_all_val)
             tsncont_ring2mean = "{0:.2f}".format((seeing_ring2mean_val/100) * tsncont_p2sp_all_val)
             tsncont_total = "{0:.2f}".format((seeing_total_val/100) * tsncont_p2sp_all_val)
 
-            tablecoutstring = 'testing: SNR in total source area (all frames) with PSF:<br />' + \
-                              'C: ' + tsncont_centermean + ' (' + seeing_centermean_string + '%),<br />' + \
-                              'R1: ' + tsncont_ring1mean + ' (' + seeing_ring1mean_string + '%),<br />' + \
-                              'R2: ' + tsncont_ring2mean + ' (' + seeing_ring2mean_string + '%),<br />' + \
-                              'C+R1+R2: ' + tsncont_total + ' (' + seeing_total_string + '%)<br /><br />' + \
-                              'OUTPUT CONTINUUM SNR:' + \
+            sncont_centerspaxel_voxel_val = outputofcalc['sncont_centerspaxel_voxel']
+            sncont_centerspaxel_voxel_string = "{0:.2f}".format(float(sncont_centerspaxel_voxel_val))
+            sncont_cr1spaxels_voxel_val = outputofcalc['sncont_cr1spaxels_voxel']
+            sncont_cr1spaxels_voxel_string = "{0:.2f}".format(float(sncont_cr1spaxels_voxel_val))
+            sncont_cr1r2spaxels_voxel_val = outputofcalc['sncont_cr1r2spaxels_voxel']
+            sncont_cr1r2spaxels_voxel_string = "{0:.2f}".format(float(sncont_cr1r2spaxels_voxel_val))
+            #
+            tsncont_centerspaxel_voxel_val = outputofcalc['tsncont_centerspaxel_voxel']
+            tsncont_centerspaxel_voxel_string = "{0:.2f}".format(float(tsncont_centerspaxel_voxel_val))
+            tsncont_cr1spaxels_voxel_val = outputofcalc['tsncont_cr1spaxels_voxel']
+            tsncont_cr1spaxels_voxel_string = "{0:.2f}".format(float(tsncont_cr1spaxels_voxel_val))
+            tsncont_cr1r2spaxels_voxel_val = outputofcalc['tsncont_cr1r2spaxels_voxel']
+            tsncont_cr1r2spaxels_voxel_string = "{0:.2f}".format(float(tsncont_cr1r2spaxels_voxel_val))
+            
+            sncont_centerspaxel_aa_val = outputofcalc['sncont_centerspaxel_aa']
+            sncont_centerspaxel_aa_string = "{0:.2f}".format(float(sncont_centerspaxel_aa_val))
+            sncont_cr1spaxels_aa_val = outputofcalc['sncont_cr1spaxels_aa']
+            sncont_cr1spaxels_aa_string = "{0:.2f}".format(float(sncont_cr1spaxels_aa_val))
+            sncont_cr1r2spaxels_aa_val = outputofcalc['sncont_cr1r2spaxels_aa']
+            sncont_cr1r2spaxels_aa_string = "{0:.2f}".format(float(sncont_cr1r2spaxels_aa_val))
+            #
+            tsncont_centerspaxel_aa_val = outputofcalc['tsncont_centerspaxel_aa']
+            tsncont_centerspaxel_aa_string = "{0:.2f}".format(float(tsncont_centerspaxel_aa_val))
+            tsncont_cr1spaxels_aa_val = outputofcalc['tsncont_cr1spaxels_aa']
+            tsncont_cr1spaxels_aa_string = "{0:.2f}".format(float(tsncont_cr1spaxels_aa_val))
+            tsncont_cr1r2spaxels_aa_val = outputofcalc['tsncont_cr1r2spaxels_aa']
+            tsncont_cr1r2spaxels_aa_string = "{0:.2f}".format(float(tsncont_cr1r2spaxels_aa_val))
+            
+            sncont_centerspaxel_all_val = outputofcalc['sncont_centerspaxel_all']
+            sncont_centerspaxel_all_string = "{0:.2f}".format(float(sncont_centerspaxel_all_val))
+            sncont_cr1spaxels_all_val = outputofcalc['sncont_cr1spaxels_all']
+            sncont_cr1spaxels_all_string = "{0:.2f}".format(float(sncont_cr1spaxels_all_val))
+            sncont_cr1r2spaxels_all_val = outputofcalc['sncont_cr1r2spaxels_all']
+            sncont_cr1r2spaxels_all_string = "{0:.2f}".format(float(sncont_cr1r2spaxels_all_val))
+            #
+            tsncont_centerspaxel_all_val = outputofcalc['tsncont_centerspaxel_all']
+            tsncont_centerspaxel_all_string = "{0:.2f}".format(float(tsncont_centerspaxel_all_val))
+            tsncont_cr1spaxels_all_val = outputofcalc['tsncont_cr1spaxels_all']
+            tsncont_cr1spaxels_all_string = "{0:.2f}".format(float(tsncont_cr1spaxels_all_val))
+            tsncont_cr1r2spaxels_all_val = outputofcalc['tsncont_cr1r2spaxels_all']
+            tsncont_cr1r2spaxels_all_string = "{0:.2f}".format(float(tsncont_cr1r2spaxels_all_val))
+
+            tablecoutstring = 'OUTPUT CONTINUUM SNR:' + \
                               '<br />(at lambda_c(VPH) = ' + lambdaeff_string + ' AA)' + \
                               '<table border=1>' + \
                               '<tr><th class="iconcolumn" scope="col"> </th><th scope="col" colspan="2">* SNR per fibre:</th><th scope="col"></th></tr>' + \
@@ -525,7 +587,6 @@ def etc_do(request):
                                   '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_perfibinap.jpeg" /></td><td class="perframecolumn"> ' + snline_fibre_string + '</td><td> ' + tsnline_fibre_string + '</td><td> per fiber in aperture</td></tr>' + \
                                   '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_totalinap.jpeg" /></td><td class="perframecolumn"> ' + snline_all_string + '</td><td>' + tsnline_all_string + '</td><td> total in aperture</td></tr>' + \
                                   '</table><br />'
-                # '<tr><td>OUTPUT LINE SNR:</td><td></td><td></td><td></td></tr>'+\
             else:
                 tableloutstring = 'No line input<br /><br />'
 
@@ -536,12 +597,18 @@ def etc_do(request):
 
             tableinputstring = '<table border=1>' + \
                                '<tr><td width=50%>INPUT PARAMETERS:</td><td></td></tr>' + \
+                               '<tr><td>Source type:</td><td>' + sourcet_val_string + '</td></tr>' + \
                                '<tr><td>Area:</td><td>' + size_val_string + ' arcsec^2</td></tr>' + \
                                '<tr><td>Observing mode:</td><td>' + om_val_string + '</td></tr>' + \
                                '<tr><td>VPH:</td><td>' + vph_val_string + '</td></tr>' + \
-                               '<tr><td>Source type:</td><td>' + sourcet_val_string + '</td></tr>' + \
+                               '<tr><td>Input flux:</td><td>' + fluxt_name_string + '</td></tr>' + \
+                               '<tr><td>Source spectrum:</td><td>' + spect_val_string + '</td></tr>' + \
                                '<tr><td>Continuum:</td><td>' + bandc_val_string + ' = ' + mag_val_string + 'mag</td></tr>' + \
                                '<tr><td>Continuum flux:</td><td>' + netflux_string + ' cgs</td></tr>' + \
+                               '<tr><td>Resolved line?:</td><td>' + resolvedline_val_string + '</td></tr>' + \
+                               '<tr><td>Line wavelength:</td><td>' + wline_val_string + '</td></tr>' + \
+                               '<tr><td>Line flux:</td><td>' + fline_val_string + '</td></tr>' + \
+                               '<tr><td>Line FWHM:</td><td>' + fwhmline_val_string + '</td></tr>' + \
                                '<tr><td>*Sky Condition:</td><td>' + skycond_val_string + '</td></tr>' + \
                                '<tr><td>Moon:</td><td>' + moon_val_string + '</td></tr>' + \
                                '<tr><td>Airmass: X=</td><td>' + airmass_val_string + '</td></tr>' + \
@@ -555,19 +622,88 @@ def etc_do(request):
                                '<tr><td>NP_Dark:</td><td>' + npdark_val_string + '</td></tr>' + \
                                '<tr><td>'+switchstring+'</td><td>' + nsbundles_val_string + '</td></tr>' + \
                                '</table><br />'
+
+            tablecalcstring = '<br /><br />' + \
+                              '<p id="mathid">Details of calculations (TEST):<br />' + \
+                              '$$\\textrm{Radius of source, } R_{source} = ' + radius_val_string + '\\textrm{ arcsec}$$' + \
+                              '$$\\textrm{Area of source, } \Omega_{source} = \pi \\times ' + radius_val_string + '^{2} = ' + size_val_string + '\\textrm{ arcsec}^{2}$$' + \
+                              '$$\\textrm{Radius of one fiber, } R_{fiber} = 0.31 \\textrm{ arcsec}$$'+ \
+                              '$$\\textrm{Area of one fiber, } \Omega_{fiber} =  3\sqrt{3} \left( \\frac{R_{fiber}^{2}}{2} \\right)$$' + \
+                              '$$\\textrm{Number of fibers used to measure sky} = \\frac{\Omega_{source}}{\Omega_{fiber}} = ' + nfibres_string + '$$' + \
+                              '$$\\textrm{Area in which sky has been measured, } \Omega_{sky} = ' + nfibres_string + '\\times \Omega_{fiber}$$' + \
+                              '</p>' + \
+                              '<br /><br />'
+            print om_val_string
+            if om_val_string == 'MOS':
+                tablenewpsfstring = ''
+            else:
+                tablenewpsfstring = 'SNR with new PSF' + \
+                                    '<table border=1>' + \
+                                    '<tr><th class="iconcolumn" scope="col"> </th>' + \
+                                        '<th scope="col" colspan="6">* SNR per spaxel zones due to PSF (only in LCB mode):<br />D_{fiber}=0.62 arcsec; Seeing FWHM = ' + seeingx_string + ' arcsec</th>' + \
+                                        '<th scope="col"></th> ' + \
+                                        '</tr>' + \
+                                    '<tr><th class="iconcolumn" scope="row"></th>' + \
+                                        '<th scope="col" colspan="3" class="perframecolumn">** per frame</th>' + \
+                                        '<th scope="col" colspan="3" class="allframecolumn">** all frames</th>' + \
+                                        '<td></td>' + \
+                                        '</tr>' + \
+                                    '<tr><th class="iconcolumn" scope="row"><img class="iconsize" src="/static/etc/images/icon_psfrings.jpeg" /></th>' + \
+                                        '<td class="colc">C<br />(' + seeing_centermean_string +'%)<br />1 fiber</td>' + \
+                                        '<td class="colcr1">C+R1<br />(' + seeing_cr1_string + '%)<br />7 fibers</td>' + \
+                                        '<td class="colcr1r2">C+R1+R2<br />(' + seeing_cr1r2_string + '%)<br />19 fibers</td>' + \
+                                        '<td class="colc">C<br />(' + seeing_centermean_string +'%)<br />1 fiber</td>' + \
+                                        '<td class="colcr1">C+R1<br />(' + seeing_cr1_string + '%)<br />7 fibers</td>' + \
+                                        '<td class="colcr1r2">C+R1+R2<br />(' + seeing_cr1r2_string + '%)<br />19 fibers</td>' + \
+                                        '<td>percentage of enclosed flux</td>' + \
+                                        '</tr>' + \
+                                    '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspfwhm.jpeg" /></td>' + \
+                                        '<td class="perframecolumn"> ' + sncont_centerspaxel_voxel_string + ' </td>' + \
+                                        '<td> ' + sncont_cr1spaxels_voxel_string + '</td>' + \
+                                        '<td> ' + sncont_cr1r2spaxels_voxel_string + '</td>' + \
+                                        '<td class="perframecolumn"> ' + tsncont_centerspaxel_voxel_string + ' </td>' + \
+                                        '<td> ' + tsncont_cr1spaxels_voxel_string + '</td>' + \
+                                        '<td> ' + tsncont_cr1r2spaxels_voxel_string + '</td>' + \
+                                        '<td> per voxel</td>' + \
+                                        '</tr>' + \
+                                    '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_peraa.jpeg" /></td>' + \
+                                        '<td class="perframecolumn"> ' + sncont_centerspaxel_aa_string + ' </td>' + \
+                                        '<td> ' + sncont_cr1spaxels_aa_string + '</td>' + \
+                                        '<td> ' + sncont_cr1r2spaxels_aa_string + '</td>' + \
+                                        '<td class="perframecolumn"> ' + tsncont_centerspaxel_aa_string + ' </td>' + \
+                                        '<td> ' + tsncont_cr1spaxels_aa_string + '</td>' + \
+                                        '<td> ' + tsncont_cr1r2spaxels_aa_string + '</td>' + \
+                                        '<td> per AA</td>' + \
+                                        '</tr>' + \
+                                    '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_integrated.jpeg" /></td>' + \
+                                        '<td class="perframecolumn"> ' + sncont_centerspaxel_all_string + ' </td>' + \
+                                        '<td> ' + sncont_cr1spaxels_all_string + '</td>' + \
+                                        '<td> ' + sncont_cr1r2spaxels_all_string + '</td>' + \
+                                        '<td class="perframecolumn"> ' + tsncont_centerspaxel_all_string + ' </td>' + \
+                                        '<td> ' + tsncont_cr1spaxels_all_string + '</td>' + \
+                                        '<td> ' + tsncont_cr1r2spaxels_all_string + '</td>' + \
+                                        '<td> integrated spectrum </td>' + \
+                                        '</tr>' + \
+                                    '</table><br />'
+
         else:
             tablecoutstring = ''
             tableloutstring = ''
             tableinputstring = ''
+            tablecalcstring = ''
+            tablenewpsfstring = ''
         print "### LOG: ABOUT TO QUIT ETC_DO"
         from django.http import JsonResponse
         return JsonResponse({'outtext': outtextstring,
                              'textinput': inputstring,
                              'textcout': coutputstring,
                              'textlout': loutputstring,
+                             'textcalc': textcalcstring,
                              'tablecout': tablecoutstring,
                              'tablelout': tableloutstring,
                              'tableinput': tableinputstring,
+                             'tablecalc': tablecalcstring,
+                             'tablenewpsf': tablenewpsfstring,
                              'graphic': html,
 
                              })

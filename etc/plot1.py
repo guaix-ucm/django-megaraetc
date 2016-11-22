@@ -157,6 +157,10 @@ def plot_and_save2_new(tempname, x2, y2, x2b, y2b,
                        label1, label2, label3):
     import matplotlib.pyplot as plt
     import numpy
+    # import matplotlib as mpl
+    # mpl.rcParams['legend.frameon']=False
+    # mpl.rcParams['legend.framealpha']=1
+
     # CREATE TEMPORARY FILE
     # temp = tempfile.NamedTemporaryFile(suffix=".png", prefix="temp", dir="etc/static/etc/tmp/", delete=False)
     # NEED TO REMOVE THE CANVAS FIRST OR IT OVERPLOTS
@@ -202,7 +206,7 @@ def plot_and_save2_new(tempname, x2, y2, x2b, y2b,
     ax.plot(filtx2c, filty2c, '-b', lw=1, label='per frame all fibers')
     ax.plot(filtx2d, filty2d, '-b', lw=3, label='all frames all fibers')
 
-    ax.legend(loc='center left', bbox_to_anchor=(0.85, 0.9), frameon=False)
+    ax.legend(loc='center left', bbox_to_anchor=(0.85, 0.9), frameon=None)
     import pylab
     # pylab.legend(loc=4)
     string1 = "Source: " + label1

@@ -26,7 +26,7 @@
 
         <div id="index_leftdiv">
             <a href="{% url 'etc:form' %}">
-            <img id="img_bigImage"
+            <img id="img_bigImage" title="Click here to start!"
             src="{% static 'etc/images/button_hex_green.png' %}"
             onmouseover="changeImage('{% static 'etc/images/button_hex_blue.png' %}')"
             onmouseout="changeImage('{% static 'etc/images/button_hex_green.png' %}')"
@@ -44,10 +44,17 @@
             <h3>Welcome to<BR />
             MEGARA Online
             <hr id="index_hr_special" />
-            Exposure Time Calculator version 0.6.0</h3>
+            Exposure Time Calculator version 0.7.0</h3>
         </div>
         <div id="index_rightdiv">
-            <img src="{% static 'etc/images/django.jpg' %}" id="img_poweredby"/>
+            <a href="https://www.djangoproject.com/" target="_blank">
+                <img title="Powered by Django" src="{% static 'etc/images/django.jpg' %}" id="img_poweredby"/>
+            </a>
+            <a href="http://www.mathjax.org" target="_blank">
+                <img title="Powered by MathJax"
+                src="http://cdn.mathjax.org/mathjax/badge/badge.gif"
+                border="0" alt="Powered by MathJax" />
+            </a>
         </div>
 
         <br />

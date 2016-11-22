@@ -5,10 +5,28 @@
 
     {% block head %}
             <title>MEGARA Online Exposure Time Calculator</title>
-            <link href="{% static 'etc/css/webmegaraetc-0.6.0.css' %}" rel="stylesheet" type="text/css" />
-            <script src="{% static 'etc/js/webmegaraetc-0.6.0.js' %}"></script>
+            <link href="{% static 'etc/css/webmegaraetc-0.7.0.css' %}" rel="stylesheet" type="text/css" />
+            <script src="{% static 'etc/js/webmegaraetc-0.7.0.js' %}"></script>
             <script src="{% static 'etc/js/d3.min.js' %}"></script>
-
+            <script type="text/x-mathjax-config">
+              MathJax.Hub.Config({
+                tex2jax: {
+                    inlineMath: [["$","$"],["\\(","\\)"]]
+                },
+                jax: ["input/TeX","output/HTML-CSS"],
+                displayAlign: "left"
+              });
+             </script>
+            <script>
+            $(document).ready(function(){
+                $("#hide").click(function(){
+                    $("div").hide();
+                });
+                $("#show").click(function(){
+                    $("div").show();
+                });
+            });
+            </script>
     {% endblock %}
 
     {% block header %}
@@ -25,18 +43,13 @@
                 <div id="leftdiv">
                     <h4>Target Input Flux Distribution</h4>
                     {% bootstrap_form form1 %}
-
                 </div>
 
                 <div id="rightdiv">
                     <h4>Instrument Setup</h4>
                     {% bootstrap_form form2 %}
-                </div>
-                <div id="rightdiv">
                     <h4>Atmospheric Conditions</h4>
                     {% bootstrap_form form3 %}
-                </div>
-                <div id="rightdiv">
                     <h4>Observational Setup</h4>
                     {% bootstrap_form form4 %}
                 </div>
@@ -56,8 +69,7 @@
 
     <!-- THE OUTPUT form STARTS HERE -->
             <div id="theoutput">
-                <div id="result3">
-
+                <div id="outbuttons">
                             <b>Output Continuum S/N:</b>
                             <a class="" href="Javascript:newPopupBig('/static/etc/help/continuumoutput.txt');" type="link"><span class="glyphicon glyphicon-question-sign"></span></a>
                             <b>Output Line S/N:</b>
@@ -67,19 +79,33 @@
                             <div id="store_result">
                                 <b>Store Results:</b>
                                 <a class="" href="Javascript:newPopupBig('/static/etc/outputcalc.txt');" type="link"><span class="glyphicon glyphicon-save-file"></span></a>
+                                <b>See details of calculations:</b>
+                                <a class="" href="Javascript:newPopupBig('/static/etc/outputcalc2.html');" type="link"><span class="glyphicon glyphicon-save-file"></span></a>
                             </div>
+
                             <!--<video controls loop autoplay width=70px>-->
                               <!--<source src="{% static 'etc/movie.mp4' %}" type="video/mp4">-->
                               <!--<source src="{% static 'etc/movie.ogg' %}" type="video/ogg">-->
                               <!--Your browser does not support the video tag.-->
                             <!--</video>-->
                 </div>
+                <div>
 
-                <div id="result">
-                </div>
-                <div id="result2">
-                </div>
-                <div id="result4">
+                    <div id="resultgraphic"> <!-- MPLD3 -->
+                    </div>
+
+                    <div id="buffer"> <!-- located in between graphics and tables -->
+                    </div>
+
+                    <div id="result4"> <!-- TABLES -->
+                    </div>
+
+                    <div id="resultnewpsf"> <!-- NEWPSF -->
+                    </div>
+
+                    <!--<div id="resultmath"> &lt;!&ndash; MATHJAX TEST &ndash;&gt; -->
+                    <!--</div>  -->
+
                 </div>
             </div>
         </div>

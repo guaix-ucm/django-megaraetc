@@ -2,13 +2,14 @@
 {% load staticfiles %}
 {% load bootstrap3 %}
 
-
-<!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="UTF-8">
         <script type="text/javascript" src="{% static 'etc/js/jquery-1.12.0.min.js' %}" ></script>
         <link rel="stylesheet" type="text/css" href="{% static 'etc/css/style.css' %}" />
+        <script type="text/javascript" async
+                src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+        </script>
         {% block head %}
             <title>MEGARA Online Exposure Time Calculator </title>
         {% endblock head %}
