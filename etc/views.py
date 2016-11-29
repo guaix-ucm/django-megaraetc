@@ -637,7 +637,8 @@ def etc_do(request):
             if om_val_string == 'MOS':
                 tablenewpsfstring = ''
             else:
-                tablenewpsfstring = 'SNR with new PSF' + \
+                tablenewpsfstring = '<hr />' + \
+                                    'SNR with new PSF' + \
                                     '<table border=1>' + \
                                     '<tr><th class="iconcolumn" scope="col"> </th>' + \
                                         '<th scope="col" colspan="6">* SNR per spaxel zones due to PSF (only in LCB mode):<br />D_{fiber}=0.62 arcsec; Seeing FWHM = ' + seeingx_string + ' arcsec</th>' + \

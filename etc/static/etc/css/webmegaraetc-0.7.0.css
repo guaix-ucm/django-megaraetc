@@ -88,12 +88,15 @@ label.control-label {
     visibility: hidden;
 }
 
-/* MPLD3 */
-#resultgraphic {
-    min-width: 20px;
+#leftcolumn {
     width: 50%;
     height: 100%;
     float:left !important;
+}
+
+/* MPLD3 */
+#resultgraphic {
+    min-width: 20px;
 }
 
 #buffer {
@@ -125,9 +128,9 @@ label.control-label {
 }
 
 #resultnewpsf {
-    margin-top: 100px;
     width: 50%;
-    float: left;
+    height: 100%
+    float: left !important;
 }
 
 /*#resultmathtext {
@@ -150,7 +153,7 @@ label.control-label {
     height:     100%;
     width:      100%;
     background: rgba( 255, 255, 255, .8 )
-                url('../../out25.gif')
+                url('../../out50b.gif')
                 50% 50%
                 no-repeat;
 }
