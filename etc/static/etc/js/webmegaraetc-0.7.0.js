@@ -39,6 +39,9 @@ $( document ).ready(function() {
                 MathJax.Hub.Queue(["Typeset",MathJax.Hub, "mathid"]);
 
                 $("#store_result").css('visibility', 'visible');
+
+                var graphic2 = $(data)[0]['graphic2'];
+                $("#othergraphic").empty().append(graphic2);
                 //$('.btn-primary').css('color','#fff');
                 //$('.btn-primary').css('background-color','#337ab7');
                 //$('.btn-primary').css('border-color','#2e6da4');

@@ -8,6 +8,11 @@ from .models import SpectralTemplate, VPHSetup
 from justcalc import calc
 from plot1 import plot_and_save_new, plot_and_save2_new
 
+from plot1_bokeh import bokehplot1
+from bokeh.resources import CDN
+from bokeh.embed import components
+from bokeh.embed import file_html
+
 import numpy
 import matplotlib
 matplotlib.use('Agg')
@@ -341,6 +346,7 @@ def etc_do(request):
         html += mpld3.fig_to_html(figura2)
 
         html = html.replace("None", "")  # No se xq introduce string None
+
 
         import matplotlib.pyplot as plt
         plt.clf()
@@ -693,6 +699,14 @@ def etc_do(request):
             tableinputstring = ''
             tablecalcstring = ''
             tablenewpsfstring = ''
+
+        # figura3, figdiv = bokehplot1()
+        # print 'figura3 =', figura3
+        # print 'figdiv=',figdiv
+        # html2 = figdiv
+        # print html2
+        html2 = ''  # for testing
+
         print "### LOG: ABOUT TO QUIT ETC_DO"
         from django.http import JsonResponse
         return JsonResponse({'outtext': outtextstring,
@@ -706,5 +720,6 @@ def etc_do(request):
                              'tablecalc': tablecalcstring,
                              'tablenewpsf': tablenewpsfstring,
                              'graphic': html,
+                             'graphic2': html2,
 
                              })
