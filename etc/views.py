@@ -8,11 +8,6 @@ from .models import SpectralTemplate, VPHSetup
 from justcalc import calc
 from plot1 import plot_and_save_new, plot_and_save2_new
 
-from plot1_bokeh import bokehplot1
-from bokeh.resources import CDN
-from bokeh.embed import components
-from bokeh.embed import file_html
-
 import numpy
 import matplotlib
 matplotlib.use('Agg')
@@ -700,10 +695,6 @@ def etc_do(request):
             tablecalcstring = ''
             tablenewpsfstring = ''
 
-        # figura3, figdiv = bokehplot1()
-        # print 'figura3 =', figura3
-        # print 'figdiv=',figdiv
-        # html2 = figdiv
         # print html2
         html2 = ''  # for testing
 
