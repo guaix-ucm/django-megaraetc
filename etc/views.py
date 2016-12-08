@@ -6,14 +6,15 @@ from .models import PhotometricFilter, SeeingTemplate
 from .models import SpectralTemplate, VPHSetup
 
 from justcalc import calc
-from plot1 import plot_and_save_new, plot_and_save2_new
+# from plot1 import plot_and_save_new, plot_and_save2_new
+from plot1_bokeh import bokehplot1
 
 import numpy
-import matplotlib
-matplotlib.use('Agg')
-
-import mpld3
-from mpld3 import plugins
+# import matplotlib
+# matplotlib.use('Agg')
+#
+# import mpld3
+# from mpld3 import plugins
 # /home/pica/Documents/virt_django/django_megara
 
 
@@ -188,7 +189,7 @@ def get_info(request):
         form3 = AtmosphericConditionsForm()
         form4 = ObservationalSetupForm()
 
-    return render(request, 'etc/webmegaraetc-0.7.0.html', {
+    return render(request, 'etc/webmegaraetc-0.7.5.html', {
         'form1': form1,
         'form2': form2,
         'form3': form3,
@@ -209,7 +210,7 @@ def etc_form(request):
                    'form4': form4,
                    }
 
-    return render(request, 'etc/webmegaraetc-0.7.0.html', total_formu)
+    return render(request, 'etc/webmegaraetc-0.7.5.html', total_formu)
 
 
 # LOADS THIS AFTER PRESSING "COMPUTE" webmegaraetc.html and
@@ -323,28 +324,25 @@ def etc_do(request):
             y3 = numpy.arange(1, 1001, 1)
             z3 = numpy.arange(1, 1001, 1)
 
-        figura = plot_and_save_new('', x, y, x3, y3, z3,
-                                   vph_minval, vph_maxval,
-                                   label1, label2, label3)
+        # figura = plot_and_save_new('', x, y, x3, y3, z3,
+        #                            vph_minval, vph_maxval,
+        #                            label1, label2, label3)
 
-        # tooltip = mpld3.plugins.PointLabelTooltip(points)
-        # plugins.connect(figura, tooltip)
+        # html = mpld3.fig_to_html(figura)
 
-        html = mpld3.fig_to_html(figura)
+        # figura2 = plot_and_save2_new('', x2, y2, x2b, y2b,
+        #                              x2c, y2c, x2d, y2d,
+        #                              x3, y3, z3,
+        #                              vph_minval, vph_maxval,
+        #                              label2a, label2b, label2c)
 
-        figura2 = plot_and_save2_new('', x2, y2, x2b, y2b,
-                                     x2c, y2c, x2d, y2d,
-                                     x3, y3, z3,
-                                     vph_minval, vph_maxval,
-                                     label2a, label2b, label2c)
+        # html += mpld3.fig_to_html(figura2)
 
-        html += mpld3.fig_to_html(figura2)
-
-        html = html.replace("None", "")  # No se xq introduce string None
+        # html = html.replace("None", "")  # No se xq introduce string None
 
 
-        import matplotlib.pyplot as plt
-        plt.clf()
+        # import matplotlib.pyplot as plt
+        # plt.clf()
 
         if not tocheck:
             om_val_string = str(outputofcalc['om_val'])
@@ -695,8 +693,17 @@ def etc_do(request):
             tablecalcstring = ''
             tablenewpsfstring = ''
 
-        # print html2
+
         html2 = ''  # for testing
+        # print html2
+        thescript, thediv = bokehplot1(x, y, x3, y3, z3,
+                                       vph_minval, vph_maxval,
+                                       label1, label2, label3,
+                                       x2, y2, x2b, y2b,
+                                       x2c, y2c, x2d, y2d,
+                                       label2a, label2b, label2c)
+        html = ""
+
 
         print "### LOG: ABOUT TO QUIT ETC_DO"
         from django.http import JsonResponse
@@ -711,6 +718,6 @@ def etc_do(request):
                              'tablecalc': tablecalcstring,
                              'tablenewpsf': tablenewpsfstring,
                              'graphic': html,
-                             'graphic2': html2,
-
+                             'thescript': thescript,
+                             'thediv': thediv,
                              })

@@ -40,8 +40,12 @@ $( document ).ready(function() {
 
                 $("#store_result").css('visibility', 'visible');
 
-                var graphic2 = $(data)[0]['graphic2'];
-                $("#othergraphic").empty().append(graphic2);
+                var thediv = $(data)[0]['thediv'];
+                var thescript = $(data)[0]['thescript'];
+
+                $("#othergraphic").empty().append(thediv);
+                $("#othergraphic").append(thescript);
+
                 //$('.btn-primary').css('color','#fff');
                 //$('.btn-primary').css('background-color','#337ab7');
                 //$('.btn-primary').css('border-color','#2e6da4');

@@ -349,37 +349,6 @@ def specpar(om_val, xit, disp, ps, nfibres, nfibresy, areafibre, rfibre,  deltab
         # verbose += "nfib = 0 <br />"
         # verbose += "nfib1 = 0 <br />"
 
-    # elif xit == 12: # for C, R1, R2 spaxels SNR per voxel
-    #     verbose += "<b>### XIT = 12 <br />"
-    #     verbose += "### for centralspaxels current observing mode: %s ###<br /> </b><br />" % om_val
-    #     deltalambda = deltab
-    #     verbose += "$\Delta\lambda = deltab = %s $ <br />" % deltalambda
-    #     if om_val == "MOS":
-    #         verbose += "Observing mode is MOS, not computing c+r1+r2<br />"
-    #         omegasource = areafibre
-    #         npixx = 4
-    #         npixy = 4
-    #         nfib = 1
-    #         nfib1 = 1
-    #         omegaskysource = omegasource
-    #
-    #     else:
-    #         if areasource >= areafibre:
-    #             omegasource = areafibre
-    #             verbose += "$\Omega_{source} = A_{fiber} = %s $ because $A_{source} \geq A_{fiber} $ <br />" % omegasource
-    #         else:
-    #             omegasource = areasource
-    #             verbose += "$\Omega_{source} = A_{source} = %s $ because $A_{source} < A_{fiber} $ <br />" % omegasource
-    #         npixx = deltab / disp  # lambda range of vph (in angstroms) / (angstrom per pixel)
-    #         npixy = 2. * rfibre / ps
-    #         omegaskysource = areafibre
-    #         nfib = 0. # Default value
-    #         nfib1 = 0. # Default value
-    #         verbose += "$n_{pix,x} = deltab/disp = %s/%s = %s $ <br />" % (deltab, disp, npixx)
-    #         verbose += "$n_{pix,y} = \\frac{2 \\times R_{fiber}}{ps} = \\frac{2 \\times %s}{%s} = %s $ <br />" % (rfibre, ps, npixy)
-    #         verbose += "$\Omega_{sky,source} = A_{fiber} = %s $ <br />" % omegaskysource
-    #         verbose += "nfib = 0 <br />"
-    #         verbose += "nfib1 = 0 <br />"
     elif xit==12:   # for C, R1, R2 spaxels SNR per voxel (adapted from xit=3)
         deltalambda = fwhmvph_om * disp
         omegasource = areaseeing
@@ -440,44 +409,6 @@ def specpar(om_val, xit, disp, ps, nfibres, nfibresy, areafibre, rfibre,  deltab
         print 'verbose', type(verbose)
 
     elif xit == 13: # for C, R1, R2, for 1AA; adapted from xit=4
-        # deltalambda = 1.0
-        # omegasource = areaseeing
-        # verbose += "<b>### XIT = 13 <br />"
-        # verbose += "### for centralspaxels current observing mode: %s ###<br /> </b><br />" % om_val
-        # # verbose += "$\Delta\lambda = 1.0 $ <br />"
-        # # verbose += "$\Omega_{source} = A_{seeing} = %s $ <br />" % omegasource
-        # if om_val=='MOS':
-        #     verbose += "Observing mode is MOS, not computing c+r1+r2<br />"
-        #     # omegasource = areafibre
-        #     npixx = 4
-        #     npixy = 4
-        #     nfib = 1
-        #     nfib1 = 1
-        #     omegaskysource = omegasource
-        #
-        # else:
-        #     if (seeingx / 2.) <= rfibre:
-        #         omegaskysource = areafibre
-        #         nfiby = 1.0
-        #         nfib = 1.0
-        #         # verbose += "since $\\frac{seeingx}{2} (= \\frac{%s}{2}) \leq R_{fiber} (= %s) $ <br />" % (seeingx, rfibre)
-        #         # verbose += "$\Omega_{sky,source} = A_{fiber} = %s $ <br />" % omegaskysource
-        #         # verbose += "nfiby = 1.0 <br />"
-        #         # verbose += "nfib = 1.0 <br />"
-        #     else:
-        #         nfib = math.ceil (omegasource / areafibre)
-        #         omegaskysource = nfib * areafibre
-        #         nfiby = math.sqrt(nfib)
-        #         # verbose += "since $\\frac{seeingx}{2} (= \\frac{%s}{2}) > R_{fiber} (= %s) $ <br />" % (seeingx, rfibre)
-        #         # verbose += "nfib = $\\frac{\Omega_{source}}{A_{fiber}} = \\frac{%s}{%s} = %s $ <br />" % (omegasource, areafibre, nfib)
-        #         # verbose += "$\Omega_{sky,source} = nfib \\times A_{fiber} = %s \\times %s = %s $ <br />" % (nfib, areafibre, omegaskysource)
-        #         # verbose += "nfiby = $\sqrt{nfib} = \sqrt{%s} = %s $ <br />" % (nfib, nfiby)
-        #     npixx = 1.0 / disp
-        #     npixy = nfiby * 2.0 * rfibre / ps
-        #     nfib1 = 0. # Default value
-        #     # verbose += "$n_{pix,x} = \\frac{1}{disp} = \\frac{1}{%s} = %s $ <br />" % (disp,npixx)
-        #     # verbose += "$n_{pix,y} = nfiby \\times \\frac{(2 \\times R_{fiber})}{ps} = %s \\times \\frac{(2 \\times %s)}{%s} = %s $ <br />" % (nfiby, rfibre, ps, npixy)
-        #     # verbose += "nfib1 = 0 <br />"
         deltalambda = 1.0
         omegasource = areaseeing
         verbose += "<b>### XIT = 4 <br />"
@@ -508,44 +439,6 @@ def specpar(om_val, xit, disp, ps, nfibres, nfibresy, areafibre, rfibre,  deltab
         # verbose += "nfib1 = 0 <br />"
 
     elif xit == 14: # for C, R1, R2 spaxels SNR of integrated spectrum (i.e. Total); adapted from xit=5
-        # deltalambda = deltab
-        # omegasource = areaseeing
-        # verbose += "<b>### XIT = 14 <br />"
-        # verbose += "### for centralspaxels current observing mode: %s ###<br /> </b><br />" % om_val
-        # # verbose += "$\Delta\lambda = deltab = %s $ <br />" % deltab
-        # # verbose += "$\Omega_{source} = A_{seeing} = %s $ <br />" % omegasource
-        # if om_val=='MOS':
-        #     verbose += "Observing mode is MOS, not computing c+r1+r2<br />"
-        #     # omegasource = areafibre
-        #     npixx = 4
-        #     npixy = 4
-        #     nfib = 1
-        #     nfib1 = 1
-        #     omegaskysource = omegasource
-        # else:
-        #     if (seeingx / 2.) <= rfibre:
-        #         omegaskysource = areafibre
-        #         nfiby = 1.0
-        #         nfib = 1.0
-        #         # verbose += "since $\\frac{seeingx}{2} (= \\frac{%s}{2}) \leq R_{fiber} (= %s) $ <br />" % (seeingx, rfibre)
-        #         # verbose += "$\Omega_{sky,source} = A_{fiber} = %s $ <br />" % omegaskysource
-        #         # verbose += "nfiby = 1.0 <br />"
-        #         # verbose += "nfib = 1.0 <br />"
-        #     else:
-        #         nfib = math.ceil (omegasource / areafibre)
-        #         omegaskysource = nfib * areafibre
-        #         nfiby = math.sqrt(nfib)
-        #         # verbose += "since $\\frac{seeingx}{2} (= \\frac{%s}{2}) > R_{fiber} (= %s) $ <br />" % (seeingx, rfibre)
-        #         # verbose += "nfib = $\\frac{\Omega_{source}}{A_{fiber}} = \\frac{%s}{%s} = %s $ <br />" % (omegasource, areafibre, nfib)
-        #         # verbose += "$\Omega_{sky,source} = nfib \\times A_{fiber} = %s \\times %s = %s $ <br />" % (nfib, areafibre, omegaskysource)
-        #         # verbose += "nfiby = $\sqrt{nfib} = \sqrt{%s} = %s $ <br />" % (nfib, nfiby)
-        #
-        #     npixx = deltab / disp
-        #     npixy = nfiby * 2.0 * rfibre / ps
-        #     nfib1 = 0. # Default value
-        #     # verbose += "$n_{pix,x} = \\frac{deltab}{disp} = \\frac{%s}{%s} = %s $ <br />" % (deltab, disp, npixx)
-        #     # verbose += "$n_{pix,y} = nfiby \\times \\frac{(2 \\times R_{fiber})}{ps} = %s \\times \\frac{(2 \\times %s)}{%s} = %s $ <br />" % (nfiby, rfibre, ps, npixy)
-        #     # verbose += "nfib1 = 0 <br />"
         deltalambda = deltab
         omegasource = areaseeing
         verbose += "<b>### XIT = 5 <br />"

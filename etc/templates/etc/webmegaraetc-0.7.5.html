@@ -5,8 +5,8 @@
 
     {% block head %}
             <title>MEGARA Online Exposure Time Calculator</title>
-            <link href="{% static 'etc/css/webmegaraetc-0.7.0.css' %}" rel="stylesheet" type="text/css" />
-            <script src="{% static 'etc/js/webmegaraetc-0.7.0.js' %}"></script>
+            <link href="{% static 'etc/css/webmegaraetc-0.7.5.css' %}" rel="stylesheet" type="text/css" />
+            <script src="{% static 'etc/js/webmegaraetc-0.7.5.js' %}"></script>
             <script src="{% static 'etc/js/d3.min.js' %}"></script>
             <script type="text/x-mathjax-config">
               MathJax.Hub.Config({
@@ -28,14 +28,14 @@
             });
             </script>
             <link
-                href="http://cdn.pydata.org/bokeh/release/bokeh-0.12.0.min.css"
+                href="http://cdn.pydata.org/bokeh/release/bokeh-0.12.3.min.css"
                 rel="stylesheet" type="text/css">
             <link
-                href="http://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.0.min.css"
+                href="http://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.3.min.css"
                 rel="stylesheet" type="text/css">
 
-            <script src="http://cdn.pydata.org/bokeh/release/bokeh-0.12.0.min.js"></script>
-            <script src="http://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.0.min.js"></script>
+            <script src="http://cdn.pydata.org/bokeh/release/bokeh-0.12.3.min.js"></script>
+            <script src="http://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.3.min.js"></script>
     {% endblock %}
 
     {% block header %}
@@ -99,11 +99,11 @@
                             <!--</video>-->
                 </div>
                 <div id="leftcolumn">
+                    <div id="othergraphic">
+                    </div>
                     <div id="resultgraphic"> <!-- MPLD3 -->
                     </div>
                     <div id="resultnewpsf"> <!-- NEWPSF -->
-                    </div>
-                    <div id="othergraphic">
                     </div>
                 </div>
                 <div id="buffer"> <!-- located in between graphics and tables -->
