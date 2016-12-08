@@ -66,13 +66,23 @@ div.maintitletd {
     text-align: left;
 }
 
+#index_bottomdiv {
+    width: 100%;
+    text-align: center;
+}
+
 #img_bigImage {
     width: 150px;
 }
 
-#img_poweredby {
+#img_django {
     text-align: right;
-    width: 100px;
+    width: 37px;
+}
+
+#img_bokeh {
+    text-align: right;
+    width: 37px;
 }
 
 #copyright {
