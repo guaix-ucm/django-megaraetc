@@ -1,5 +1,6 @@
 ### MEGARA ONLINE ETC HISTORY ###
 
+2016/12/08 v0.7.5 Improved graphics, powered by Bokeh. Got rid of mpld3.
 2016/11/22 v0.7.0 Powered by MathJax. Added new output table when in LCB mode. Added 'see details of calculations' button. Modified loader.gif
 2016/11/03 v0.6.0 With seeing PSF data (database update required), output results are shown but need polish, added favicon, fixed bugs with cookies.
 2016/10/24 v0.5.0 Line+Continuum graphics and calculations updates
