@@ -1026,27 +1026,27 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                 textcalc += "# Converting flux/arcsec**2 in real source to the more disperse flux/arcsec**2 in case of seeing-dominated <br />"
                 textcalc += "continuum flux $F_{cont} = \\frac{F_{net} \\times A_{source}}{A_{seeing}} = \\frac{%s \\times %s}{%s} = %s \\textrm{erg/s/cm}^{2}$ <br />" % (netflux, realareasource, areaseeing, fcont)
                 textcalc += "integrated line flux $F_{line} = \\frac{F_{line} \\times A_{source}}{A_{seeing}} = \\frac{%s \\times %s}{%s} = %s \\textrm{erg/s/cm}^{2}$ <br />" % (netflux, realareasource, areaseeing, flineparc)
-                if om_val == "LCB":
-                    fcont_centerspaxel = netflux * (seeing_centermean/100) * (realareasource / areaseeing)
-                    fcont_ring1spaxel = netflux *  (seeing_ring1mean/100) * (realareasource / areaseeing) / 6
-                    fcont_ring2spaxel = netflux * (seeing_ring2mean/100) * (realareasource / areaseeing) / 12
-
-                    flineparc_centerspaxel = fline_val * (seeing_centermean/100) * (realareasource / areaseeing)
-                    flineparc_ring1spaxel = fline_val * (seeing_ring1mean/100) * (realareasource / areaseeing) / 6
-                    flineparc_ring2spaxel  = fline_val * (seeing_ring2mean/100) * (realareasource / areaseeing) / 12
-                    textcalc += "<font color='red'>Since OM is LCB, we show how the source flux is spatially dispersed over the spaxels due to seeing</font> <br />"
-                    textcalc += "<table border=1><tr><td>"
-                    textcalc += "$F_{center,spaxel} = F_{total} \\times (%s$ %% $) \\times \\frac{\Omega_{source}}{A_{seeing}} = %s \\times (%s / 100) \\times \\frac{%s}{%s} = %s $" % (seeing_centermean, fcont, seeing_centermean, realareasource, areaseeing, fcont_centerspaxel)
-                    textcalc += "</td></tr><tr><td>"
-                    textcalc += "$F_{ring1,spaxel} = F_{total} \\times (%s$ %% $) \\times \\frac{\Omega_{source}}{A_{seeing}} = %s \\times (%s / 100) \\times \\frac{%s}{%s} = %s $" % (seeing_ring1mean, fcont, seeing_ring1mean, realareasource, areaseeing,  fcont_ring1spaxel)
-                    textcalc += "</td></tr><tr><td>"
-                    textcalc += "$F_{ring2,spaxel} = F_{total} \\times (%s$ %% $) \\times \\frac{\Omega_{source}}{A_{seeing}}  = %s \\times (%s / 100) \\times \\frac{%s}{%s} = %s $" % (seeing_ring2mean, fcont, seeing_ring2mean, realareasource, areaseeing, fcont_ring2spaxel)
-                    textcalc += "</td></tr></table>"
-
-                    fcont_cr1 = fcont_centerspaxel + 6*fcont_ring1spaxel
-                    fcont_cr1r2 = fcont_centerspaxel + 6*fcont_ring1spaxel + 12*fcont_ring2spaxel
-                    flineparc_cr1 = flineparc_centerspaxel + 6*flineparc_ring1spaxel
-                    flineparc_cr1r2 = flineparc_centerspaxel + 6*flineparc_ring1spaxel + 12*flineparc_ring2spaxel
+                # if om_val == "LCB":
+                #     fcont_centerspaxel = netflux * (seeing_centermean/100) * (realareasource / areaseeing)
+                #     fcont_ring1spaxel = netflux *  (seeing_ring1mean/100) * (realareasource / areaseeing) / 6
+                #     fcont_ring2spaxel = netflux * (seeing_ring2mean/100) * (realareasource / areaseeing) / 12
+                #
+                #     flineparc_centerspaxel = fline_val * (seeing_centermean/100) * (realareasource / areaseeing)
+                #     flineparc_ring1spaxel = fline_val * (seeing_ring1mean/100) * (realareasource / areaseeing) / 6
+                #     flineparc_ring2spaxel  = fline_val * (seeing_ring2mean/100) * (realareasource / areaseeing) / 12
+                #     textcalc += "<font color='red'>Since OM is LCB, we show how the source flux is spatially dispersed over the spaxels due to seeing</font> <br />"
+                #     textcalc += "<table border=1><tr><td>"
+                #     textcalc += "$F_{center,spaxel} = F_{total} \\times (%s$ %% $) \\times \\frac{\Omega_{source}}{A_{seeing}} = %s \\times (%s / 100) \\times \\frac{%s}{%s} = %s $" % (seeing_centermean, fcont, seeing_centermean, realareasource, areaseeing, fcont_centerspaxel)
+                #     textcalc += "</td></tr><tr><td>"
+                #     textcalc += "$F_{ring1,spaxel} = F_{total} \\times (%s$ %% $) \\times \\frac{\Omega_{source}}{A_{seeing}} = %s \\times (%s / 100) \\times \\frac{%s}{%s} = %s $" % (seeing_ring1mean, fcont, seeing_ring1mean, realareasource, areaseeing,  fcont_ring1spaxel)
+                #     textcalc += "</td></tr><tr><td>"
+                #     textcalc += "$F_{ring2,spaxel} = F_{total} \\times (%s$ %% $) \\times \\frac{\Omega_{source}}{A_{seeing}}  = %s \\times (%s / 100) \\times \\frac{%s}{%s} = %s $" % (seeing_ring2mean, fcont, seeing_ring2mean, realareasource, areaseeing, fcont_ring2spaxel)
+                #     textcalc += "</td></tr></table>"
+                #
+                #     fcont_cr1 = fcont_centerspaxel + 6*fcont_ring1spaxel
+                #     fcont_cr1r2 = fcont_centerspaxel + 6*fcont_ring1spaxel + 12*fcont_ring2spaxel
+                #     flineparc_cr1 = flineparc_centerspaxel + 6*flineparc_ring1spaxel
+                #     flineparc_cr1r2 = flineparc_centerspaxel + 6*flineparc_ring1spaxel + 12*flineparc_ring2spaxel
 
             else:
                 fcont = netflux
@@ -1054,26 +1054,26 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                 textcalc += "Since source type is E and %s ($R_{seeing@x}$) $<$ %s ($R_{source}$) <br />" % (rseeingx, realrsource)
                 textcalc += "continuum flux $F_{cont} = F_{net} = %s \\textrm{erg/s/cm}^{2}$ <br />" % fcont
                 textcalc += "integrated line flux $F_{line} = %s \\textrm{erg/s/cm}^{2}$ <br />" % flineparc
-                if om_val == "LCB":
-                    fcont_centerspaxel = netflux * (seeing_centermean/100)
-                    fcont_ring1spaxel = netflux * (seeing_ring1mean/100) / 6
-                    fcont_ring2spaxel = netflux * (seeing_ring2mean/100) / 12
-
-                    flineparc_centerspaxel = fline_val * (seeing_centermean/100)
-                    flineparc_ring1spaxel = fline_val * (seeing_ring1mean/100) / 6
-                    flineparc_ring2spaxel  = fline_val * (seeing_ring2mean/100) / 12
-                    textcalc += "<table border=1><tr><td>"
-                    textcalc += "$F_{center,spaxel} = F_{total} * %s$ %% $ = %s \\times %s / 100 = %s $" % (seeing_centermean, fcont, seeing_centermean, fcont_centerspaxel)
-                    textcalc += "</td></tr><tr><td>"
-                    textcalc += "$F_{ring1,spaxel} = F_{total} * %s$ %% $ = %s \\times %s / 100 = %s $" % (seeing_ring1mean, fcont, seeing_ring1mean, fcont_ring1spaxel)
-                    textcalc += "</td></tr><tr><td>"
-                    textcalc += "$F_{ring2,spaxel} = F_{total} * %s$ %% $ = %s \\times %s / 100 = %s $" % (seeing_ring2mean, fcont, seeing_ring2mean, fcont_ring2spaxel)
-                    textcalc += "</td></tr></table>"
-
-                    fcont_cr1 = fcont_centerspaxel + 6*fcont_ring1spaxel
-                    fcont_cr1r2 = fcont_centerspaxel + 6*fcont_ring1spaxel + 12*fcont_ring2spaxel
-                    flineparc_cr1 = flineparc_centerspaxel + 6*flineparc_ring1spaxel
-                    flineparc_cr1r2 = flineparc_centerspaxel + 6*flineparc_ring1spaxel + 12*flineparc_ring2spaxel
+                # if om_val == "LCB":
+                #     fcont_centerspaxel = netflux * (seeing_centermean/100)
+                #     fcont_ring1spaxel = netflux * (seeing_ring1mean/100) / 6
+                #     fcont_ring2spaxel = netflux * (seeing_ring2mean/100) / 12
+                #
+                #     flineparc_centerspaxel = fline_val * (seeing_centermean/100)
+                #     flineparc_ring1spaxel = fline_val * (seeing_ring1mean/100) / 6
+                #     flineparc_ring2spaxel  = fline_val * (seeing_ring2mean/100) / 12
+                #     textcalc += "<table border=1><tr><td>"
+                #     textcalc += "$F_{center,spaxel} = F_{total} * %s$ %% $ = %s \\times %s / 100 = %s $" % (seeing_centermean, fcont, seeing_centermean, fcont_centerspaxel)
+                #     textcalc += "</td></tr><tr><td>"
+                #     textcalc += "$F_{ring1,spaxel} = F_{total} * %s$ %% $ = %s \\times %s / 100 = %s $" % (seeing_ring1mean, fcont, seeing_ring1mean, fcont_ring1spaxel)
+                #     textcalc += "</td></tr><tr><td>"
+                #     textcalc += "$F_{ring2,spaxel} = F_{total} * %s$ %% $ = %s \\times %s / 100 = %s $" % (seeing_ring2mean, fcont, seeing_ring2mean, fcont_ring2spaxel)
+                #     textcalc += "</td></tr></table>"
+                #
+                #     fcont_cr1 = fcont_centerspaxel + 6*fcont_ring1spaxel
+                #     fcont_cr1r2 = fcont_centerspaxel + 6*fcont_ring1spaxel + 12*fcont_ring2spaxel
+                #     flineparc_cr1 = flineparc_centerspaxel + 6*flineparc_ring1spaxel
+                #     flineparc_cr1r2 = flineparc_centerspaxel + 6*flineparc_ring1spaxel + 12*flineparc_ring2spaxel
 
         else:
             fcont = netflux / areaseeing
@@ -1081,25 +1081,32 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
             textcalc += "Since source type is P <br />"
             textcalc += "continuum flux $F_{cont} = \\frac{F_{net}}{A_{seeing}} = \\frac{%s}{%s} = %s \\textrm{erg/s/cm}^{2}$ <br />" % (netflux, areaseeing, fcont)
             textcalc += "integrated line flux $F_{line} = \\frac{F_{line,input}}{A_{seeing}} = \\frac{%s}{%s} = %s \\textrm{erg/s/cm}^{2}$ <br />" % (fline_val, areaseeing, flineparc)
-            if om_val == "LCB":
-                fcont_centerspaxel = netflux * seeing_centermean / areaseeing
-                fcont_ring1spaxel = (netflux *  seeing_ring1mean / 6) / areaseeing
-                fcont_ring2spaxel = (netflux * seeing_ring2mean / 12) / areaseeing
-
-                flineparc_centerspaxel = fline_val * seeing_centermean / areaseeing
-                flineparc_ring1spaxel = (fline_val * seeing_ring1mean / 6) / areaseeing
-                flineparc_ring2spaxel  = (fline_val * seeing_ring2mean / 12) / areaseeing
+            # if om_val == "LCB":
+            #     fcont_centerspaxel = netflux * seeing_centermean / areaseeing
+            #     fcont_ring1spaxel = (netflux *  seeing_ring1mean / 6) / areaseeing
+            #     fcont_ring2spaxel = (netflux * seeing_ring2mean / 12) / areaseeing
+            #
+            #     flineparc_centerspaxel = fline_val * seeing_centermean / areaseeing
+            #     flineparc_ring1spaxel = (fline_val * seeing_ring1mean / 6) / areaseeing
+            #     flineparc_ring2spaxel  = (fline_val * seeing_ring2mean / 12) / areaseeing
 
         # Source spectrum scaled to totalflux in continuum
         normc, fc = sclspect(fcont, lamb, lc1, lc2, sourcespectrum, tfilterc,
                              wline_val, fline_val, fwhmline_val)
+
         if om_val == "LCB":
-            normcctr, fcctr = sclspect(fcont_centerspaxel, lamb, lc1, lc2, sourcespectrum, tfilterc,
-                                 wline_val, fline_val, fwhmline_val)
-            normcr1, fcr1 = sclspect(fcont_ring1spaxel, lamb, lc1, lc2, sourcespectrum, tfilterc,
-                                 wline_val, fline_val, fwhmline_val)
-            normcr2, fcr2 = sclspect(fcont_ring2spaxel, lamb, lc1, lc2, sourcespectrum, tfilterc,
-                                 wline_val, fline_val, fwhmline_val)
+            # normcctr, fcctr = sclspect(fcont_centerspaxel, lamb, lc1, lc2, sourcespectrum, tfilterc,
+            #                      wline_val, fline_val, fwhmline_val)
+            # normcr1, fcr1 = sclspect(fcont_ring1spaxel, lamb, lc1, lc2, sourcespectrum, tfilterc,
+            #                      wline_val, fline_val, fwhmline_val)
+            # normcr2, fcr2 = sclspect(fcont_ring2spaxel, lamb, lc1, lc2, sourcespectrum, tfilterc,
+            #                      wline_val, fline_val, fwhmline_val)
+            # textcalc += "normcctr = %s; fcctr = %s <br />" % (normcctr, fcctr)
+            # textcalc += "normcr1 = %s; fcr1 = %s <br />" % (normcr1, fcr1)
+            # textcalc += "normcr2 = %s; fcr2 = %s <br />" % (normcr2, fcr2)
+            fcctr = fc * seeing_centermean/100
+            fcr1 = fc * seeing_ring1mean/100
+            fcr2 = fc * seeing_ring2mean/100
 
         textcalc += "Normalization factor: normc = %s <br />" % normc
 
@@ -1289,6 +1296,15 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                 sncont_c = signalcont_c / noisecont_c
                 sncont_r1 = signalcont_r1 / noisecont_r1
                 sncont_r2 = signalcont_r2 / noisecont_r2
+                if xit==12:
+                    textcalc += "signalcont_c = %s <br />" % signalcont_c
+                    textcalc += "signalcont = %s <br />" % signalcont
+                    textcalc += "noisecont_c = %s <br />" % noisecont_c
+                    textcalc += "noisecont = %s <br />" % noisecont
+
+                    textcalc += "sncontc=%s <br />" % sncont_c
+                    textcalc += "sncontr1=%s <br />" % sncont_r1
+                    textcalc += "sncontr2=%s <br />" % sncont_r2
             else:
                 sncont_c = 99999
                 sncont_r1 = 99999
