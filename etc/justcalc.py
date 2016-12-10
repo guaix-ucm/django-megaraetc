@@ -533,7 +533,8 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
          spect_val, bandc_val, \
          om_val, vph_val, \
          skycond_val, moon_val, airmass_val, seeing_val, \
-         numframe_val, exptimepframe_val, nsbundles_val):
+         numframe_val, exptimepframe_val, nsbundles_val, \
+         plotflag_val):
     global texti, textoc, textol, textcalc
     # Clear previous outputs
     # Warning
@@ -1478,303 +1479,329 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
         # End of FOR loop for computations of SNR per frame.
         pass
 
-        # FOR COMPUTING SNR per detector pixel at each lamb (not just lambdaeff)
-        # we need to recompute the SNR as above but just for the case of SNR per detector pixel
-        # and replacing in the function signal(), lambdaeff by lamb.
-        # Then, for exptime per frame:
-        textcalc += "<br />### Compute SNR per detector pixel @ all $\lambda$ (used for plot) ### <br />"
-        items = [9, 0]
-        for xit in items:
-            # Deriving spectroscopic parameters for each case:
-            deltalambda, omegasource, npixx, npixy, nfib, nfib1, omegaskysource, specparstring = specpar(
-                om_val, xit, disp, ps,
-                nfibres, nfibresy, areafibre, rfibre, deltab, areasource,
-                diamsource, areaseeing, seeingx)
-
-            # Number of pixels in detector under consideration: just counting the factor in area
-            # when we consider the used sky minibundles
-            npix = npixx * npixy
-            npixsky = (omegasky / omegaskysource) * npix
-
-            # Source continuum signal in defined spectral and spatial resolution element
-            signalcont, _ = signal(fc, deltalambda, lamb, effsys, stel,
-                                omegasource, exptimepframe_val, enph, lamb)
-
-            # Sky signal in defined spectral and spatial resolution element
-            signalsky, _ = signal(fs, deltalambda, lamb, effsys, stel,
-                               omegaskysource, exptimepframe_val, enph, lamb)
-
-            # Dark signal
-            signaldark, sdverb = dark(exptime_val, dc, npix)
-
-            # Noise due to dark measurement to the square
-            noisedarksq, noisedarksqverb = darknoisesq(npix, npdark_val, exptimepframe_val, dc,
-                                      ron)
-
-            # RON
-            ronoise, ronoiseverb = readoutnoise(npix, ron)
-
-            # Noise due to sky substraction
-            # Sky signal *MEASURED* in defined spectral and spatial resolution element
-            signalskymeasured, _ = signal(fs, deltalambda, lamb, effsys, stel,
-                                       omegasky, exptimepframe_val, enph, lamb)
-            ronoiseskymeasured, ronoiseskymeasuredverb = readoutnoise(npixsky, ron)
-            signaldarkskymeasured, sdsmverb = dark(exptimepframe_val, dc, npixsky)
-            noisedarksqskymeasured, noisedarksqskymeasuredverb = darknoisesq(npixsky, npdark_val,
-                                                 exptimepframe_val, dc, ron)
-
-            noiseskysq = (omegaskysource / omegasky) ** 2 * (
-            signalskymeasured + ronoiseskymeasured + signaldarkskymeasured + noisedarksqskymeasured)
-
-            if xit == 9:
-                # Source continuum noise in defined spectral and spatial resolution element
-                noisecont_psp_asp = []
-                pframesn_psp_asp = []
-                allframesn_psp_asp = []
-                # pframesn_psp_asp_all = []    #SNR per frame per spectral pixel all source area
-                # allframesn_psp_asp_all = []  #SNR total per spectral pixel all source area
-                for idxno, valno in enumerate(signalcont):
-                    noisecont_val = math.sqrt(signalcont[idxno] + signalsky[
-                        idxno] + signaldark + ronoise + noisedarksq +
-                                              noiseskysq[idxno])
-                    noisecont_psp_asp.append(noisecont_val)
-                    # Signal-to-noise of continuum
-                    # sncont_val = signalcont[idxno] / (noisecont_val*4)  #SNR per detector pixel
-                    sncont_val = signalcont[idxno] / (
-                    noisecont_val * 2)  # SNR per spectral pixel
-                    pframesn_psp_asp.append(sncont_val)
-
-                    tsncont_val = sncont_val * numpy.sqrt(
-                        numframe_val)  # total SNR per detector pixel
-                    allframesn_psp_asp.append(tsncont_val)
-            elif xit == 0:  # dummy
-                # Source continuum noise in defined spectral and spatial resolution element
-                noisecont_psp_asp_all = []
-                pframesn_psp_asp_all = []  # SNR per frame per spectral pixel all source area
-                allframesn_psp_asp_all = []  # SNR total per spectral pixel all source area
-                for idxno, valno in enumerate(signalcont):
-                    noisecont_val = math.sqrt(signalcont[idxno] +
-                                              signalsky[idxno] +
-                                              signaldark + ronoise +
-                                              noisedarksq + noiseskysq[idxno])
-                    noisecont_psp_asp_all.append(noisecont_val)
-                    # Signal-to-noise ratio of continuum
-                    sncont_val = signalcont[idxno] / (
-                    noisecont_val * 2)  # SNR per detector pixel
-                    pframesn_psp_asp_all.append(sncont_val)
-
-                    tsncont_val = sncont_val * numpy.sqrt(
-                        numframe_val)  # total SNR per detector pixel
-                    allframesn_psp_asp_all.append(tsncont_val)
-
-        ### END COMPUTATION OF SNR_PSP_PSPP PER FRAME EXPTIME
-
-
-        ###################
-        # In case of line #
-        ###################
-        if fluxt_val == "L":
-
-            deltalambda = fwhmline_val * nfwhmline_val
-            npixx = deltalambda / disp
-            deltalambdacont = fwhmline_val * cnfwhmline_val
-            npixxcont = deltalambdacont / disp
-
-            # Different spatial elements to consider, depending on whether the source is punctual or extended.
-            # Starting FOR loop for computations
-            items = range(4)
+        ######################################################################
+        ############################### GRAPHICS #############################
+        ######################################################################
+        if plotflag_val=='yes':
+            # FOR COMPUTING SNR per detector pixel at each lamb (not just lambdaeff)
+            # we need to recompute the SNR as above but just for the case of SNR per detector pixel
+            # and replacing in the function signal(), lambdaeff by lamb.
+            # Then, for exptime per frame:
+            textcalc += "<br />### Compute SNR per detector pixel @ all $\lambda$ (used for plot) ### <br />"
+            items = [9, 0]
             for xit in items:
-
                 # Deriving spectroscopic parameters for each case:
-                omegasource, npixy, omegaskysource, nfiby, npixx = \
-                    specparline(om_val, xit, areasource, diamsource, ps, disp,
-                                nfibres, areafibre, rfibre, nfibresy,
-                                areaseeing, seeingx, npixx)
-
-                # Line signal in defined spatial resolution element: only in the line
-                # Line flux is given already integrated (not per AA)--> bandwidth deltalambda = 1 AA
-                signalline = linesignal(flineparc, 1.0, effsys, stel, omegasource, exptime_val, wline_val, lamb)
-
-                # Continuum signal in defined spatial resolution element, in deltalambda.
-                # (If no. of line FWHMs selected is deltalambda to derive the line signal).
-                # Extract continuum at the wavelength.
-                ind = numpy.where(lamb == wline_val)
-                contatline = fc[ind]
-
-                signalcont_line = linesignal(contatline, deltalambda, effsys,
-                                             stel, omegasource, exptime_val,
-                                             wline_val, lamb)
+                deltalambda, omegasource, npixx, npixy, nfib, nfib1, omegaskysource, specparstring = specpar(
+                    om_val, xit, disp, ps,
+                    nfibres, nfibresy, areafibre, rfibre, deltab, areasource,
+                    diamsource, areaseeing, seeingx)
 
                 # Number of pixels in detector under consideration: just counting the factor in area
                 # when we consider the used sky minibundles
                 npix = npixx * npixy
-                npixcont = (cnfwhmline_val / nfwhmline_val) * npix
+                npixsky = (omegasky / omegaskysource) * npix
 
-                # Signal of dark current
-                signaldark_line, sdlverb = dark(exptime_val, dc, npix)
+                # Source continuum signal in defined spectral and spatial resolution element
+                signalcont, _ = signal(fc, deltalambda, lamb, effsys, stel,
+                                    omegasource, exptimepframe_val, enph, lamb)
+
+                # Sky signal in defined spectral and spatial resolution element
+                signalsky, _ = signal(fs, deltalambda, lamb, effsys, stel,
+                                   omegaskysource, exptimepframe_val, enph, lamb)
+
+                # Dark signal
+                signaldark, sdverb = dark(exptime_val, dc, npix)
 
                 # Noise due to dark measurement to the square
-                noisedarksq_line, noisedarksq_lineverb = darknoisesq(npix, npdark_val, exptime_val,
-                                               dc, ron)
+                noisedarksq, noisedarksqverb = darknoisesq(npix, npdark_val, exptimepframe_val, dc,
+                                          ron)
 
                 # RON
-                ronoiseline, ronoiselineverb = readoutnoise(npix, ron)
+                ronoise, ronoiseverb = readoutnoise(npix, ron)
 
-                # Noise due to continuum substraction
-                # Continuum signal *MEASURED* in spatial resolution element, in cnfwhmline_val
-                signalcontmeasured = linesignal(contatline, deltalambdacont,
-                                                effsys, stel,
-                                                omegasource, exptime_val,
-                                                wline_val, lamb)
-                ronoisecontmeasured, ronoisecontmeasuredverb = readoutnoise(npixcont, ron)
-                signaldarkcontmeasured, sdcmverb = dark(exptime_val, dc, npixcont)
-                noisedarksqcontmeasured, noisedarksqcontmeasuredverb = darknoisesq(npixcont, npdark_val,
-                                                      exptime_val, dc, ron)
+                # Noise due to sky substraction
+                # Sky signal *MEASURED* in defined spectral and spatial resolution element
+                signalskymeasured, _ = signal(fs, deltalambda, lamb, effsys, stel,
+                                           omegasky, exptimepframe_val, enph, lamb)
+                ronoiseskymeasured, ronoiseskymeasuredverb = readoutnoise(npixsky, ron)
+                signaldarkskymeasured, sdsmverb = dark(exptimepframe_val, dc, npixsky)
+                noisedarksqskymeasured, noisedarksqskymeasuredverb = darknoisesq(npixsky, npdark_val,
+                                                     exptimepframe_val, dc, ron)
 
-                noisecontsq = (nfwhmline_val / cnfwhmline_val) ** 2 * (
-                signalcontmeasured +
-                ronoisecontmeasured + signaldarkcontmeasured + noisedarksqcontmeasured)
+                noiseskysq = (omegaskysource / omegasky) ** 2 * (
+                signalskymeasured + ronoiseskymeasured + signaldarkskymeasured + noisedarksqskymeasured)
 
-                # Line noise in defined spectral and spatial resolution element
-                noiseline = math.sqrt(
-                    signalline + signalcont_line + signaldark_line + ronoiseline +
-                    noisedarksq_line + noisecontsq)
+                if xit == 9:
+                    # Source continuum noise in defined spectral and spatial resolution element
+                    noisecont_psp_asp = []
+                    pframesn_psp_asp = []
+                    allframesn_psp_asp = []
+                    # pframesn_psp_asp_all = []    #SNR per frame per spectral pixel all source area
+                    # allframesn_psp_asp_all = []  #SNR total per spectral pixel all source area
+                    for idxno, valno in enumerate(signalcont):
+                        noisecont_val = math.sqrt(signalcont[idxno] + signalsky[
+                            idxno] + signaldark + ronoise + noisedarksq +
+                                                  noiseskysq[idxno])
+                        noisecont_psp_asp.append(noisecont_val)
+                        # Signal-to-noise of continuum
+                        # sncont_val = signalcont[idxno] / (noisecont_val*4)  #SNR per detector pixel
+                        sncont_val = signalcont[idxno] / (
+                        noisecont_val * 2)  # SNR per spectral pixel
+                        pframesn_psp_asp.append(sncont_val)
 
-                # Signal-to-noise of line
-                snline = signalline / noiseline
+                        tsncont_val = sncont_val * numpy.sqrt(
+                            numframe_val)  # total SNR per detector pixel
+                        allframesn_psp_asp.append(tsncont_val)
+                elif xit == 0:  # dummy
+                    # Source continuum noise in defined spectral and spatial resolution element
+                    noisecont_psp_asp_all = []
+                    pframesn_psp_asp_all = []  # SNR per frame per spectral pixel all source area
+                    allframesn_psp_asp_all = []  # SNR total per spectral pixel all source area
+                    for idxno, valno in enumerate(signalcont):
+                        noisecont_val = math.sqrt(signalcont[idxno] +
+                                                  signalsky[idxno] +
+                                                  signaldark + ronoise +
+                                                  noisedarksq + noiseskysq[idxno])
+                        noisecont_psp_asp_all.append(noisecont_val)
+                        # Signal-to-noise ratio of continuum
+                        sncont_val = signalcont[idxno] / (
+                        noisecont_val * 2)  # SNR per detector pixel
+                        pframesn_psp_asp_all.append(sncont_val)
 
-                # Cases per arcsec2 and per AA and per fibre per AA
-                if xit == 2 or xit == 3:
-                    npixxinAA = 1.0 / disp
-                    npixinAA = npixxinAA * npixy
+                        tsncont_val = sncont_val * numpy.sqrt(
+                            numframe_val)  # total SNR per detector pixel
+                        allframesn_psp_asp_all.append(tsncont_val)
 
-                    # If line FWHM is > 1 A, line and continuum fluxes contributing to measurement
-                    if fwhmline_val > 1.0:
-                        signallineperAA = signalline / fwhmline_val
-                        signalcont_lineperAA = signalcont_line / deltalambda
-                    # If line FWHM is < 1 A, line and continuum fluxes contributing to measurement
-                    else:
-                        signallineperAA = signalline
-                        signalcont_lineperAA = linesignal(contatline, 1.0,
-                                                          effsys, stel,
-                                                          omegasource,
-                                                          exptime_val,
-                                                          wline_val, lamb)
+            ### END COMPUTATION OF SNR_PSP_PSPP PER FRAME EXPTIME
 
-                    # Common computations, independent on if FWHM > 1AA or not.
-                    signaldark_lineperAA, sdlpaaverb = dark(exptime_val, dc, npixinAA)
-                    noisedarksq_lineperAA, noisedarksq_lineperAAverb = darknoisesq(npixinAA, npdark_val,
-                                                        exptime_val, dc, ron)
-                    ronoiselineperAA, ronoiselineperAAverb = readoutnoise(npixinAA, ron)
 
-                    # Noise in continuum measurement is the same as before, but the scaling is
-                    # different according to the different number of pixels in 1 AA.
-                    noisecontmeasuredperAA = (((
-                                               1. / fwhmline_val) / nfwhmline_val) ** 2) * noisecontsq
+            ###################
+            # In case of line #
+            ###################
+            if fluxt_val == "L":
 
-                    # Total noise in line
-                    noiselineperAA = math.sqrt(
-                        signallineperAA + signalcont_lineperAA +
-                        signaldark_lineperAA + ronoiselineperAA + noisedarksq_lineperAA +
-                        noisecontmeasuredperAA)
+                deltalambda = fwhmline_val * nfwhmline_val
+                npixx = deltalambda / disp
+                deltalambdacont = fwhmline_val * cnfwhmline_val
+                npixxcont = deltalambdacont / disp
 
-                    if xit == 2:
-                        snlineperAA = signallineperAA / noiselineperAA
+                # Different spatial elements to consider, depending on whether the source is punctual or extended.
+                # Starting FOR loop for computations
+                items = range(4)
+                for xit in items:
+
+                    # Deriving spectroscopic parameters for each case:
+                    omegasource, npixy, omegaskysource, nfiby, npixx = \
+                        specparline(om_val, xit, areasource, diamsource, ps, disp,
+                                    nfibres, areafibre, rfibre, nfibresy,
+                                    areaseeing, seeingx, npixx)
+
+                    # Line signal in defined spatial resolution element: only in the line
+                    # Line flux is given already integrated (not per AA)--> bandwidth deltalambda = 1 AA
+                    signalline = linesignal(flineparc, 1.0, effsys, stel, omegasource, exptime_val, wline_val, lamb)
+
+                    # Continuum signal in defined spatial resolution element, in deltalambda.
+                    # (If no. of line FWHMs selected is deltalambda to derive the line signal).
+                    # Extract continuum at the wavelength.
+                    ind = numpy.where(lamb == wline_val)
+                    contatline = fc[ind]
+
+                    signalcont_line = linesignal(contatline, deltalambda, effsys,
+                                                 stel, omegasource, exptime_val,
+                                                 wline_val, lamb)
+
+                    # Number of pixels in detector under consideration: just counting the factor in area
+                    # when we consider the used sky minibundles
+                    npix = npixx * npixy
+                    npixcont = (cnfwhmline_val / nfwhmline_val) * npix
+
+                    # Signal of dark current
+                    signaldark_line, sdlverb = dark(exptime_val, dc, npix)
+
+                    # Noise due to dark measurement to the square
+                    noisedarksq_line, noisedarksq_lineverb = darknoisesq(npix, npdark_val, exptime_val,
+                                                   dc, ron)
+
+                    # RON
+                    ronoiseline, ronoiselineverb = readoutnoise(npix, ron)
+
+                    # Noise due to continuum substraction
+                    # Continuum signal *MEASURED* in spatial resolution element, in cnfwhmline_val
+                    signalcontmeasured = linesignal(contatline, deltalambdacont,
+                                                    effsys, stel,
+                                                    omegasource, exptime_val,
+                                                    wline_val, lamb)
+                    ronoisecontmeasured, ronoisecontmeasuredverb = readoutnoise(npixcont, ron)
+                    signaldarkcontmeasured, sdcmverb = dark(exptime_val, dc, npixcont)
+                    noisedarksqcontmeasured, noisedarksqcontmeasuredverb = darknoisesq(npixcont, npdark_val,
+                                                          exptime_val, dc, ron)
+
+                    noisecontsq = (nfwhmline_val / cnfwhmline_val) ** 2 * (
+                    signalcontmeasured +
+                    ronoisecontmeasured + signaldarkcontmeasured + noisedarksqcontmeasured)
+
+                    # Line noise in defined spectral and spatial resolution element
+                    noiseline = math.sqrt(
+                        signalline + signalcont_line + signaldark_line + ronoiseline +
+                        noisedarksq_line + noisecontsq)
+
+                    # Signal-to-noise of line
+                    snline = signalline / noiseline
+
+                    # Cases per arcsec2 and per AA and per fibre per AA
+                    if xit == 2 or xit == 3:
+                        npixxinAA = 1.0 / disp
+                        npixinAA = npixxinAA * npixy
+
+                        # If line FWHM is > 1 A, line and continuum fluxes contributing to measurement
+                        if fwhmline_val > 1.0:
+                            signallineperAA = signalline / fwhmline_val
+                            signalcont_lineperAA = signalcont_line / deltalambda
+                        # If line FWHM is < 1 A, line and continuum fluxes contributing to measurement
+                        else:
+                            signallineperAA = signalline
+                            signalcont_lineperAA = linesignal(contatline, 1.0,
+                                                              effsys, stel,
+                                                              omegasource,
+                                                              exptime_val,
+                                                              wline_val, lamb)
+
+                        # Common computations, independent on if FWHM > 1AA or not.
+                        signaldark_lineperAA, sdlpaaverb = dark(exptime_val, dc, npixinAA)
+                        noisedarksq_lineperAA, noisedarksq_lineperAAverb = darknoisesq(npixinAA, npdark_val,
+                                                            exptime_val, dc, ron)
+                        ronoiselineperAA, ronoiselineperAAverb = readoutnoise(npixinAA, ron)
+
+                        # Noise in continuum measurement is the same as before, but the scaling is
+                        # different according to the different number of pixels in 1 AA.
+                        noisecontmeasuredperAA = (((
+                                                   1. / fwhmline_val) / nfwhmline_val) ** 2) * noisecontsq
+
+                        # Total noise in line
+                        noiselineperAA = math.sqrt(
+                            signallineperAA + signalcont_lineperAA +
+                            signaldark_lineperAA + ronoiselineperAA + noisedarksq_lineperAA +
+                            noisecontmeasuredperAA)
+
+                        if xit == 2:
+                            snlineperAA = signallineperAA / noiselineperAA
+                        if xit == 3:
+                            snlinefibreperAA = signallineperAA / noiselineperAA  ### SAME AS snlineperAA ???
+
+                    # 1 spaxel, (1 fibre diameter * 4 pix in spectral direction)
                     if xit == 3:
-                        snlinefibreperAA = signallineperAA / noiselineperAA  ### SAME AS snlineperAA ???
+                        # VPH FWHM is always <= line FWHM (it is imposed)
+                        npixfibre = (fwhmvph / disp) * (2. * rfibre / ps)
+                        npixxspaxel = 4.0  # Nyquist-Shannon sampling theorem
+                        npixspaxel = npixxspaxel * npixy
+                        ratio = npixfibre / (npixspaxel)
+                        signallinespaxel = signalline / ratio
+                        signalcont_linespaxel = signalcont_line / ratio
 
-                # 1 spaxel, (1 fibre diameter * 4 pix in spectral direction)
-                if xit == 3:
-                    # VPH FWHM is always <= line FWHM (it is imposed)
-                    npixfibre = (fwhmvph / disp) * (2. * rfibre / ps)
-                    npixxspaxel = 4.0  # Nyquist-Shannon sampling theorem
-                    npixspaxel = npixxspaxel * npixy
-                    ratio = npixfibre / (npixspaxel)
-                    signallinespaxel = signalline / ratio
-                    signalcont_linespaxel = signalcont_line / ratio
+                        signaldark_linespaxel, sdlspaxverb = dark(exptime_val, dc, npixspaxel)
+                        noisedarksq_linespaxel, noisedarksq_linespaxelverb = darknoisesq(npixspaxel,
+                                                             npdark_val,
+                                                             exptime_val, dc, ron)
+                        ronoiselinespaxel, ronoiselinespaxelverb = readoutnoise(npixspaxel, ron)
 
-                    signaldark_linespaxel, sdlspaxverb = dark(exptime_val, dc, npixspaxel)
-                    noisedarksq_linespaxel, noisedarksq_linespaxelverb = darknoisesq(npixspaxel,
-                                                         npdark_val,
-                                                         exptime_val, dc, ron)
-                    ronoiselinespaxel, ronoiselinespaxelverb = readoutnoise(npixspaxel, ron)
+                        # Noise in continuum measurement is the same as before, but the scaling is
+                        # different according to the different number of pixels in 4 pixels.
+                        noisecontmeasuredperspaxel = (((
+                                                       fwhmvph / fwhmline_val) / nfwhmline_val) ** 2) * noisecontsq
 
-                    # Noise in continuum measurement is the same as before, but the scaling is
-                    # different according to the different number of pixels in 4 pixels.
-                    noisecontmeasuredperspaxel = (((
-                                                   fwhmvph / fwhmline_val) / nfwhmline_val) ** 2) * noisecontsq
+                        noiselinespaxel = math.sqrt(
+                            signallinespaxel + signalcont_linespaxel +
+                            signaldark_linespaxel + ronoiselinespaxel + noisedarksq_linespaxel +
+                            noisecontmeasuredperspaxel)
 
-                    noiselinespaxel = math.sqrt(
-                        signallinespaxel + signalcont_linespaxel +
-                        signaldark_linespaxel + ronoiselinespaxel + noisedarksq_linespaxel +
-                        noisecontmeasuredperspaxel)
+                        snlinespaxel = signallinespaxel / noiselinespaxel
 
-                    snlinespaxel = signallinespaxel / noiselinespaxel
+                    # 1 spectral and spatial pixel
+                    if xit == 3:
+                        npixfibre = (fwhmline_val / disp) * (2. * rfibre / ps)
+                        npixx1pix = 1.0
+                        npixy1pix = 1.0
+                        npix1pix = npixx1pix * npixy1pix
+                        ratio = npixfibre / (npix1pix)
+                        signalline1pix = signalline / ratio
+                        signalcont_line1pix = signalcont_line / ratio
 
-                # 1 spectral and spatial pixel
-                if xit == 3:
-                    npixfibre = (fwhmline_val / disp) * (2. * rfibre / ps)
-                    npixx1pix = 1.0
-                    npixy1pix = 1.0
-                    npix1pix = npixx1pix * npixy1pix
-                    ratio = npixfibre / (npix1pix)
-                    signalline1pix = signalline / ratio
-                    signalcont_line1pix = signalcont_line / ratio
+                        signaldark_line1pix, sdl1pverbose = dark(exptime_val, dc, npix1pix)
+                        noisedarksq_line1pix, noisedarksq_line1pixverb = darknoisesq(npix1pix, npdark_val,
+                                                           exptime_val, dc, ron)
+                        ronoiseline1pix, ronoiseline1pixverb = readoutnoise(npix1pix, ron)
 
-                    signaldark_line1pix, sdl1pverbose = dark(exptime_val, dc, npix1pix)
-                    noisedarksq_line1pix, noisedarksq_line1pixverb = darknoisesq(npix1pix, npdark_val,
-                                                       exptime_val, dc, ron)
-                    ronoiseline1pix, ronoiseline1pixverb = readoutnoise(npix1pix, ron)
+                        # Noise in continuum measurement is the same as before, but the scaling is
+                        # different according to the different number of pixels 1 pix.
+                        noisecontmeasuredperspaxel = ((((
+                                                        fwhmvph / fwhmline_val) / 4.0) /
+                                                       nfwhmline_val) ** 2) * noisecontsq
 
-                    # Noise in continuum measurement is the same as before, but the scaling is
-                    # different according to the different number of pixels 1 pix.
-                    noisecontmeasuredperspaxel = ((((
-                                                    fwhmvph / fwhmline_val) / 4.0) /
-                                                   nfwhmline_val) ** 2) * noisecontsq
+                        noiseline1pix = math.sqrt(
+                            signalline1pix + signalcont_line1pix +
+                            signaldark_line1pix + ronoiseline1pix + noisedarksq_line1pix +
+                            noisecontmeasuredperspaxel)
 
-                    noiseline1pix = math.sqrt(
-                        signalline1pix + signalcont_line1pix +
-                        signaldark_line1pix + ronoiseline1pix + noisedarksq_line1pix +
-                        noisecontmeasuredperspaxel)
+                        snline1pix = signalline1pix / noiseline1pix
+                        # snline1pix = snlinespaxel / math.sqrt(16)
 
-                    snline1pix = signalline1pix / noiseline1pix
-                    # snline1pix = snlinespaxel / math.sqrt(16)
+                    # Output values:
 
-                # Output values:
+                    if xit == 0:  # All area
+                        snline_all = snline
+                        tsnline_all = snline_all * numpy.sqrt(numframe_val)
 
-                if xit == 0:  # All area
-                    snline_all = snline
-                    tsnline_all = snline_all * numpy.sqrt(numframe_val)
+                    elif xit == 1:  # Seeing
+                        snline_seeing = snline
+                        tsnline_seeing = snline_seeing * numpy.sqrt(numframe_val)
 
-                elif xit == 1:  # Seeing
-                    snline_seeing = snline
-                    tsnline_seeing = snline_seeing * numpy.sqrt(numframe_val)
+                    elif xit == 2:  # 1 arcsec**2
+                        snline_1 = snline
+                        tsnline_1 = snline_1 * numpy.sqrt(numframe_val)
+                        snline_1_aa = snlineperAA
+                        tsnline_1_aa = snline_1_aa * numpy.sqrt(numframe_val)
 
-                elif xit == 2:  # 1 arcsec**2
-                    snline_1 = snline
-                    tsnline_1 = snline_1 * numpy.sqrt(numframe_val)
-                    snline_1_aa = snlineperAA
-                    tsnline_1_aa = snline_1_aa * numpy.sqrt(numframe_val)
+                    elif xit == 3:  # 1 fibre
+                        snline_fibre = snline
+                        tsnline_fibre = snline_fibre * numpy.sqrt(
+                            numframe_val)  # all frames
+                        snline_fibre1aa = snlinefibreperAA
+                        tsnline_fibre1aa = snline_fibre1aa * numpy.sqrt(
+                            numframe_val)  # all frames
+                        snline_spaxel = snlinespaxel
+                        tsnline_spaxel = snline_spaxel * numpy.sqrt(
+                            numframe_val)  # all frames
+                        snline_pspp = snline1pix
+                        tsnline_pspp = snline_pspp * numpy.sqrt(
+                            numframe_val)  # total SNR per detector pixel
 
-                elif xit == 3:  # 1 fibre
-                    snline_fibre = snline
-                    tsnline_fibre = snline_fibre * numpy.sqrt(
-                        numframe_val)  # all frames
-                    snline_fibre1aa = snlinefibreperAA
-                    tsnline_fibre1aa = snline_fibre1aa * numpy.sqrt(
-                        numframe_val)  # all frames
-                    snline_spaxel = snlinespaxel
-                    tsnline_spaxel = snline_spaxel * numpy.sqrt(
-                        numframe_val)  # all frames
-                    snline_pspp = snline1pix
-                    tsnline_pspp = snline_pspp * numpy.sqrt(
-                        numframe_val)  # total SNR per detector pixel
+                # End of FOR loop for computations
+                pass
 
-            # End of FOR loop for computations
-            pass
-
-        # Ending if line
+            # Ending if line
+            else:
+                snline_all = 0.
+                tsnline_all = 0.
+                snline_seeing = 0.
+                tsnline_seeing = 0.
+                snline_1 = 0.
+                tsnline_1 = 0.
+                snline_1_aa = 0.
+                tsnline_1_aa = 0.
+                snline_fibre = 0.
+                tsnline_fibre = 0.
+                snline_pspp = 0.
+                tsnline_pspp = 0.
+                snline_spaxel = 0.
+                tsnline_spaxel = 0.
+                snline_fibre1aa = 0.
+                tsnline_fibre1aa = 0.
         else:
+            pframesn_psp_asp = 0
+            allframesn_psp_asp = 0
+            pframesn_psp_asp_all = 0
+            allframesn_psp_asp_all = 0
+
             snline_all = 0.
             tsnline_all = 0.
             snline_seeing = 0.
@@ -1791,6 +1818,8 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
             tsnline_spaxel = 0.
             snline_fibre1aa = 0.
             tsnline_fibre1aa = 0.
+
+        # else plotflag_val=='no' and do not enter the loop for computing graph elements
 
         ##############################
         # Output of input parameters #
@@ -1965,7 +1994,9 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                 'sncont_cr1r2spaxels_all': sncont_cr1r2_all, \
                 'tsncont_centerspaxel_all': tsncont_c_all, \
                 'tsncont_cr1spaxels_all': tsncont_cr1_all, \
-                'tsncont_cr1r2spaxels_all': tsncont_cr1r2_all \
+                'tsncont_cr1r2spaxels_all': tsncont_cr1r2_all, \
+\
+                'plotflag_val': plotflag_val \
                 }  # ADDED FOR DJANGO (for views.py)
     # Avoiding computations in case of exception of errind
     else:

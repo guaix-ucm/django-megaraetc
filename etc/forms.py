@@ -31,6 +31,10 @@ IFLUX = [('C', 'Continuum'),
 RLINECHOICES = [('N', 'No'),
                 ('Y', 'Yes')]
 
+PLOTCHOICES = [('no', 'No'),
+                ('yes', 'Yes')]
+
+
 CONTMAGFLUX = [('M', 'Continuum mag'),
                ('F', 'Continuum flux')]
 
@@ -150,3 +154,6 @@ class ObservationalSetupForm(forms.Form):
     ntbundles = forms.IntegerField(label=mark_safe(ntbundles_help), help_text=ntbundles_hint, initial=567, min_value=1, max_value=567, widget=forms.TextInput(attrs={'placeholder':'56', 'oninput':'calculateNsbund()'}))
     lineap = forms.FloatField(label=mark_safe(lineap_help), initial=1.0, widget=forms.TextInput(attrs={'disabled':'true', 'placeholder':'lineap'}))
     contap = forms.FloatField(label=mark_safe(contap_help), initial=1.0, widget=forms.TextInput(attrs={'disabled':'true', 'placeholder':'contap'}))
+
+class OutputSetupForm(forms.Form):
+    plotflag = forms.ChoiceField(label="Graphic output?", initial="no", choices=PLOTCHOICES, widget=forms.RadioSelect(renderer=HorizontalRadioRenderer))

@@ -1,6 +1,27 @@
 /*CSS*/
 /* this is a comment */
 
+//a:link {
+//    color: white;
+//}
+
+a.splinkcol:link {text-decoration: none; color: black;}
+A.splinkcol:visited {text-decoration: none; color: hotpink;}
+A.splinkcol:hover {text-decoration: underline; color: blue;}
+A.splinkcol:active {text-decoration: none; color: red;}
+
+a:visited {
+    color: green;
+}
+
+a:hover {
+    color: hotpink;
+}
+
+a:active {
+    color: blue;
+}
+
 h4{
     background-color: #A8C9FF;
     text-align: center;
@@ -16,6 +37,7 @@ span.help-block{
     display: initial;
     float: right;
 }
+
 div#theformcontainer{
     margin-bottom: 1%;
 }
@@ -31,20 +53,20 @@ div#rightdiv{
     margin-left: 1%;
 }
 
-div#submitbuttonsdiv{
+div#submitbuttonsdiv {
     float: left;
     width: 100%;
     text-align: center;
 }
 
-label.control-label{
-    width: 40%;
+label.control-label {
+    width: 48%;
     float: left;
 }
 
-.form-control{
-    float: left;
-    width: 45% !important;
+.form-control {
+  float: left;
+    width: 40% !important;
     margin-bottom: 10px;
 }
 
@@ -52,49 +74,82 @@ label.control-label{
     width: 90px;
 }
 
-#result3{
-    text-align: center;
-}
-
-#store_result{
-    visibility: hidden;
-}
-
-#result2{
-    width:35%;
-    height: 100%;
-    float:left
-}
-
-#result2 > p{
-    line-height: normal;
-    text-align: left;
-    background-color: transparent;
-}
-
-#result4 {
-    width: 35%;
-    height: 100%;
-    float: left;
-}
-
 #theoutput {
     width: 100%;
     float: left;
-    min-height: 972px;
+    min-height: 1800px;     /* size of page */
 }
 
+#outbuttons {
+    text-align: center;
+}
 
-#result{
-    min-width: 640px;
-    width:60%;
+#store_result {
+    visibility: hidden;
+}
+
+#leftcolumn {
+    width: 50%;
     height: 100%;
     float:left !important;
 }
 
+/* MPLD3 */
+#resultgraphic {
+    min-width: 20px;
+}
 
+#buffer {
+    width: 5%;
+    height: 100%;
+    float: left;
+}
 
+#buffer > p{
+    line-height: normal;
+    text-align: left;
+    background-color: transparent;
+}
+#rightcolumn {
+    width: 40%;
+    height: 100%;
+    float: right;
+}
+/* TABLES */
+#result4 {
+    width: 100%;
+    height: 100%;
+}
 
+#resultmath {
+    width: 100%;
+    float: left;
+}
+
+#mathid {
+    font-size: 15pt;
+}
+
+#resultnewpsf {
+    width: 100%;
+    /*height: 100%*/
+}
+
+#othergraphic {
+    min-width: 20px;
+    width: 100%;
+/*    height: 100%;*/
+}
+/*#resultmathtext {
+    width: 100%;
+    float: left;
+    display: none;
+}
+
+#expandbutton {
+    float: left;
+}
+*/
 
 .modal {
     display:    none;
@@ -105,7 +160,7 @@ label.control-label{
     height:     100%;
     width:      100%;
     background: rgba( 255, 255, 255, .8 )
-                url('http://i.stack.imgur.com/FhHRx.gif')
+                url('../../out50b.gif')
                 50% 50%
                 no-repeat;
 }

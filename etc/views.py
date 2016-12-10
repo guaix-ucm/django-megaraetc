@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from .forms import AtmosphericConditionsForm, ObservationalSetupForm
 from .forms import TargetForm, InstrumentForm
+from .forms import OutputSetupForm
 from .models import PhotometricFilter, SeeingTemplate
 from .models import SpectralTemplate, VPHSetup
 
@@ -16,6 +17,9 @@ import numpy
 # import mpld3
 # from mpld3 import plugins
 # /home/pica/Documents/virt_django/django_megara
+
+import time
+from time import strftime
 
 
 def compute5(request):
@@ -139,6 +143,8 @@ def compute5(request):
         exptimepframe_val = float(request.POST['exptimepframe'])
         nsbundles_val = int(request.POST['nsbundles'])
 
+        plotflag_val = request.POST['plotflag']
+
         outputofcalc = calc(request.POST['stype'],
                             request.POST['contmagflux'],
                             mag_val, fc_val,
@@ -151,7 +157,9 @@ def compute5(request):
                             spect_val, bandc_val,
                             request.POST['om_val'], vph_val,
                             skycond_val, moon_val, airmass_val, seeing_val,
-                            numframes_val, exptimepframe_val, nsbundles_val)
+                            numframes_val, exptimepframe_val, nsbundles_val,
+                            plotflag_val
+                            )
 
     # cleanstring = string1.replace("\'", '\n')
     # cleanstring = cleanstring.replace(",", ' ')
@@ -181,6 +189,7 @@ def get_info(request):
         form2 = InstrumentForm(request.GET)
         form3 = AtmosphericConditionsForm(request.GET)
         form4 = ObservationalSetupForm(request.GET)
+        form5 = OutputSetupForm(request.GET)
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -188,12 +197,14 @@ def get_info(request):
         form2 = InstrumentForm()
         form3 = AtmosphericConditionsForm()
         form4 = ObservationalSetupForm()
+        form5 = OutputSetupForm()
 
-    return render(request, 'etc/webmegaraetc-0.7.5.html', {
+    return render(request, 'etc/webmegaraetc-0.7.6.html', {
         'form1': form1,
         'form2': form2,
         'form3': form3,
         'form4': form4,
+        'form5': form5,
     })
 
 
@@ -203,17 +214,19 @@ def etc_form(request):
     form2 = InstrumentForm()
     form3 = AtmosphericConditionsForm()
     form4 = ObservationalSetupForm()
+    form5 = OutputSetupForm()
 
     total_formu = {'form1': form1,
                    'form2': form2,
                    'form3': form3,
                    'form4': form4,
+                   'form5': form5,
                    }
 
-    return render(request, 'etc/webmegaraetc-0.7.5.html', total_formu)
+    return render(request, 'etc/webmegaraetc-0.7.6.html', total_formu)
 
 
-# LOADS THIS AFTER PRESSING "COMPUTE" webmegaraetc.html and
+# LOADS THIS AFTER PRESSING "SUBMIT" webmegaraetc.html and
 # OUTPUT RESULTS in JSON HTTP Response directly into html page
 # FINAL STRING CLEANSING/FILTERING HERE
 #
@@ -230,6 +243,10 @@ def etc_do(request):
 
     elif request.method == 'POST':
         print '### LOG: ETC_DO'
+        start_time = time.time()
+        start_time_string = time.strftime("%H:%M:%S")
+        print 'Start time: ', str(start_time)
+        print 'Date time: ', start_time_string
         outputofcalc = compute5(request)
         print '### LOG: ETC_DO: OUTPUTOFCALC SUCCESSFULLY COMPUTED'
         tocheck = str(outputofcalc['outtext'])
@@ -239,16 +256,13 @@ def etc_do(request):
             outtextstring = tocheck
 
         ##############################################
-        ### TESTING AREA
+        ### OUTPUT TEXT
         ##############################################
         inputstring = '<br /><p>' + str(outputofcalc['texti']) + '</p>'
         coutputstring = '<br /><p>' + str(outputofcalc['textoc']) + '</p>'
         loutputstring = '<br /><p>' + str(outputofcalc['textol']) + '</p>'
         textcalcstring = '<br /><table border=1 id="mathtextid"><tr><td>' + str(outputofcalc['textcalc']) + '</td></tr></table>'
 
-        ######################
-        ### MPLD3 GRAPHICS ###
-        ######################
         # Suck out relevant data from database
         vph = request.POST['vph']
         queryvph = VPHSetup.objects.filter(pk=vph).values()
@@ -259,91 +273,88 @@ def etc_do(request):
         queryspec = SpectralTemplate.objects.filter(pk=spec).values()
         entry_spec_name = queryspec[0]['name']
 
-        # Check if computation outputs are conform
-        if not tocheck:
-            x = outputofcalc['lamb']
-            y = outputofcalc['fc']
-            label1 = entry_spec_name
-            label2 = outputofcalc['mag_val']
-            label3 = outputofcalc['bandc_val']
 
-            x2 = x
-            y2 = outputofcalc['pframesn_psp_asp']
-            x2b = x2
-            y2b = outputofcalc['allframesn_psp_asp']
-            x2c = x2
-            y2c = outputofcalc['pframesn_psp_asp_all']
-            x2d = x2
-            y2d = outputofcalc['allframesn_psp_asp_all']
+        ################################################################
+        ########################## GRAPHICS ############################
+        ################################################################
 
-            label2a = entry_spec_name
-            label2b = vph_val
-            label2c = outputofcalc['bandc_val']
+        plotflag_val = request.POST['plotflag']
+
+        if plotflag_val == 'yes':
+            # First, prepare variables to be plotted
+            # Check if computation outputs are conform
+            if not tocheck:
+                x = outputofcalc['lamb']
+                y = outputofcalc['fc']
+                label1 = entry_spec_name
+                label2 = outputofcalc['mag_val']
+                label3 = outputofcalc['bandc_val']
+
+                x2 = x
+                y2 = outputofcalc['pframesn_psp_asp']
+                x2b = x2
+                y2b = outputofcalc['allframesn_psp_asp']
+                x2c = x2
+                y2c = outputofcalc['pframesn_psp_asp_all']
+                x2d = x2
+                y2d = outputofcalc['allframesn_psp_asp_all']
+
+                label2a = entry_spec_name
+                label2b = vph_val
+                label2c = outputofcalc['bandc_val']
+            else:
+                x = numpy.arange(1, 1001, 1)
+                y = numpy.arange(1, 1001, 1)
+                x2 = numpy.arange(1, 1001, 1)
+                y2 = numpy.arange(1, 1001, 1)
+                x2b = numpy.arange(1, 1001, 1)
+                y2b = numpy.arange(1, 1001, 1)
+                x2c = numpy.arange(1, 1001, 1)
+                y2c = numpy.arange(1, 1001, 1)
+                x2d = numpy.arange(1, 1001, 1)
+                y2d = numpy.arange(1, 1001, 1)
+
+                label1 = "none"
+                label2 = 20.0  # Float
+                label3 = "none"
+                label2a = "none"
+                label2b = "none"
+                label2c = "none"
+
+            # More things to check
+            if not tocheck:
+                x3 = outputofcalc['wline_val']
+                y3 = outputofcalc['fwhmline_val']
+                z3 = outputofcalc['fline_val']
+            else:
+                x3 = numpy.arange(1, 1001, 1)
+                y3 = numpy.arange(1, 1001, 1)
+                z3 = numpy.arange(1, 1001, 1)
+
+            # LEGACY CODE (MPLD3)
+            # figura = plot_and_save_new('', x, y, x3, y3, z3,
+            #                            vph_minval, vph_maxval,
+            #                            label1, label2, label3)
+            # html = mpld3.fig_to_html(figura)
+            # html += mpld3.fig_to_html(figura2)
+            # html = html.replace("None", "")  # No se xq introduce string None
+
+            thescript, thediv = bokehplot1(x, y, x3, y3, z3,
+                                           vph_minval, vph_maxval,
+                                           label1, label2, label3,
+                                           x2, y2, x2b, y2b,
+                                           x2c, y2c, x2d, y2d,
+                                           label2a, label2b, label2c)
         else:
-            x = numpy.arange(1, 1001, 1)
-            y = numpy.arange(1, 1001, 1)
-            x2 = numpy.arange(1, 1001, 1)
-            y2 = numpy.arange(1, 1001, 1)
-            x2b = numpy.arange(1, 1001, 1)
-            y2b = numpy.arange(1, 1001, 1)
-            x2c = numpy.arange(1, 1001, 1)
-            y2c = numpy.arange(1, 1001, 1)
-            x2d = numpy.arange(1, 1001, 1)
-            y2d = numpy.arange(1, 1001, 1)
+            thescript = ""
+            thediv = ""
 
-            label1 = "none"
-            label2 = 20.0  # Float
-            label3 = "none"
-            label2a = "none"
-            label2b = "none"
-            label2c = "none"
+        html = ""
+        ################################################################
+        ################################################################
+        ################################################################
 
-        # # CREATE TEMPORARY FILE
-        # temp = tempfile.NamedTemporaryFile(suffix=".png", prefix="temp", dir="etc/static/etc/tmp/", delete=False)
-        #
-        # graphic = plot_and_save(temp.name, x, y, label1, label2, label3)
-        # temp2 = tempfile.NamedTemporaryFile(suffix=".png", prefix="temp", dir="etc/static/etc/tmp/", delete=False)
-        # graphic2 = plot_and_save2(temp2.name, x2, y2, x2b, y2b, x2c, y2c, x2d, y2d, label2a, label2b, label2c)
-        #
-        # # RENAME FILE PATH
-        # dirname, basename = os.path.split(graphic)
-        # newpath = '/static/etc/tmp/'
-        # graphic = os.path.join(newpath, basename)
-        #
-        # dirname2, basename2 = os.path.split(graphic2)
-        # newpath2 = '/static/etc/tmp/'
-        # graphic2 = os.path.join(newpath2, basename2)
-
-        # More things to check
-        if not tocheck:
-            x3 = outputofcalc['wline_val']
-            y3 = outputofcalc['fwhmline_val']
-            z3 = outputofcalc['fline_val']
-        else:
-            x3 = numpy.arange(1, 1001, 1)
-            y3 = numpy.arange(1, 1001, 1)
-            z3 = numpy.arange(1, 1001, 1)
-
-        # figura = plot_and_save_new('', x, y, x3, y3, z3,
-        #                            vph_minval, vph_maxval,
-        #                            label1, label2, label3)
-
-        # html = mpld3.fig_to_html(figura)
-
-        # figura2 = plot_and_save2_new('', x2, y2, x2b, y2b,
-        #                              x2c, y2c, x2d, y2d,
-        #                              x3, y3, z3,
-        #                              vph_minval, vph_maxval,
-        #                              label2a, label2b, label2c)
-
-        # html += mpld3.fig_to_html(figura2)
-
-        # html = html.replace("None", "")  # No se xq introduce string None
-
-
-        # import matplotlib.pyplot as plt
-        # plt.clf()
-
+        # Check variables and format them to strings
         if not tocheck:
             om_val_string = str(outputofcalc['om_val'])
             bandc_val_string = str(outputofcalc['bandc_val'])
@@ -381,12 +392,10 @@ def etc_do(request):
             lamb_string = str(outputofcalc['lamb'])
             spect_val_string = str(outputofcalc['spect_val'])
             fc_string = str(outputofcalc['fc'])
-            pframesn_psp_asp_string = str(outputofcalc['pframesn_psp_asp'])
-            allframesn_psp_asp_string = str(outputofcalc['pframesn_psp_asp'])
-            pframesn_psp_asp_all_string = str(
-                outputofcalc['pframesn_psp_asp_all'])
-            allframesn_psp_asp_all_string = str(
-                outputofcalc['allframesn_psp_asp_all'])
+            # pframesn_psp_asp_string = str(outputofcalc['pframesn_psp_asp'])
+            # allframesn_psp_asp_string = str(outputofcalc['pframesn_psp_asp'])
+            # pframesn_psp_asp_all_string = str(outputofcalc['pframesn_psp_asp_all'])
+            # allframesn_psp_asp_all_string = str(outputofcalc['allframesn_psp_asp_all'])
 
             nfibres_string = str(outputofcalc['nfibres'])
             nfib_string = str(outputofcalc['nfib'])
@@ -542,7 +551,8 @@ def etc_do(request):
             tsncont_cr1r2spaxels_all_val = outputofcalc['tsncont_cr1r2spaxels_all']
             tsncont_cr1r2spaxels_all_string = "{0:.2f}".format(float(tsncont_cr1r2spaxels_all_val))
 
-            tablecoutstring = 'OUTPUT CONTINUUM SNR:' + \
+            tablecoutstring = '<hr /><br />' + \
+                              'OUTPUT CONTINUUM SNR:' + \
                               '<br />(at lambda_c(VPH) = ' + lambdaeff_string + ' AA)' + \
                               '<table border=1>' + \
                               '<tr><th class="iconcolumn" scope="col"> </th><th scope="col" colspan="2">* SNR per fibre:</th><th scope="col"></th></tr>' + \
@@ -637,7 +647,11 @@ def etc_do(request):
                 tablenewpsfstring = ''
             else:
                 tablenewpsfstring = '<hr />' + \
+                                    'Time of request: ' + start_time_string + '<br />' + \
+                                    'End of request: ' + time.strftime("%H:%M:%S") + '<br />' + \
+                                    'Computation time: ' + str((time.time() - start_time)) + ' seconds <br />' + \
                                     'SNR with new PSF' + \
+                                    '<br />(at lambda_c(VPH) = ' + lambdaeff_string + ' AA)' + \
                                     '<table border=1>' + \
                                     '<tr><th class="iconcolumn" scope="col"> </th>' + \
                                         '<th scope="col" colspan="6">* SNR per spaxel zones due to PSF (only in LCB mode):<br />D_{fiber}=0.62 arcsec; Seeing FWHM = ' + seeingx_string + ' arcsec</th>' + \
@@ -696,14 +710,6 @@ def etc_do(request):
 
         html2 = ''  # for testing
         # print html2
-        thescript, thediv = bokehplot1(x, y, x3, y3, z3,
-                                       vph_minval, vph_maxval,
-                                       label1, label2, label3,
-                                       x2, y2, x2b, y2b,
-                                       x2c, y2c, x2d, y2d,
-                                       label2a, label2b, label2c)
-        html = ""
-
 
         print "### LOG: ABOUT TO QUIT ETC_DO"
         from django.http import JsonResponse
@@ -717,7 +723,6 @@ def etc_do(request):
                              'tableinput': tableinputstring,
                              'tablecalc': tablecalcstring,
                              'tablenewpsf': tablenewpsfstring,
-                             'graphic': html,
                              'thescript': thescript,
                              'thediv': thediv,
                              })

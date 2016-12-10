@@ -1,8 +1,9 @@
 $( document ).ready(function() {
     console.log( "ready!" );
 
-    $('html').animate({scrollTop:0}, 1);
-    $('body').animate({scrollTop:0}, 1);
+//    $('html').animate({scrollTop:0}, 1);
+//    $('body').animate({scrollTop:0}, 1);
+    $(window).load(function(){ $("html,body").animate({scrollTop: 0}, 1); });
 
     $body = $("body");
     $(document).on({
@@ -23,20 +24,44 @@ $( document ).ready(function() {
             // Put the results in a div
             posting.done(function (data) {
                 console.log($(data))
-                $(data)[0]['graphic']
                 var content = $(data).find("#content");
-                $("#result").empty().append($(data)[0]['graphic']);
 //                $("#result2").empty().append($(data)[0]['outtext'] + $(data)[0]['textcout'] + $(data)[0]['textlout'] + $(data)[0]['textinput']);
                 $("#result4").empty().append($(data)[0]['outtext'] + $(data)[0]['tablecout'] + $(data)[0]['tablelout'] + $(data)[0]['tableinput']);
+
+                var newpsf = $(data)[0]['tablenewpsf'];
+                $("#resultnewpsf").empty().append(newpsf);
+
+                // MathJax Typesetting:
+                // Insert 'tablecalc' as a string into variable mathtable which
+                // will appear in the HTML ID #resultmath.
+                // Then, get the pre-defined id (in tablecalc), in this case mathid
+                // and typeset the string.
+                var mathtable = $(data)[0]['tablecalc'];
+                $("#resultmath").empty().append(mathtable);
+                var mathid = document.getElementById("mathid");
+                MathJax.Hub.Queue(["Typeset",MathJax.Hub, "mathid"]);
+
+                // Make 'store result' button visible
                 $("#store_result").css('visibility', 'visible');
+
+                // Graphics
+                var thediv = $(data)[0]['thediv'];
+                var thescript = $(data)[0]['thescript'];
+
+                $("#othergraphic").empty().append(thediv);
+                $("#othergraphic").append(thescript);
+
                 //$('.btn-primary').css('color','#fff');
                 //$('.btn-primary').css('background-color','#337ab7');
                 //$('.btn-primary').css('border-color','#2e6da4');
+
             });
             $("input[type=submit]").css('visibility', 'hidden')
+
         }
     });
 });
+
 
 // pop-up window
 function newPopup(url) {
@@ -54,7 +79,6 @@ url,'popUpWindow','height=900,width=740,left=10,top=10,resizable=yes,scrollbars=
 function closeWin() {
 	alert("Just close the browser's tab to quit.")
 }
-
 
 
 // for source type
@@ -248,6 +272,7 @@ function selectRline() {
 
 }
 
+
 //change 'fibers' (in LCB mode) to 'bundles' (in MOS mode)
 function selectorOmode() {
     if (document.getElementById('id_om_val').value=='LCB') {
@@ -258,8 +283,8 @@ function selectorOmode() {
     }
     else if (document.getElementById('id_om_val').value=='MOS') {
         var nst = 'Number of Sky Bundles';
-        var nsdefval = 8;
-        var ntdefval = 84;
+        var nsdefval = 1;
+        var ntdefval = 91;
         var ntt = 'Number of Target Bundles';
     }
     document.getElementById('id_nst').innerHTML = nst;
@@ -346,12 +371,29 @@ function storeValues(form)
     setCookie("the_skycond", myform.id_skycond.value, 365);
     setCookie("the_moonph", myform.id_moonph.value, 365);
     setCookie("the_airmass", myform.id_airmass.value, 365);
-    setCookie("the_seeing", myform.id_seeing.value, 365);
+    setCookie("the_seeing", myform.id_seeing.options[myform.id_seeing.selectedIndex].text, 365);
+    setCookie("the_seeing_pk", myform.id_seeing.value, 365);
+
     setCookie("the_numframes", myform.id_numframes.value, 365);
     setCookie("the_exptimepframe", myform.id_exptimepframe.value, 365);
     setCookie("the_nsbundles", myform.id_nsbundles.value, 365);
+    setCookie("the_ntbundles", myform.id_ntbundles.value, 365);
+    if (document.getElementById("id_om_val").value == 'MOS') {
+        setCookie("the_nst", "Number of Sky Bundles", 365);
+        setCookie("the_ntt", "Number of Target Bundles", 365);
+    }
+    else if (document.getElementById('id_om_val').value == 'LCB') {
+        setCookie("the_nst", "Number of Sky Fibers", 365);
+        setCookie("the_ntt", "Number of Target Fibers", 365);
+    }
     setCookie("the_lineap", myform.id_lineap.value, 365);
     setCookie("the_contap", myform.id_contap.value, 365);
+    if (document.getElementById("id_plotflag_0").checked == true) {
+        setCookie("the_plotflag", myform.id_plotflag_0.value, 365);
+    }
+    else if (document.getElementById("id_plotflag_1").checked == true) {
+        setCookie("the_plotflag", myform.id_plotflag_1.value, 365);
+    }
 //    setCookie("field3", form.field3.value, 365);
 //    setCookie("field4", form.field4.value, 365);
     return true;
@@ -380,40 +422,53 @@ function displayCookies() {
     var fname_moonph=getCookie("the_moonph");
     var fname_airmass=getCookie("the_airmass");
     var fname_seeing=getCookie("the_seeing");
+    var fname_seeing_pk=getCookie("the_seeing_pk");
+
     var fname_numframes=getCookie("the_numframes");
     var fname_exptimepframe=getCookie("the_exptimepframe");
     var fname_nsbundles=getCookie("the_nsbundles");
+    var fname_ntbundles=getCookie("the_ntbundles");
+    var fname_nst=getCookie("the_nst");
+    var fname_ntt=getCookie("the_ntt");
+
     var fname_lineap=getCookie("the_lineap");
     var fname_contap=getCookie("the_contap");
 
+    var fname_plotflag=getCookie("the_plotflag");
+
 	if (fname_radius==null) {fname_radius="";}
 	if (fname_radius!="" && fname_radius!="") {fname_radius="the_radius="+fname_radius;}
-	alert ('The current stype is= '+fname_stype+
-	'\ninput size= '+fname_isize+
-	'\nwith area= '+fname_area+
-	'\nwith radius= '+fname_radius+
-	'\nwith iflux= '+fname_iflux+
-	'\nwith rline= '+fname_rline+
-	'\nwith spectype= '+fname_spectype+
-	'\nwith pfilter= '+fname_pfilter+
-	'\nwith contmagflux= '+fname_contmagflux+
-	'\nwith contmagval= '+fname_contmagval+
-	'\nwith contfluxval= '+fname_contfluxval+
-	'\nwith lineflux= '+fname_lineflux+
-	'\nwith linewave= '+fname_linewave+
-	'\nwith linefwhm= '+fname_linefwhm+
+	alert ('These are the cookies currently stored in your browser:'+
+	'\nstype = '+fname_stype+
+	'\ninput size = '+fname_isize+
+	'\nwith area = '+fname_area+
+	'\nwith radius = '+fname_radius+
+	'\nwith iflux = '+fname_iflux+
+	'\nwith rline = '+fname_rline+
+	'\nwith spectype = '+fname_spectype+
+	'\nwith pfilter = '+fname_pfilter+
+	'\nwith contmagflux = '+fname_contmagflux+
+	'\nwith contmagval = '+fname_contmagval+
+	'\nwith contfluxval = '+fname_contfluxval+
+	'\nwith lineflux = '+fname_lineflux+
+	'\nwith linewave = '+fname_linewave+
+	'\nwith linefwhm = '+fname_linefwhm+
 
-	'\nwith om_val= '+fname_om_val+
-	'\nwith vph='+fname_vph+
-	'\nwith skycond ='+fname_skycond+
-	'\nwith moonph ='+fname_moonph+
-	'\nwith airmass ='+fname_airmass+
-	'\nwith seeing ='+fname_seeing+
-	'\nwith numframes ='+fname_numframes+
-	'\nwith exptimepframe ='+fname_exptimepframe+
-	'\nwith nsbundles ='+fname_nsbundles+
-	'\nwith lineap ='+fname_lineap+
-	'\nwith contap ='+fname_contap+
+	'\nwith om_val = '+fname_om_val+
+	'\nwith vph = '+fname_vph+
+	'\nwith skycond = '+fname_skycond+
+	'\nwith moonph = '+fname_moonph+
+	'\nwith airmass = '+fname_airmass+
+	'\nwith seeing = '+fname_seeing+' (pk='+fname_seeing_pk+')'+
+	'\nwith numframes = '+fname_numframes+
+	'\nwith exptimepframe = '+fname_exptimepframe+
+	'\nwith nsbundles = '+fname_nsbundles+
+	'\nwith ntbundles = '+fname_ntbundles+
+	'\nwith nst = '+fname_nst+
+
+	'\nwith lineap = '+fname_lineap+
+	'\nwith contap = '+fname_contap+
+	'\nwith plotflag = '+fname_plotflag+
 	' ');
 }
 
@@ -440,14 +495,21 @@ function deleteCookies(name) {
   document.cookie = "the_moonph=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
   document.cookie = "the_airmass=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
   document.cookie = "the_seeing=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  document.cookie = "the_seeing_pk=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
   document.cookie = "the_numframes=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
   document.cookie = "the_exptimepframe=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
   document.cookie = "the_nsbundles=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  document.cookie = "the_ntbundles=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  document.cookie = "the_nst=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  document.cookie = "the_ntt=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
   document.cookie = "the_lineap=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
   document.cookie = "the_contap=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
 
-  location.reload();
+  document.cookie = "the_plotflag=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+
   alert ('Cookies deleted.');
+  window.location.reload();
+  myform.reset();
 }
 
 function readCookies() {
@@ -503,15 +565,28 @@ function readCookies() {
 
         document.getElementById('id_om_val').value = getCookie('the_om_val');
         document.getElementById('id_vph').value = getCookie('the_vph');
+
         document.getElementById('id_skycond').value = getCookie('the_skycond');
         document.getElementById('id_moonph').value = getCookie('the_moonph');
         document.getElementById('id_airmass').value = getCookie('the_airmass');
-        document.getElementById('id_seeing').value = getCookie('the_seeing');
+        document.getElementById('id_seeing').value = getCookie('the_seeing_pk');
+
         document.getElementById('id_numframes').value = getCookie('the_numframes');
         document.getElementById('id_exptimepframe').value = getCookie('the_exptimepframe');
         document.getElementById('id_nsbundles').value = getCookie('the_nsbundles');
+        document.getElementById('id_ntbundles').value = getCookie('the_ntbundles');
+        document.getElementById('id_nst').innerHTML = getCookie('the_nst');
+        document.getElementById('id_ntt').innerHTML = getCookie('the_ntt');
+
         document.getElementById('id_lineap').value = getCookie('the_lineap');
         document.getElementById('id_contap').value = getCookie('the_contap');
+        if (getCookie("the_plotflag") == 'no') {
+            document.getElementById('id_plotflag_0').checked = true;
+            }
+        else {
+            document.getElementById('id_plotflag_1').checked = true;
+        }
+
     }
 }
 
@@ -519,7 +594,7 @@ function readCookies() {
 function calculateNtbund() {
     var nsbundles_var = document.getElementById('id_nsbundles').value;
     if (document.getElementById('id_om_val').value=='LCB') {
-        var ntbundles = 89 - nsbundles_var;
+        var ntbundles = 623 - nsbundles_var;
     }
     else if (document.getElementById('id_om_val').value=='MOS') {
         var ntbundles = 92 - nsbundles_var;
@@ -530,12 +605,13 @@ function calculateNtbund() {
 function calculateNsbund() {
     var ntbundles_var = document.getElementById('id_ntbundles').value;
     if (document.getElementById('id_om_val').value=='LCB') {
-        var nsbundles = 89 - ntbundles_var;
+        var nsbundles = 623 - ntbundles_var;
     }
     else if (document.getElementById('id_om_val').value=='MOS') {
         var nsbundles = 92 - ntbundles_var;
     }
     document.getElementById('id_nsbundles').value = parseInt(nsbundles);
 }
+
 
 // -->
