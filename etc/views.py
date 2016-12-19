@@ -199,7 +199,7 @@ def get_info(request):
         form4 = ObservationalSetupForm()
         form5 = OutputSetupForm()
 
-    return render(request, 'etc/webmegaraetc-0.7.6.html', {
+    return render(request, 'etc/webmegaraetc-0.7.7.html', {
         'form1': form1,
         'form2': form2,
         'form3': form3,
@@ -223,7 +223,7 @@ def etc_form(request):
                    'form5': form5,
                    }
 
-    return render(request, 'etc/webmegaraetc-0.7.6.html', total_formu)
+    return render(request, 'etc/webmegaraetc-0.7.7.html', total_formu)
 
 
 # LOADS THIS AFTER PRESSING "SUBMIT" webmegaraetc.html and
@@ -511,6 +511,11 @@ def etc_do(request):
 
             sncont_centerspaxel_voxel_val = outputofcalc['sncont_centerspaxel_voxel']
             sncont_centerspaxel_voxel_string = "{0:.2f}".format(float(sncont_centerspaxel_voxel_val))
+            sncont_r1spaxel_voxel_val = outputofcalc['sncont_r1spaxel_voxel']
+            sncont_r1spaxel_voxel_string = "{0:.2f}".format(float(sncont_r1spaxel_voxel_val))
+            sncont_r2spaxel_voxel_val = outputofcalc['sncont_r2spaxel_voxel']
+            sncont_r2spaxel_voxel_string = "{0:.2f}".format(float(sncont_r2spaxel_voxel_val))
+
             sncont_cr1spaxels_voxel_val = outputofcalc['sncont_cr1spaxels_voxel']
             sncont_cr1spaxels_voxel_string = "{0:.2f}".format(float(sncont_cr1spaxels_voxel_val))
             sncont_cr1r2spaxels_voxel_val = outputofcalc['sncont_cr1r2spaxels_voxel']
@@ -647,6 +652,9 @@ def etc_do(request):
                 tablenewpsfstring = ''
             else:
                 tablenewpsfstring = '<hr />' + \
+                                    'TESTING AREA: SNCONT_C_VOXEL= ' + sncont_centerspaxel_voxel_string + '<br />' + \
+                                    'TESTING AREA: SNCONT_R1_VOXEL= ' + sncont_r1spaxel_voxel_string + '<br />' + \
+                                    'TESTING AREA: SNCONT_R2_VOXEL= ' + sncont_r2spaxel_voxel_string + '<br />' + \
                                     'Time of request: ' + start_time_string + '<br />' + \
                                     'End of request: ' + time.strftime("%H:%M:%S") + '<br />' + \
                                     'Computation time: ' + str((time.time() - start_time)) + ' seconds <br />' + \

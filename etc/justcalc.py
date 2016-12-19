@@ -1105,9 +1105,9 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
             # textcalc += "normcctr = %s; fcctr = %s <br />" % (normcctr, fcctr)
             # textcalc += "normcr1 = %s; fcr1 = %s <br />" % (normcr1, fcr1)
             # textcalc += "normcr2 = %s; fcr2 = %s <br />" % (normcr2, fcr2)
-            fcctr = fc * seeing_centermean/100
-            fcr1 = fc * seeing_ring1mean/100
-            fcr2 = fc * seeing_ring2mean/100
+            fcctr = fc * seeing_centermean/(1*100)  # 1 spaxel
+            fcr1 = fc * seeing_ring1mean/(6*100)    # 6 spaxels
+            fcr2 = fc * seeing_ring2mean/(12*100)        # 12 spaxels
 
         textcalc += "Normalization factor: normc = %s <br />" % normc
 
@@ -1976,6 +1976,8 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                 'seeing_total': seeing_total, \
 \
                 'sncont_centerspaxel_voxel': sncont_c_voxel, \
+                'sncont_r1spaxel_voxel': sncont_r1_voxel, \
+                'sncont_r2spaxel_voxel': sncont_r2_voxel, \
                 'sncont_cr1spaxels_voxel': sncont_cr1_voxel, \
                 'sncont_cr1r2spaxels_voxel': sncont_cr1r2_voxel, \
                 'tsncont_centerspaxel_voxel': tsncont_c_voxel, \
