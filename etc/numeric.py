@@ -58,8 +58,8 @@ def specpar(om_val, xit, disp, ps, nfibres, nfibresy, areafibre, rfibre,  deltab
     verbose = ""    # reset at the beginning of each loop
   # FWHM does not depend on Observing mode: is fixed to 4 pixels by design
 
-    fwhmvph_om = 4.0
-    verbose += "Note: FWHM(VPH) does not depend on Observing mode: is fixed to 4 pixels by design. <br /><br />"
+    fwhmvph_om = 4.0    # Should we change this to 3.6?
+    verbose += "Note: FWHM of VPH does not depend on Observing mode: is fixed to 4 pixels. <br /><br />"
 
     if xit == 0: # P2SP (per 2 spectral pixels), All area
         deltalambda = fwhmvph_om * disp
@@ -88,13 +88,13 @@ def specpar(om_val, xit, disp, ps, nfibres, nfibresy, areafibre, rfibre,  deltab
         nfib1 = 0. # Default value
         verbose += "<b>### XIT = 1 <br />"
         verbose += "### per AA, All area </b><br />"
-        # verbose += "$\Delta\lambda = %s$ <br />" % (deltalambda)
-        # verbose += "$\Omega_{source} = \\textrm{Area of source} = %s $ <br />" % omegasource
-        # verbose += "$n_{pix,x} = \\frac{1}{disp} = \\frac{1}{%s} = %s $ <br />" % (disp,npixx)
-        # verbose += "$n_{pix,y} = N_{fibers,y} \\times \\frac{(2 \\times R_{fiber})}{ps} = %s \\times \\frac{(2 \\times %s)}{%s} = %s $ <br />" % (nfibresy, rfibre, ps, npixy)
-        # verbose += "$\Omega_{sky,source} = N_{fibers} \\times A_{fiber} = %s \\times %s = %s $ <br />" % (nfibres, areafibre, omegaskysource)
-        # verbose += "nfib = %s <br />" % nfib
-        # verbose += "nfib1 = %s <br />" % nfib1
+        verbose += "$\Delta\lambda = %s$ <br />" % (deltalambda)
+        verbose += "$\Omega_{source} = \\textrm{Area of source} = %s $ <br />" % omegasource
+        verbose += "$n_{pix,x} = \\frac{1}{disp} = \\frac{1}{%s} = %s $ <br />" % (disp,npixx)
+        verbose += "$n_{pix,y} = N_{fibers,y} \\times \\frac{(2 \\times R_{fiber})}{ps} = %s \\times \\frac{(2 \\times %s)}{%s} = %s $ <br />" % (nfibresy, rfibre, ps, npixy)
+        verbose += "$\Omega_{sky,source} = N_{fibers} \\times A_{fiber} = %s \\times %s = %s $ <br />" % (nfibres, areafibre, omegaskysource)
+        verbose += "nfib = %s <br />" % nfib
+        verbose += "nfib1 = %s <br />" % nfib1
 
     elif xit == 2: # Bandwidth, All area    
         deltalambda = deltab    
@@ -352,7 +352,7 @@ def specpar(om_val, xit, disp, ps, nfibres, nfibresy, areafibre, rfibre,  deltab
     elif xit==12:   # for C, R1, R2 spaxels SNR per voxel (adapted from xit=9)
         deltalambda = fwhmvph_om * disp
         verbose += "<b>### XIT = 12 <br />"
-        verbose += "### per 2 spectral pixels, per fiber </b><br />"
+        verbose += "### for C, R1, R2 spaxels per voxel </b><br />"
         verbose += "$\Delta\lambda = FWHM(VPH) \\times disp = %s \\times %s = %s $ <br />" % (fwhmvph_om, disp, deltalambda)
         if areasource >= areafibre:
             omegasource = areafibre
@@ -417,6 +417,66 @@ def specpar(om_val, xit, disp, ps, nfibres, nfibresy, areafibre, rfibre,  deltab
         verbose += "$\Omega_{sky,source} = A_{fiber} = %s $ <br />" % omegaskysource
         verbose += "nfib = 0 <br />"
         verbose += "nfib1 = 0 <br />"
+
+    elif xit == 15: # pdp_fiber: per detector pixel per fiber
+        deltalambda = disp  # because we're only using 1pixx
+        verbose += "<b>### XIT = 15 <br />"
+        verbose += "### per detector pixel, per fiber </b><br />"
+        # verbose += "$\Delta\lambda = FWHM(VPH) \\times disp = %s \\times %s = %s $ <br />" % (fwhmvph_om, disp, deltalambda)
+        if areasource >= areafibre:
+            omegasource = areafibre
+            # verbose += "$\Omega_{source} = A_{fiber} = %s $ because $A_{source} \geq A_{fiber} $ <br />" % omegasource
+        else:
+            omegasource = areasource
+            # verbose += "$\Omega_{source} = A_{source} = %s $ because $A_{source} < A_{fiber} $ <br />" % omegasource
+        npixx = 1
+        npixy = 1
+        omegaskysource = areafibre
+        nfib = 0. # Default value
+        nfib1 = 0. # Default value
+        # verbose += "$n_{pix,x} = FWHM(VPH) = %s $ <br />" % npixx
+        # verbose += "$n_{pix,y} = \\frac{2 \\times R_{fiber}}{ps} = \\frac{2 \\times %s}{%s} = %s $ <br />" % (rfibre, ps, npixy)
+        # verbose += "$\Omega_{sky,source} = A_{fiber} = %s $ <br />" % omegaskysource
+        # verbose += "nfib = 0 <br />"
+        # verbose += "nfib1 = 0 <br />"
+    elif xit == 16: # psp_fiber: per spectral (1pixx x 4pixy) pixel per fiber
+        deltalambda = disp  # because we're only using 1pixx
+        verbose += "<b>### XIT = 16 <br />"
+        verbose += "### per spectral pixels, per fiber </b><br />"
+        # verbose += "$\Delta\lambda = FWHM(VPH) \\times disp = %s \\times %s = %s $ <br />" % (fwhmvph_om, disp, deltalambda)
+        if areasource >= areafibre:
+            omegasource = areafibre
+            # verbose += "$\Omega_{source} = A_{fiber} = %s $ because $A_{source} \geq A_{fiber} $ <br />" % omegasource
+        else:
+            omegasource = areasource
+            # verbose += "$\Omega_{source} = A_{source} = %s $ because $A_{source} < A_{fiber} $ <br />" % omegasource
+        npixx = 1
+        npixy = 4
+        omegaskysource = areafibre
+        nfib = 0. # Default value
+        nfib1 = 0. # Default value
+        # verbose += "$n_{pix,x} = FWHM(VPH) = %s $ <br />" % npixx
+        # verbose += "$n_{pix,y} = \\frac{2 \\times R_{fiber}}{ps} = \\frac{2 \\times %s}{%s} = %s $ <br />" % (rfibre, ps, npixy)
+        # verbose += "$\Omega_{sky,source} = A_{fiber} = %s $ <br />" % omegaskysource
+        # verbose += "nfib = 0 <br />"
+        # verbose += "nfib1 = 0 <br />"
+    if xit == 17: # psp_all: per spectral (1pixx x 4pixy) pixel for total source area (i.e. times number of fibers)
+        deltalambda = disp
+        omegasource = areasource
+        npixx = 1
+        npixy = nfibresy * 4
+        omegaskysource = nfibres * areafibre
+        nfib = 0. # Default value
+        nfib1 = 0. # Default value
+        verbose += "<b>### XIT = 17 <br />"
+        verbose += "### per spectral pixels, All area </b><br />"
+        # verbose += "$\Delta\lambda = FWHM(VPH) \\times disp = %s \\times %s = %s$ <br />" % (fwhmvph_om, disp, deltalambda)
+        # verbose += "$\Omega_{source} = \\textrm{Area of source} = %s $ <br />" % omegasource
+        # verbose += "$n_{pix,x} = FWHM(VPH) = %s$ <br />" % npixx
+        # verbose += "$n_{pix,y} = N_{fibers,y} \\times \\frac{(2 \\times R_{fiber})}{ps} = %s \\times \\frac{(2 \\times %s)}{%s} = %s $ <br />" % (nfibresy, rfibre, ps, npixy)
+        # verbose += "$\Omega_{sky,source} = N_{fibers} \\times A_{fiber} = %s \\times %s = %s $ <br />" % (nfibres, areafibre, omegaskysource)
+        # verbose += "nfib = %s <br />" % nfib
+        # verbose += "nfib1 = %s <br />" % nfib1
 
     return deltalambda, omegasource, npixx, npixy, nfib, nfib1, omegaskysource, verbose
 
@@ -616,7 +676,7 @@ def sclspect (iflux, wv, wv1, wv2, ispect, iband, wline, fline, fwhml):
 def signal(farcs, dlambda, lambdaeff, eff, st, omega, expt, ep, wv):
   
     total = farcs * eff * st * omega * expt / ep
-    verbose = "$Total = \\frac{farcs \\times dlambda \\times eff \\times st \\times omega \\times expt}{E_{\gamma}} = \\frac{%s \\times %s \\times %s \\times %s \\times %s}{%s} = %s $ <br />" % (farcs, eff, st, omega, expt, ep, total)
+    verbose = "$Total = \\frac{farcs \\times \Delta\lambda \\times eff \\times st \\times omega \\times expt}{E_{\gamma}} = \\frac{%s \\times %s \\times %s \\times %s \\times %s}{%s} = %s $ <br />" % (farcs, eff, st, omega, expt, ep, total)
 
     wv1 = lambdaeff - (dlambda / 2.)
     wv2 = lambdaeff + (dlambda / 2.)
@@ -671,7 +731,7 @@ def signal(farcs, dlambda, lambdaeff, eff, st, omega, expt, ep, wv):
 
         # Integrate in range to derive value    
         integ = tvalue * dlambda
-        verbose += "Signal $S = tvalue \\times dlambda = %s \\times %s = %s$<br />" % (tvalue, dlambda, integ)
+        verbose += "Signal $S = tvalue \\times \Delta\lambda = %s \\times %s = %s$<br />" % (tvalue, dlambda, integ)
     return integ, verbose
 
 # ********************************
@@ -691,7 +751,7 @@ def linesignal(farcs, deltal, eff, st, omega, expt, lwv, wv):
 
     # Physical constants
     hplanck = 6.62606885e-27  # Planck constant (ergs/s)    
-    lightv = 2.99792458e10    # Light velocity (cm/s)
+    lightv = 2.99792458e10    # Speed of light (cm/s)
     pi = 3.14159
 
     lwv = numpy.array(lwv)

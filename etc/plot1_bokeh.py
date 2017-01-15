@@ -41,7 +41,7 @@ def bokehplot1(x, y,
                   color=['red', 'red', 'blue','blue'], line_dash='solid', line_width=[1,3,1,3])
     # p2.line(x2b,y2b, color='red', line_dash='dashed')
     p2.renderers.extend([vlineg, vlinemin, vlinemax])
-    p2.yaxis.axis_label = "SNR per spectral pixel"
+    p2.yaxis.axis_label = "SNR per voxel"
     p2.xaxis.axis_label = "Wavelength (Angstrom)"
     legend2 = Legend(items=[
         ("per frame 1 fiber", [p2.line(line_width=1, color='red')]),

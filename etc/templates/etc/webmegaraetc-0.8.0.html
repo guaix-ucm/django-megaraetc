@@ -1,13 +1,10 @@
 {% extends "etc/base.html" %}
+{% load bootstrap3 %}
 {% load staticfiles %}
 {# Load the tag library #}
-{% load bootstrap3 %}
 
     {% block head %}
             <title>MEGARA Online Exposure Time Calculator</title>
-            <link href="{% static 'etc/css/webmegaraetc-0.7.7.css' %}" rel="stylesheet" type="text/css" />
-            <script src="{% static 'etc/js/webmegaraetc-0.7.7.js' %}"></script>
-            <script src="{% static 'etc/js/d3.min.js' %}"></script>
             <script type="text/x-mathjax-config">
               MathJax.Hub.Config({
                 tex2jax: {
@@ -69,8 +66,8 @@
                 {% buttons class="aux" %}
                     {% bootstrap_button "Submit" button_type="submit" button_class="btn-primary" icon="star" %}
                     {% bootstrap_button "Reset" button_type="reset" button_class="btn-primary" icon="remove" href="Javascript:deleteCookies();" %}
-                    {% bootstrap_button "Manual v0.4.5" button_type="link" button_class="btn-primary" icon="save-file" href="Javascript:newPopupBig('/static/etc/TEC_MEG_057-2E.pdf');" %}
-                    {% bootstrap_button "Help" button_type="link" button_class="btn-primary" icon="question-sign" href="Javascript:newPopupBig('/static/etc/help/MEGARA_ONLINE_ETC_QUICK_GUIDE.pdf');" %}
+                    {% bootstrap_button "Manual" button_type="link" button_class="btn-primary" icon="save-file" href="Javascript:newPopupBig('/static/etc/TEC_MEG_057-2E.pdf');" %}
+                    {% bootstrap_button "Quick Start" button_type="link" button_class="btn-primary" icon="question-sign" href="Javascript:newPopupBig('/static/etc/help/MEGARA_ONLINE_ETC_QUICK_GUIDE.pdf');" %}
                     {% bootstrap_button "Show Cookies" button_type="link" button_class="btn-primary" icon="star" href="Javascript:displayCookies();" %}
                     <!--{% bootstrap_button "Delete Cookies" button_type="link" button_class="btn-primary" icon="star" href="Javascript:deleteCookies();" %}-->
                     <!--{% bootstrap_button "Download" button_type="link" button_class="btn-primary" icon="floppy-save" href="/static/etc/megaraetc-0.4.1.tar" %}-->
@@ -89,9 +86,9 @@
                             <a class="" href="Javascript:newPopupBig('/static/etc/help/inputparameters.txt');" type="link"><span class="glyphicon glyphicon-question-sign"></span></a>
                             <div id="store_result">
                                 <b>Store Results:</b>
-                                <a class="" href="Javascript:newPopupBig('/static/etc/outputcalc.txt');" type="link"><span class="glyphicon glyphicon-save-file"></span></a>
-                                <b>See details of calculations:</b>
-                                <a class="" href="Javascript:newPopupBig('/static/etc/outputcalc2.html');" type="link"><span class="glyphicon glyphicon-save-file"></span></a>
+                                <a class="" href="Javascript:downloadFile(forfile);" type="link"><span class="glyphicon glyphicon-save-file"></span></a>
+                                <b>Store details of calculations:</b>
+                                <a class="" href="Javascript:downloadCalcFile(calcfile);" type="link"><span class="glyphicon glyphicon-save-file"></span></a>
                             </div>
 
                             <!--<video controls loop autoplay width=70px>-->
@@ -100,10 +97,16 @@
                               <!--Your browser does not support the video tag.-->
                             <!--</video>-->
                 </div>
+                <div id="outheaders">
+                    <div id="outhead1"> <!-- OUTPUT HEADS: including OM + computation time -->
+                    </div>
+                </div>
                 <div id="leftcolumn">
                     <!--<div id="resultgraphic"> &lt;!&ndash; MPLD3 &ndash;&gt;-->
                     <!--</div>-->
                     <div id="resultnewpsf"> <!-- NEWPSF -->
+                    </div>
+                    <div id="resultnewpsfline"> <!-- NEWPSF for line -->
                     </div>
                     <div id="othergraphic">
                     </div>

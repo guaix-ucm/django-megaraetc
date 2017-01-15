@@ -1,3 +1,4 @@
+
 {% load staticfiles %}
 
 <link rel="apple-touch-icon-precomposed"
@@ -26,17 +27,17 @@
 
         <div id="index_leftdiv">
             <a href="{% url 'etc:form' %}">
-            <img id="img_bigImage" title="Click here to start!"
-            src="{% static 'etc/images/button_hex_green.png' %}"
-            onmouseover="changeImage('{% static 'etc/images/button_hex_blue.png' %}')"
-            onmouseout="changeImage('{% static 'etc/images/button_hex_green.png' %}')"
-            onclick="changeImage('{% static 'etc/images/button_hex_red.png' %}')"
-            />
-            <script type="text/javascript" language="javascript">
-            function changeImage(img){
-            document.getElementById('img_bigImage').src=img;
-            }
-            </script>
+                <img id="img_bigImage" title="Click here to start!"
+                src="{% static 'etc/images/button_hex_green.png' %}"
+                onmouseover="changeImage('{% static 'etc/images/button_hex_blue.png' %}')"
+                onmouseout="changeImage('{% static 'etc/images/button_hex_green.png' %}')"
+                onclick="changeImage('{% static 'etc/images/button_hex_red.png' %}')"
+                />
+                <script type="text/javascript" language="javascript">
+                function changeImage(img){
+                document.getElementById('img_bigImage').src=img;
+                }
+                </script>
             </a>
         </div>
 
@@ -44,7 +45,7 @@
             <h3>Welcome to<BR />
             MEGARA Online
             <hr id="index_hr_special" />
-            Exposure Time Calculator version 0.7.7</h3>
+            Exposure Time Calculator version 0.8.0</h3>
         </div>
         <div id="index_bottomdiv">
             <a href="https://www.djangoproject.com/" target="_blank">
@@ -72,7 +73,7 @@
         <div id="recommendation">Browser recommendation: Chrome or Firefox.</div>
         <hr id="index_footerline">
         <div id="index_footer">
-            <font id="copyright">&copy;2016 MEGARA</font>
+            <font id="copyright">&copy;2016-2017 MEGARA</font>
         </div>
     </div>
 </div><!--close wrapper-->

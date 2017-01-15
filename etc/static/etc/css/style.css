@@ -1,5 +1,6 @@
 /* GLOBAL */
 
+
 body{
     max-width: 1080px;
     margin: 0 auto !important;
@@ -8,6 +9,10 @@ body{
 
 #header{
     height: 100px;
+}
+
+#subheader {
+    height: 100%;
 }
 
 div.ucmlogotd{
@@ -73,7 +78,36 @@ div.maintitletd {
 
 #img_bigImage {
     width: 150px;
+    position: relative;
+    -webkit-animation-name: spinbutton; /* Safari 4.0 - 8.0 */
+    -webkit-animation-duration: 1s; /* Safari 4.0 - 8.0 */
+    -webkit-animation-delay: 0s; /* Safari 4.0 - 8.0 */
+    -webkit-animation-timing-function: linear;
+    -webkit-animation-iteration-count: infinite;
+    animation-name: spinbutton;
+    animation-duration: 1s;
+    animation-delay: 0s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
 }
+/* Safari 4.0 - 8.0 */
+@-webkit-keyframes spinbutton {
+    0%   {background-color:none; left:0px; top:0px; transform: scale(1);}
+    25%  {background-color:none; left:0px; top:0px; transform: scale(1.05);}
+    50%  {background-color:none; left:0px; top:0px; transform: scale(1);}
+    75%  {background-color:none; left:0px; top:0px; transform: scale(1.05);}
+    100% {background-color:none; left:0px; top:0px; transform: scale(1);}
+}
+
+/* Standard syntax */
+@keyframes spinbutton {
+    0%   {background-color:none; left:0px; top:0px; transform: scale(1);}
+    25%  {background-color:none; left:0px; top:0px; transform: scale(1.05);}
+    50%  {background-color:none; left:0px; top:0px; transform: scale(1);}
+    75%  {background-color:none; left:0px; top:0px; transform: scale(1.05);}
+    100% {background-color:none; left:0px; top:0px; transform: scale(1);}
+}
+
 
 #img_django {
     text-align: right;

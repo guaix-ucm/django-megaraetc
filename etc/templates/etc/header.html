@@ -3,14 +3,18 @@
 
 
 
-<div id="header" onclick="document.location='{% url 'etc:index' %}'" onmouseover="style.cursor='pointer' ">
-    <div class="ucmlogotd">
-        <img id="ucmlogoimg" src="{% static 'etc/images/ucm-small.jpg' %}"/>
-    </div>
-    <div class="maintitletd">
-        <h5>MEGARA Online Exposure Time Calculator (v0.7.7)</h5>
-    </div>
-    <div class="megaralogotd">
-        <img src="{% static 'etc/images/megara_logo.gif' %}" width=150px />
+<div id="header" onmouseover="style.cursor='pointer' ">
+    <a href="javascript:twofunc();">
+        <div class="ucmlogotd">
+        <img id="ucmlogoimg" src="{% static 'etc/images/ucm-small.jpg' %}" />
+        </div>
+    </a>
+    <div id="subheader" onclick="document.location='{% url 'etc:index' %}'">
+        <div class="maintitletd">
+            <h5>MEGARA Online Exposure Time Calculator (v0.8.0)</h5>
+        </div>
+        <div class="megaralogotd">
+            <img src="{% static 'etc/images/megara_logo.gif' %}" width=150px />
+        </div>
     </div>
 </div>

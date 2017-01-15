@@ -26,7 +26,7 @@ usually do not vary appreciably during the night, but with solar cycle,
 latitude and airmass.
 
 
-Table 3: Extra magnitudes to be added to reference values of sky emission in
+Table 3: Extra magnitudes to be subtracted from reference values of sky emission in
 Table 2, for bright, grey, and dark nights in La Palma, in mag/arcsec**2 in
 the V-band, in order to account for zodiacal light, airglow, and starlight
 (I. Skillen, 2002, ING Technical Note 127)

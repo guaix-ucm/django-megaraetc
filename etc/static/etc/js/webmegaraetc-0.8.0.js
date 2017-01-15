@@ -1,10 +1,13 @@
+var forfile = ''
+var calcfile = ''
+
 $( document ).ready(function() {
-    console.log( "ready!" );
+    console.log( "MEGARA Online ETC ready!" );
 
 //    $('html').animate({scrollTop:0}, 1);
 //    $('body').animate({scrollTop:0}, 1);
     $(window).load(function(){ $("html,body").animate({scrollTop: 0}, 1); });
-
+//    window.location = (""+window.location).replace(/#[A-Za-z0-9_]*$/,'')+"#outheaders";
     $body = $("body");
     $(document).on({
         ajaxStart: function() { $body.addClass("loading");    },
@@ -21,15 +24,22 @@ $( document ).ready(function() {
             //// Send the data using post
             var posting = $.post("/etc/do", $(this).serialize());
             //
-            // Put the results in a div
+            // Put the results in div
             posting.done(function (data) {
                 console.log($(data))
                 var content = $(data).find("#content");
+
 //                $("#result2").empty().append($(data)[0]['outtext'] + $(data)[0]['textcout'] + $(data)[0]['textlout'] + $(data)[0]['textinput']);
                 $("#result4").empty().append($(data)[0]['outtext'] + $(data)[0]['tablecout'] + $(data)[0]['tablelout'] + $(data)[0]['tableinput']);
 
+                var outputhead1 = $(data)[0]['outhead1'];
+                $("#outhead1").empty().append(outputhead1);
+
                 var newpsf = $(data)[0]['tablenewpsf'];
                 $("#resultnewpsf").empty().append(newpsf);
+
+                var newpsfline = $(data)[0]['tablenewpsfline'];
+                $("#resultnewpsfline").empty().append(newpsfline);
 
                 // MathJax Typesetting:
                 // Insert 'tablecalc' as a string into variable mathtable which
@@ -43,25 +53,49 @@ $( document ).ready(function() {
 
                 // Make 'store result' button visible
                 $("#store_result").css('visibility', 'visible');
-
+                forfile = $(data)[0]['forfile'];    // global variable update
+                calcfile = $(data)[0]['forfile2'];  // global variable update
                 // Graphics
                 var thediv = $(data)[0]['thediv'];
                 var thescript = $(data)[0]['thescript'];
-
                 $("#othergraphic").empty().append(thediv);
                 $("#othergraphic").append(thescript);
 
                 //$('.btn-primary').css('color','#fff');
                 //$('.btn-primary').css('background-color','#337ab7');
                 //$('.btn-primary').css('border-color','#2e6da4');
-
             });
-            $("input[type=submit]").css('visibility', 'hidden')
-
+            $("input[type=submit]").css('visibility', 'hidden');
         }
     });
 });
 
+
+function downloadFile(forfile) {
+    var save = document.createElement('a');
+    save.href = 'data:attachment/txt,' + encodeURI(forfile);
+    save.download = 'MEGARA-ETC-output.txt' || forfile;
+    var event = document.createEvent("MouseEvents");
+        event.initMouseEvent(
+                "click", true, false, window, 0, 0, 0, 0, 0
+                , false, false, false, false, 0, null
+        );
+    save.dispatchEvent(event);
+//    var wnd = window.open("about:blank", "", 'height=900,width=740,left=10,top=10,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes,target=_blank');
+//    wnd.document.write(forfile);
+}
+
+function downloadCalcFile(calcfile){
+    var save = document.createElement('a');
+    save.href = 'data:attachment/html,' + encodeURI(calcfile);
+    save.download = 'MEGARA-ETC-details.html' || calcfile;
+    var event = document.createEvent("MouseEvents");
+        event.initMouseEvent(
+                "click", true, false, window, 0, 0, 0, 0, 0
+                , false, false, false, false, 0, null
+        );
+    save.dispatchEvent(event);
+}
 
 // pop-up window
 function newPopup(url) {
@@ -394,7 +428,12 @@ function storeValues(form)
     else if (document.getElementById("id_plotflag_1").checked == true) {
         setCookie("the_plotflag", myform.id_plotflag_1.value, 365);
     }
-//    setCookie("field3", form.field3.value, 365);
+    if (window.counter%2==0) {
+        setCookie("the_colorflag", 0, 365);
+    }
+    else if (window.counter%2==1) {
+        setCookie("the_colorflag", 1, 365);
+    }
 //    setCookie("field4", form.field4.value, 365);
     return true;
   }
@@ -435,6 +474,7 @@ function displayCookies() {
     var fname_contap=getCookie("the_contap");
 
     var fname_plotflag=getCookie("the_plotflag");
+    var fname_colorflag=getCookie("the_colorflag");
 
 	if (fname_radius==null) {fname_radius="";}
 	if (fname_radius!="" && fname_radius!="") {fname_radius="the_radius="+fname_radius;}
@@ -469,6 +509,7 @@ function displayCookies() {
 	'\nwith lineap = '+fname_lineap+
 	'\nwith contap = '+fname_contap+
 	'\nwith plotflag = '+fname_plotflag+
+	'\nwith colorflag = '+fname_colorflag+
 	' ');
 }
 
@@ -506,7 +547,7 @@ function deleteCookies(name) {
   document.cookie = "the_contap=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
 
   document.cookie = "the_plotflag=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
-
+  document.cookie = "the_colorflag=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
   alert ('Cookies deleted.');
   window.location.reload();
   myform.reset();
@@ -586,6 +627,9 @@ function readCookies() {
         else {
             document.getElementById('id_plotflag_1').checked = true;
         }
+        if (getCookie("the_colorflag") == '1') {
+            twofunc();
+        }
 
     }
 }
@@ -613,5 +657,37 @@ function calculateNsbund() {
     document.getElementById('id_nsbundles').value = parseInt(nsbundles);
 }
 
+function chBackcolor(color) {
+   document.body.style.backgroundColor = color;
+}
 
+function changeALL(){
+    var css='html {-webkit-filter: invert(100%);'+'-moz-filter: invert(100%);'+'-o-filter: invert(100%);'+'-ms-filter: invert(100%); }',head=document.getElementsByTagName('head')[0],style=document.createElement('style');
+        if(!window.counter){
+            window.counter=1;
+            }
+        else{window.counter++;
+            if(window.counter%2==0){
+                var css='html {-webkit-filter: invert(0%); -moz-filter: invert(0%); -o-filter: invert(0%); -ms-filter: invert(0%); }'
+                }
+            };
+            style.type='text/css';
+            if(style.styleSheet){
+                style.styleSheet.cssText=css;
+                }
+            else{
+                style.appendChild(document.createTextNode(css));
+                }
+            head.appendChild(style);
+}
+
+function twofunc() {
+    changeALL();
+    if(window.counter%2==0){
+        chBackcolor('white');
+        }
+    else {
+        chBackcolor('black');
+    }
+}
 // -->
