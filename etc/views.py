@@ -350,6 +350,10 @@ def etc_do(request):
             om_val_string = str(outputofcalc['om_val'])
             bandc_val_string = str(outputofcalc['bandc_val'])
             sourcet_val_string = str(outputofcalc['sourcet_val'])
+            if sourcet_val_string == 'E':
+                sourcet_val_string = 'Extended'
+            else:
+                sourcet_val_string = 'Point'
             mag_val_string = str('%.2f' % outputofcalc['mag_val'])
             netflux_string = '%.3e' % outputofcalc['netflux']
             size_val_string = str('%.2f' % outputofcalc['size_val'])
@@ -630,9 +634,7 @@ def etc_do(request):
             npixy_psp_all_string = "{0:.2f}".format(float(npixy_psp_all_val))
 
             outhead1string = '<hr /><span class="boldlarge">Observing Mode: ' + om_val_string + ', VPH: ' + vph_val_string + ', Source Type: ' + sourcet_val_string + ' </span>' + \
-                                '<span class="italicsmall"> Computation time: ' + "{0:.4f}".format((time.time() - start_time)) + ' seconds; ' + \
-                                'Time of request: ' + start_time_string + ' ; '\
-                                'End of request: ' + time.strftime("%H:%M:%S") + '</span><br />'
+                                '<span class="italicsmall"> Computation time: ' + "{0:.4f}".format((time.time() - start_time)) + ' seconds; </span>'
 
             # tablecoutstring = '<hr /><br />' + \
             #                   'OUTPUT CONTINUUM SNR:' + \
@@ -806,12 +808,12 @@ def etc_do(request):
                                     '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pdp.jpeg" /></td>' \
                                     '<td class="perframecolumn"> ' + snline_pspp_string + '</td>' \
                                     '<td> ' + tsnline_pspp_string + '</td>' \
-                                    '<td> per detector pixel</td></tr>' + \
+                                    '<td> per fiber per detector pixel</td></tr>' + \
                                   '<tr>' \
                                     '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspfwhm.jpeg" /></td>' \
                                     '<td class="perframecolumn"> ' + snline_voxel_string + '</td>' \
                                     '<td> ' + tsnline_voxel_string + '</td>' \
-                                    '<td> per voxel</td></tr>' + \
+                                    '<td> per fiber per voxel</td></tr>' + \
                                   '<tr>' \
                                     '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_perfibinappang.jpeg" /></td>' \
                                     '<td class="perframecolumn"> ' + snline_fibre1aa_string + '</td>' \
@@ -885,14 +887,13 @@ def etc_do(request):
             # print 'PID = ', os.getpid()
 
             # NEW OUTPUT CONTINUUM TABLE FOR MOS AND LCB
-            if om_val_string == 'MOS' and sourcet_val_string == 'P':
+            if om_val_string == 'MOS' and sourcet_val_string == 'Point':
                 tablenewpsfstring = '<hr />' + \
                                     'OUTPUT CONTINUUM SNR' + \
                                     '<br />(at lambda_c(VPH) = ' + lambdaeff_string + ' AA)' + \
                                     '<table border=1>' + \
                                     '<tr><th class="iconcolumn" scope="col"> </th>' + \
-                                        '<th scope="col" colspan="7">* Continuum SNR per spaxel zones due to PSF <br />' + \
-                                        '(MOS mode):<br />' + \
+                                        '<th scope="col" colspan="7">* Continuum SNR per spaxel zones due to PSF (MOS mode):<br />' + \
                                         'fiber diameter=0.62 arcsec; Seeing FWHM=' + seeingx_string + ' arcsec</th>' + \
                                         '</tr>' + \
                                     '<tr><th class="iconcolumn" scope="row"></th>' + \
@@ -939,14 +940,13 @@ def etc_do(request):
                                     '</table><br />'
                                     # 'TESTING AREA: SNCONT_C_VOXEL= ' + sncont_centerspaxel_voxel_string + '<br />' + \
                                     # 'TESTING AREA: SNCONT_R1_VOXEL= ' + sncont_r1spaxel_voxel_string + '<br />'
-            elif om_val_string == 'MOS' and sourcet_val_string == 'E':
+            elif om_val_string == 'MOS' and sourcet_val_string == 'Extended':
                 tablenewpsfstring = '<hr />' + \
                                     'OUTPUT CONTINUUM SNR' + \
                                     '<br />(at lambda_c(VPH) = ' + lambdaeff_string + ' AA)' + \
                                     '<table border=1>' + \
                                     '<tr><th class="iconcolumn" scope="col"> </th>' + \
-                                        '<th scope="col" colspan="7">* Continuum SNR per spaxel zones due to PSF <br />' + \
-                                        '(MOS mode):<br />' + \
+                                        '<th scope="col" colspan="7">* Continuum SNR per spaxel zones due to PSF (MOS mode):<br />' + \
                                         'fiber diameter=0.62 arcsec; Seeing FWHM=' + seeingx_string + ' arcsec</th>' + \
                                         '</tr>' + \
                                     '<tr><th class="iconcolumn" scope="row"></th>' + \
@@ -991,14 +991,13 @@ def etc_do(request):
                                         '<td> integrated spectrum </td>' + \
                                         '</tr>' + \
                                     '</table><br />'
-            elif om_val_string == 'LCB' and sourcet_val_string == 'P':
+            elif om_val_string == 'LCB' and sourcet_val_string == 'Point':
                 tablenewpsfstring = '<hr />' + \
                                     'OUTPUT CONTINUUM SNR' + \
                                     '<br />(at lambda_c(VPH) = ' + lambdaeff_string + ' AA)' + \
                                     '<table border=1>' + \
                                     '<tr><th class="iconcolumn" scope="col"> </th>' + \
-                                        '<th scope="col" colspan="7">* Continuum SNR per spaxel zones due to PSF <br />' + \
-                                        '(LCB mode):<br />' + \
+                                        '<th scope="col" colspan="7">* Continuum SNR per spaxel zones due to PSF (LCB mode):<br />' + \
                                         'fiber diameter=0.62 arcsec; Seeing FWHM=' + seeingx_string + ' arcsec</th>' + \
                                         '</tr>' + \
                                     '<tr><th class="iconcolumn" scope="row"></th>' + \
@@ -1046,14 +1045,13 @@ def etc_do(request):
                                     # 'TESTING AREA: SNCONT_C_VOXEL= ' + sncont_centerspaxel_voxel_string + '<br />' + \
                                     # 'TESTING AREA: SNCONT_R1_VOXEL= ' + sncont_r1spaxel_voxel_string + '<br />' + \
                                     # 'TESTING AREA: SNCONT_R2_VOXEL= ' + sncont_r2spaxel_voxel_string + '<br />'
-            elif om_val_string == 'LCB' and sourcet_val_string == 'E':
+            elif om_val_string == 'LCB' and sourcet_val_string == 'Extended':
                 tablenewpsfstring = '<hr />' + \
                                     'OUTPUT CONTINUUM SNR' + \
                                     '<br />(at lambda_c(VPH) = ' + lambdaeff_string + ' AA)' + \
                                     '<table border=1>' + \
                                     '<tr><th class="iconcolumn" scope="col"> </th>' + \
-                                        '<th scope="col" colspan="7">* Continuum SNR per spaxel zones due to PSF <br />' + \
-                                        '(LCB mode):<br />' + \
+                                        '<th scope="col" colspan="7">* Continuum SNR per spaxel zones due to PSF (LCB mode):<br />' + \
                                         'fiber diameter=0.62 arcsec; Seeing FWHM=' + seeingx_string + ' arcsec</th>' + \
                                         '</tr>' + \
                                     '<tr><th class="iconcolumn" scope="row"></th>' + \
@@ -1325,6 +1323,9 @@ def etc_do(request):
             forfileoutputstring = outputofcalc['forfileoutput']
             forfileoutput2string = outputofcalc['forfileoutput2']
 
+            # EXTRA FOOTER
+            footerstring = '<span class="italicsmall">Time of request: ' + start_time_string + ' ; End of request: ' + time.strftime("%H:%M:%S") + '</span>'
+
         else:
             outhead1string = ''
             tablecoutstring = ''
@@ -1335,6 +1336,7 @@ def etc_do(request):
             tablenewpsflinestring = ''
             forfileoutputstring = ''
             forfileoutput2string = ''
+            footerstring = ''
 
         html2 = ''  # for testing
         # print html2
@@ -1357,4 +1359,5 @@ def etc_do(request):
                              'outhead1': outhead1string,
                              'forfile': forfileoutputstring,
                              'forfile2': forfileoutput2string,
+                             'footerstring': footerstring,
                              })

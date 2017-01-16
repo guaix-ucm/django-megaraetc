@@ -1714,16 +1714,11 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                         # If line FWHM is < 1 A, line and continuum fluxes contributing to measurement
                         else:
                             signallineperAA = signalline
-                            signalcont_lineperAA = linesignal(contatline, 1.0,
-                                                              effsys, stel,
-                                                              omegasource,
-                                                              exptime_val,
-                                                              wline_val, lamb)
+                            signalcont_lineperAA = linesignal(contatline, 1.0, effsys, stel, omegasource, exptime_val, wline_val, lamb)
 
                         # Common computations, independent on if FWHM > 1AA or not.
                         signaldark_lineperAA, signaldark_lineperAAverb = dark(exptime_val, dc, npixinAA)
-                        noisedarksq_lineperAA, noisedarksq_lineperAAverb = darknoisesq(npixinAA, npdark_val,
-                                                            exptime_val, dc, ron)
+                        noisedarksq_lineperAA, noisedarksq_lineperAAverb = darknoisesq(npixinAA, npdark_val, exptime_val, dc, ron)
                         ronoiselineperAA, ronoiselineperAAverb = readoutnoise(npixinAA, ron)
 
                         # Noise in continuum measurement is the same as before, but the scaling is
@@ -1731,45 +1726,39 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                         noisecontmeasuredperAA = (((1. / fwhmline_val) / nfwhmline_val) ** 2) * noisecontsq
 
                         # Total noise in line
-                        noiselineperAA = math.sqrt(
-                            signallineperAA + signalcont_lineperAA +
-                            signaldark_lineperAA + ronoiselineperAA + noisedarksq_lineperAA +
-                            noisecontmeasuredperAA)
+                        noiselineperAA = math.sqrt(signallineperAA + signalcont_lineperAA + signaldark_lineperAA + ronoiselineperAA + noisedarksq_lineperAA + noisecontmeasuredperAA)
 
                         if xit == 2:
                             snlineperAA = signallineperAA / noiselineperAA
                         if xit == 3:
                             snlinefibreperAA = signallineperAA / noiselineperAA  ### SAME AS snlineperAA ???
 
-                    # 1 spaxel, (1 fibre diameter * 4 pix in spectral direction)
+                    # 1 voxel, (1 fibre diameter * 4 pix in spectral direction)
                     if xit == 3:
                         # VPH FWHM is always <= line FWHM (it is imposed)
-                        npixfibre = (fwhmvph / disp) * (2. * rfibre / ps)
+                        npixfibre = (fwhmline_val / disp) * (2. * rfibre / ps) # <-- removed this.
                         npixxvoxel = 4.0  # Nyquist-Shannon sampling theorem
-                        npixvoxel = npixxvoxel * npixy
+                        npixyvoxel = 4.0
+                        npixvoxel = npixxvoxel * npixyvoxel
                         ratio = npixfibre / (npixvoxel)
                         signallinevoxel = signalline / ratio
+                        print 'npixfibre = ', npixfibre
+                        print 'npixvoxel = ', npixvoxel
                         signalcont_linevoxel = signalcont_line / ratio
 
-                        signaldark_linevoxel, sdlspaxverb = dark(exptime_val, dc, npixvoxel)
-                        noisedarksq_linevoxel, noisedarksq_linevoxelverb = darknoisesq(npixvoxel,
-                                                             npdark_val,
-                                                             exptime_val, dc, ron)
+                        signaldark_linevoxel, signaldark_linevoxelverb = dark(exptime_val, dc, npixvoxel)
+                        noisedarksq_linevoxel, noisedarksq_linevoxelverb = darknoisesq(npixvoxel, npdark_val, exptime_val, dc, ron)
                         ronoiselinevoxel, ronoiselinevoxelverb = readoutnoise(npixvoxel, ron)
 
                         # Noise in continuum measurement is the same as before, but the scaling is
                         # different according to the different number of pixels in 4 pixels.
-                        noisecontmeasuredpervoxel = (((
-                                                       fwhmvph / fwhmline_val) / nfwhmline_val) ** 2) * noisecontsq
-
-                        noiselinevoxel = math.sqrt(
-                            signallinevoxel + signalcont_linevoxel +
-                            signaldark_linevoxel + ronoiselinevoxel + noisedarksq_linevoxel +
-                            noisecontmeasuredpervoxel)
+                        # noisecontmeasuredpervoxel = (((fwhmvph / fwhmline_val) / nfwhmline_val) ** 2) * noisecontsq
+                        noisecontmeasuredpervoxel = (((fwhmvph / fwhmline_val) / nfwhmline_val) ** 2) * noisecontsq
+                        noiselinevoxel = math.sqrt(signallinevoxel + signalcont_linevoxel + signaldark_linevoxel + ronoiselinevoxel + noisedarksq_linevoxel + noisecontmeasuredpervoxel)
 
                         snlinevoxel = signallinevoxel / noiselinevoxel
 
-                    # 1 spectral and spatial pixel
+                    # 1 spectral and spatial pixel (i.e. 1 detector pixel)
                     if xit == 3:
                         npixfibre = (fwhmline_val / disp) * (2. * rfibre / ps)
                         npixx1pix = 1.0
@@ -1777,23 +1766,18 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                         npix1pix = npixx1pix * npixy1pix
                         ratio = npixfibre / (npix1pix)
                         signalline1pix = signalline / ratio
+                        print 'npixfibre = ', npixfibre
+                        print 'npixvoxel = ', npix1pix
                         signalcont_line1pix = signalcont_line / ratio
 
-                        signaldark_line1pix, sdl1pverbose = dark(exptime_val, dc, npix1pix)
-                        noisedarksq_line1pix, noisedarksq_line1pixverb = darknoisesq(npix1pix, npdark_val,
-                                                           exptime_val, dc, ron)
+                        signaldark_line1pix, signaldark_line1pixverb = dark(exptime_val, dc, npix1pix)
+                        noisedarksq_line1pix, noisedarksq_line1pixverb = darknoisesq(npix1pix, npdark_val, exptime_val, dc, ron)
                         ronoiseline1pix, ronoiseline1pixverb = readoutnoise(npix1pix, ron)
 
                         # Noise in continuum measurement is the same as before, but the scaling is
                         # different according to the different number of pixels 1 pix.
-                        noisecontmeasuredperspaxel = ((((
-                                                        fwhmvph / fwhmline_val) / 4.0) /
-                                                       nfwhmline_val) ** 2) * noisecontsq
-
-                        noiseline1pix = math.sqrt(
-                            signalline1pix + signalcont_line1pix +
-                            signaldark_line1pix + ronoiseline1pix + noisedarksq_line1pix +
-                            noisecontmeasuredperspaxel)
+                        noisecontmeasuredperspaxel = ((((fwhmvph / fwhmline_val) / 4.0) /nfwhmline_val) ** 2) * noisecontsq
+                        noiseline1pix = math.sqrt(signalline1pix + signalcont_line1pix + signaldark_line1pix + ronoiseline1pix + noisedarksq_line1pix + noisecontmeasuredperspaxel)
 
                         snline1pix = signalline1pix / noiseline1pix
                         # snline1pix = snlinevoxel / math.sqrt(16)
@@ -1816,17 +1800,13 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
 
                     elif xit == 3:  # 1 fibre
                         snline_fibre = snline
-                        tsnline_fibre = snline_fibre * numpy.sqrt(
-                            numframe_val)  # all frames
+                        tsnline_fibre = snline_fibre * numpy.sqrt(numframe_val)  # all frames
                         snline_fibre1aa = snlinefibreperAA
-                        tsnline_fibre1aa = snline_fibre1aa * numpy.sqrt(
-                            numframe_val)  # all frames
+                        tsnline_fibre1aa = snline_fibre1aa * numpy.sqrt(numframe_val)  # all frames
                         snline_voxel = snlinevoxel
-                        tsnline_voxel = snline_voxel * numpy.sqrt(
-                            numframe_val)  # all frames
+                        tsnline_voxel = snline_voxel * numpy.sqrt(numframe_val)  # all frames
                         snline_pspp = snline1pix
-                        tsnline_pspp = snline_pspp * numpy.sqrt(
-                            numframe_val)  # total SNR per detector pixel
+                        tsnline_pspp = snline_pspp * numpy.sqrt(numframe_val)  # total SNR per detector pixel
 
                 # End of FOR loop for computations
                 pass

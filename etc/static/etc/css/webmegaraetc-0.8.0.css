@@ -39,7 +39,7 @@ span.help-block{
 }
 
 div#theformcontainer{
-    margin-bottom: 1%;
+    margin-bottom: 10px;
 }
 
 div#leftdiv {
@@ -177,9 +177,15 @@ label.control-label {
 /*    height: 100%;*/
 }
 
+#extrafooter {
+    width: 100%;
+}
+
 #outhead1 {
     width: 100%;
 }
+
+
 /*#resultmathtext {
     width: 100%;
     float: left;

@@ -61,6 +61,9 @@ $( document ).ready(function() {
                 $("#othergraphic").empty().append(thediv);
                 $("#othergraphic").append(thescript);
 
+                var footers = $(data)[0]['footerstring'];
+                $("#extrafooter").empty().append(footers);
+
                 //$('.btn-primary').css('color','#fff');
                 //$('.btn-primary').css('background-color','#337ab7');
                 //$('.btn-primary').css('border-color','#2e6da4');
