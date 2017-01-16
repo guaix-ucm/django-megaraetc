@@ -679,80 +679,83 @@ def etc_do(request):
             #                     '<td> per AA</td></tr>' + \
             #                   '<tr class="rowheight">' \
             #                     '<td> </td></tr>' + \
-            tablecoutstring = '<hr />' + \
-                              'OUTPUT CONTINUUM SNR:' + \
-                              '<br />(at lambda_c(VPH) = ' + lambdaeff_string + ' AA)' + \
-                              '<table border=1>' + \
-                              '<tr>' \
-                                '<td class="iconcolumn"> </td>' \
-                                '<th scope="col" colspan="4">* SNR in total source area:</th>' \
-                                '<th>(number of fibers = ' + nfibres_string + ')</th></tr>' + \
-                              '<tr>' \
-                                '<td class="iconcolumn"> </td>' \
-                                '<td>npixx</td><td>npixy</td>' \
-                                '<td class="perframecolumn">per frame</td>' \
-                                '<td class="allframecolumn">all frames</td>' \
-                                '<td></td></tr>' + \
-                              '<tr>' \
-                                '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspp.jpeg" /></td>' \
-                                '<td>' + npixx_psp_all_string + '</td>' \
-                                '<td>' + npixy_psp_all_string + '</td>' \
-                                '<td> ' + sncont_psp_all_string + ' </td>' \
-                                '<td> ' + tsncont_psp_all_string + '</td>' \
-                                '<td> per spectral pixel</td></tr>' + \
-                              '<tr>' \
-                                '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspfwhm.jpeg" /></td>' \
-                                '<td>' + npixx_p2sp_all_string + '</td>' \
-                                '<td>' + npixy_p2sp_all_string + '</td>' \
-                                '<td> ' + sncont_pspfwhm_all_string + ' </td>' \
-                                '<td> ' + tsncont_pspfwhm_all_string + '</td>' \
-                                '<td> per voxel</td></tr>' + \
-                              '<tr>' \
-                                '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_peraa.jpeg" /></td>' \
-                                '<td>' + npixx_1aa_all_string + '</td>' \
-                                '<td>' + npixy_1aa_all_string + '</td>' \
-                                '<td> ' + sncont_1aa_all_string + ' </td>' \
-                                '<td> ' + tsncont_1aa_all_string + '</td>' \
-                                '<td> per AA</td></tr>' + \
-                              '</table><br />'
-            if sourcet_val_string == 'E' and sourcet_val_string != 'P':
-                                  # '<hr />' + \
-                                  # 'OUTPUT CONTINUUM <br />' + \
-                                  # '(at lambda_c(VPH) = ' + lambdaeff_string + ' AA)' + \
-                tablecoutstring = tablecoutstring + \
-                                  '<table border=1>' + \
-                                  '<tr>' \
-                                    '<th class="iconcolumn" scope="col"> </td>' \
-                                    '<th scope="col" colspan="4">* SNR in one seeing:</th><th scope="col"></th></tr>' + \
-                                  '<tr>' \
-                                    '<th class="iconcolumn" scope="row"> </th>' \
-                                    '<td>npixx</td>' \
-                                    '<td>npixy</td>' \
-                                    '<td class="perframecolumn">per frame</td>' \
-                                    '<td class="allframecolumn">all frames</td>' \
-                                    '<td></td></tr>' + \
-                                  '<tr>' \
-                                    '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspfwhm.jpeg" /></td>' \
-                                    '<td>' + npixx_p2sp_seeing_string + '</td>' \
-                                    '<td>' + npixy_p2sp_seeing_string + '</td>' \
-                                    '<td> ' + sncont_p2sp_seeing_string + ' </td>' \
-                                    '<td> ' + tsncont_p2sp_seeing_string + '</td>' \
-                                    '<td> per voxel</td></tr>' + \
-                                  '<tr>' \
-                                    '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_peraa.jpeg" /></td>' \
-                                    '<td>' + npixx_1aa_seeing_string + '</td>' \
-                                    '<td>' + npixy_1aa_seeing_string + '</td>' \
-                                    '<td> ' + sncont_1aa_seeing_string + ' </td>' \
-                                    '<td> ' + tsncont_1aa_seeing_string + '</td>' \
-                                    '<td> per AA</td></tr>' + \
-                                  '<tr>' \
-                                    '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_integrated.jpeg" /></td>' \
-                                    '<td>' + npixx_band_seeing_string + '</td>' \
-                                    '<td>' + npixy_band_seeing_string + '</td>' \
-                                    '<td> ' + sncont_band_seeing_string + ' </td>' \
-                                    '<td> ' + tsncont_band_seeing_string + '</td>' \
-                                    '<td> per integrated spectrum (spaxel)</td></tr>' + \
-                                  '</table>'
+            tablecoutstring = ''
+            # tablecoutstring = '<hr />' + \
+            #                   'OUTPUT CONTINUUM SNR:' + \
+            #                   '<br />(at lambda_c(VPH) = ' + lambdaeff_string + ' AA)' + \
+            #                   '<table border=1>' + \
+            #                   '<tr>' \
+            #                     '<td class="iconcolumn"> </td>' \
+            #                     '<th scope="col" colspan="4">* SNR in total source area:</th>' \
+            #                     '<th>(number of fibers = ' + nfibres_string + ')</th></tr>' + \
+            #                   '<tr>' \
+            #                     '<td class="iconcolumn"> </td>' \
+            #                     '<td>npixx</td><td>npixy</td>' \
+            #                     '<td class="perframecolumn">per frame</td>' \
+            #                     '<td class="allframecolumn">all frames</td>' \
+            #                     '<td></td></tr>' + \
+            #                   '<tr>' \
+            #                     '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspp.jpeg" /></td>' \
+            #                     '<td>' + npixx_psp_all_string + '</td>' \
+            #                     '<td>' + npixy_psp_all_string + '</td>' \
+            #                     '<td> ' + sncont_psp_all_string + ' </td>' \
+            #                     '<td> ' + tsncont_psp_all_string + '</td>' \
+            #                     '<td> per spectral pixel</td></tr>' + \
+            #                   '<tr>' \
+            #                     '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspfwhm.jpeg" /></td>' \
+            #                     '<td>' + npixx_p2sp_all_string + '</td>' \
+            #                     '<td>' + npixy_p2sp_all_string + '</td>' \
+            #                     '<td> ' + sncont_pspfwhm_all_string + ' </td>' \
+            #                     '<td> ' + tsncont_pspfwhm_all_string + '</td>' \
+            #                     '<td> per voxel</td></tr>' + \
+            #                   '<tr>' \
+            #                     '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_peraa.jpeg" /></td>' \
+            #                     '<td>' + npixx_1aa_all_string + '</td>' \
+            #                     '<td>' + npixy_1aa_all_string + '</td>' \
+            #                     '<td> ' + sncont_1aa_all_string + ' </td>' \
+            #                     '<td> ' + tsncont_1aa_all_string + '</td>' \
+            #                     '<td> per AA</td></tr>' + \
+            #                   '</table><br />'
+
+            # if sourcet_val_string == 'E':
+            #                       # '<hr />' + \
+            #                       # 'OUTPUT CONTINUUM <br />' + \
+            #                       # '(at lambda_c(VPH) = ' + lambdaeff_string + ' AA)' + \
+            #     tablecoutstring = tablecoutstring + \
+            #                       '<hr />' + \
+            #                       '<table border=1>' + \
+            #                       '<tr>' \
+            #                         '<th class="iconcolumn" scope="col"> </td>' \
+            #                         '<th scope="col" colspan="4">* SNR in one seeing:</th><th scope="col"></th></tr>' + \
+            #                       '<tr>' \
+            #                         '<th class="iconcolumn" scope="row"> </th>' \
+            #                         '<td>npixx</td>' \
+            #                         '<td>npixy</td>' \
+            #                         '<td class="perframecolumn">per frame</td>' \
+            #                         '<td class="allframecolumn">all frames</td>' \
+            #                         '<td></td></tr>' + \
+            #                       '<tr>' \
+            #                         '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspfwhm.jpeg" /></td>' \
+            #                         '<td>' + npixx_p2sp_seeing_string + '</td>' \
+            #                         '<td>' + npixy_p2sp_seeing_string + '</td>' \
+            #                         '<td> ' + sncont_p2sp_seeing_string + ' </td>' \
+            #                         '<td> ' + tsncont_p2sp_seeing_string + '</td>' \
+            #                         '<td> per voxel</td></tr>' + \
+            #                       '<tr>' \
+            #                         '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_peraa.jpeg" /></td>' \
+            #                         '<td>' + npixx_1aa_seeing_string + '</td>' \
+            #                         '<td>' + npixy_1aa_seeing_string + '</td>' \
+            #                         '<td> ' + sncont_1aa_seeing_string + ' </td>' \
+            #                         '<td> ' + tsncont_1aa_seeing_string + '</td>' \
+            #                         '<td> per AA</td></tr>' + \
+            #                       '<tr>' \
+            #                         '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_integrated.jpeg" /></td>' \
+            #                         '<td>' + npixx_band_seeing_string + '</td>' \
+            #                         '<td>' + npixy_band_seeing_string + '</td>' \
+            #                         '<td> ' + sncont_band_seeing_string + ' </td>' \
+            #                         '<td> ' + tsncont_band_seeing_string + '</td>' \
+            #                         '<td> per integrated spectrum (spaxel)</td></tr>' + \
+            #                       '</table>'
                                   # '<tr class="rowheight">' \
                                   #   '<td> </td></tr>' + \
                                   # '<tr>' \
