@@ -38,6 +38,7 @@ class VPHSetup(models.Model):
     lambda_b = models.FloatField()
     lambda_e = models.FloatField()
     specconf = models.CharField(max_length=10)
+    specconf2 = models.CharField(max_length=10)
     class Meta:
         managed = True
         db_table = 'etc_vphsetup'
