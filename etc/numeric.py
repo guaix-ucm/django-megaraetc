@@ -684,6 +684,7 @@ def signal(farcs, dlambda, lambdaeff, eff, st, omega, expt, ep, wv):
 
     # If Deltalambda high enough, integration with trapezoid rule is realistic 
     if (dlambda > 1.5):
+        print 'dlambda = ', dlambda
         verbose += "<font color='red'>$\Delta\lambda > 1.5$, integration with trapezoid rule is realistic.<br /></font>"
 
         wv1 = numpy.array((math.ceil( wv1*10.))/10.)

@@ -282,13 +282,20 @@ def etc_do(request):
                 label3 = outputofcalc['bandc_val']
 
                 x2 = x
-                y2 = outputofcalc['pframesn_pervoxel_fiber']
                 x2b = x2
-                y2b = outputofcalc['allframesn_pervoxel_fiber']
                 x2c = x2
-                y2c = outputofcalc['pframesn_pervoxel_all']
                 x2d = x2
-                y2d = outputofcalc['allframesn_pervoxel_all']
+
+                if outputofcalc['fluxt_val']=='L':
+                    y2 = outputofcalc['pframesn_pervoxel_fiber']
+                    y2b = outputofcalc['allframesn_pervoxel_fiber']
+                    y2c = outputofcalc['pframesn_pervoxel_all']
+                    y2d = outputofcalc['allframesn_pervoxel_all']
+                else:
+                    y2 = outputofcalc['pframesn_pervoxel_c']
+                    y2b = outputofcalc['allframesn_pervoxel_c']
+                    y2c = outputofcalc['pframesn_pervoxel_cr1']
+                    y2d = outputofcalc['allframesn_pervoxel_cr1']
 
                 label2a = entry_spec_name
                 label2b = vph_val
@@ -335,7 +342,8 @@ def etc_do(request):
                                            label1, label2, label3,
                                            x2, y2, x2b, y2b,
                                            x2c, y2c, x2d, y2d,
-                                           label2a, label2b, label2c)
+                                           label2a, label2b, label2c,
+                                           outputofcalc['fluxt_val'])
         else:
             thescript = ""
             thediv = ""

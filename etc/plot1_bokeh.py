@@ -4,7 +4,8 @@ def bokehplot1(x, y,
                label1, label2, label3,
                x2, y2, x2b, y2b,
                x2c, y2c, x2d, y2d,
-               label2a, label2b, label2c):
+               label2a, label2b, label2c,
+               fluxt):
     from bokeh.plotting import figure
     from bokeh.resources import CDN
     from bokeh.embed import components
@@ -43,14 +44,26 @@ def bokehplot1(x, y,
     p2.renderers.extend([vlineg, vlinemin, vlinemax])
     p2.yaxis.axis_label = "SNR per voxel"
     p2.xaxis.axis_label = "Wavelength (Angstrom)"
-    legend2 = Legend(items=[
-        ("per frame 1 fiber", [p2.line(line_width=1, color='red')]),
-        ("all frames 1 fiber" , [p2.line(line_width=3, color='red')]),
-        ("per frame all fibers" , [p2.line(line_width=1, color='blue')]),
-        ("all frames all fibers", [p2.line(line_width=3, color='blue')]),
-        ],
-        location=(20, -30),
-        )
+
+    if fluxt=='L':
+        legend2 = Legend(items=[
+            ("per frame c fiber", [p2.line(line_width=1, color='red')]),
+            ("all frames c fiber" , [p2.line(line_width=3, color='red')]),
+            ("per frame c+r1 fibers" , [p2.line(line_width=1, color='blue')]),
+            ("all frames c+r1 fibers", [p2.line(line_width=3, color='blue')]),
+            ],
+            location=(20, -30),
+            )
+    else:
+        legend2 = Legend(items=[
+            ("per frame 1 fiber", [p2.line(line_width=1, color='red')]),
+            ("all frames 1 fiber" , [p2.line(line_width=3, color='red')]),
+            ("per frame all fibers" , [p2.line(line_width=1, color='blue')]),
+            ("all frames all fibers", [p2.line(line_width=3, color='blue')]),
+            ],
+            location=(20, -30),
+            )
+
     p2.legend.border_line_alpha = 0.5
     p2.add_layout(legend2, 'right')
 
