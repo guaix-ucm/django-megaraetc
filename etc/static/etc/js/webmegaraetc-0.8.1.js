@@ -481,7 +481,7 @@ function displayCookies() {
 
 	if (fname_radius==null) {fname_radius="";}
 	if (fname_radius!="" && fname_radius!="") {fname_radius="the_radius="+fname_radius;}
-	alert ('These are the cookies currently stored in your browser:'+
+	alert ('These are the cookies currently stored in your browser (cookies are stored whenever the "Submit" button is pressed:'+
 	'\nstype = '+fname_stype+
 	'\ninput size = '+fname_isize+
 	'\nwith area = '+fname_area+
@@ -518,42 +518,48 @@ function displayCookies() {
 
 // delete cookies
 function deleteCookies(name) {
-  document.cookie = "the_stype=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
-  document.cookie = "the_isize=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
-  document.cookie = "the_area=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
-  document.cookie = "the_radius=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
-  document.cookie = "the_iflux=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
-  document.cookie = "the_rline=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
-  document.cookie = "the_spectype=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
-  document.cookie = "the_pfilter=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
-  document.cookie = "the_contmagflux=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
-  document.cookie = "the_contmagval=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
-  document.cookie = "the_contfluxval=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
-  document.cookie = "the_lineflux=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
-  document.cookie = "the_linewave=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
-  document.cookie = "the_linefwhm=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+  if (confirm("Are you sure you want to reset the form to its default values? (Clicking 'OK' will reset the cookies to their default values, and will automatically reload the form).")) {
 
-  document.cookie = "the_om_val=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
-  document.cookie = "the_vph=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
-  document.cookie = "the_skycond=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
-  document.cookie = "the_moonph=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
-  document.cookie = "the_airmass=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
-  document.cookie = "the_seeing=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
-  document.cookie = "the_seeing_pk=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
-  document.cookie = "the_numframes=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
-  document.cookie = "the_exptimepframe=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
-  document.cookie = "the_nsbundles=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
-  document.cookie = "the_ntbundles=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
-  document.cookie = "the_nst=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
-  document.cookie = "the_ntt=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
-  document.cookie = "the_lineap=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
-  document.cookie = "the_contap=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+      document.cookie = "the_stype=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+      document.cookie = "the_isize=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+      document.cookie = "the_area=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+      document.cookie = "the_radius=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+      document.cookie = "the_iflux=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+      document.cookie = "the_rline=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+      document.cookie = "the_spectype=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+      document.cookie = "the_pfilter=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+      document.cookie = "the_contmagflux=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+      document.cookie = "the_contmagval=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+      document.cookie = "the_contfluxval=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+      document.cookie = "the_lineflux=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+      document.cookie = "the_linewave=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+      document.cookie = "the_linefwhm=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
 
-  document.cookie = "the_plotflag=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
-  document.cookie = "the_colorflag=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
-  alert ('Cookies deleted.');
-  window.location.reload();
-  myform.reset();
+      document.cookie = "the_om_val=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+      document.cookie = "the_vph=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+      document.cookie = "the_skycond=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+      document.cookie = "the_moonph=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+      document.cookie = "the_airmass=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+      document.cookie = "the_seeing=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+      document.cookie = "the_seeing_pk=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+      document.cookie = "the_numframes=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+      document.cookie = "the_exptimepframe=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+      document.cookie = "the_nsbundles=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+      document.cookie = "the_ntbundles=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+      document.cookie = "the_nst=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+      document.cookie = "the_ntt=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+      document.cookie = "the_lineap=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+      document.cookie = "the_contap=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+
+      document.cookie = "the_plotflag=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+      document.cookie = "the_colorflag=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+      alert ('Cookies deleted.');
+      window.location.reload();
+      myform.reset();
+    }
+    else {
+//    do nothing
+    }
 }
 
 function readCookies() {

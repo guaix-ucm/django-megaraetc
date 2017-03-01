@@ -190,7 +190,7 @@ def get_info(request):
         form4 = ObservationalSetupForm()
         form5 = OutputSetupForm()
 
-    return render(request, 'etc/webmegaraetc-0.8.0.html', {
+    return render(request, 'etc/webmegaraetc-0.8.1.html', {
         'form1': form1,
         'form2': form2,
         'form3': form3,
@@ -214,7 +214,7 @@ def etc_form(request):
                    'form5': form5,
                    }
 
-    return render(request, 'etc/webmegaraetc-0.8.0.html', total_formu)
+    return render(request, 'etc/webmegaraetc-0.8.1.html', total_formu)
 
 
 # LOADS THIS AFTER PRESSING "SUBMIT" webmegaraetc.html and
@@ -276,7 +276,7 @@ def etc_do(request):
             # Check if computation outputs are conform
             if not tocheck:
                 x = outputofcalc['lamb']
-                y = outputofcalc['fc']
+                y = outputofcalc['fc'] + outputofcalc['fs']
                 label1 = entry_spec_name
                 label2 = outputofcalc['mag_val']
                 label3 = outputofcalc['bandc_val']
@@ -861,7 +861,7 @@ def etc_do(request):
                                '<tr><td>Input flux type:</td><td>' + fluxt_name_string + '</td></tr>' + \
                                '<tr><td>Source spectrum:</td><td>' + spect_val_string + '</td></tr>' + \
                                '<tr><td>Continuum:</td><td>' + bandc_val_string + ' = ' + mag_val_string + 'mag</td></tr>' + \
-                               '<tr><td>Continuum flux:</td><td>' + netflux_string + ' erg/s/cm2</td></tr>' + \
+                               '<tr><td>Continuum flux:</td><td>' + netflux_string + ' cgs</td></tr>' + \
                                '<tr><td>Resolved line?:</td><td>' + resolvedline_val_string + '</td></tr>' + \
                                '<tr><td>Line wavelength:</td><td>' + wline_val_string + ' AA</td></tr>' + \
                                '<tr><td>Line flux:</td><td>' + fline_val_string + ' erg/s/cm2</td></tr>' + \
@@ -870,7 +870,7 @@ def etc_do(request):
                                '<tr><td>Moon:</td><td>' + moon_val_string + '</td></tr>' + \
                                '<tr><td>Airmass: X=</td><td>' + airmass_val_string + '</td></tr>' + \
                                '<tr><td>Seeing(@X=1):</td><td>' + seeing_zenith_string + ' arcsec</td></tr>' + \
-                               '<tr><td>Sky-flux(R,@X):</td><td>' + fsky_string + ' erg/s/cm2</td></tr>' + \
+                               '<tr><td>Sky-flux(R,@X):</td><td>' + fsky_string + ' cgs</td></tr>' + \
                                '<tr><td>Seeing(@X):</td><td>' + seeingx_string + ' arcsec</td></tr>' + \
                                '<tr><td>*Observation:</td></td><td></tr>' + \
                                '<tr><td>Number of frames:</td><td>' + numframe_val_string + '</td></tr>' + \

@@ -497,7 +497,7 @@ skymag_list = [22.0,  # Sky U
 # Atmospheric transmission at La Palma: 72% @400 nm, 80% @450 nm, 84% @500 nm
 # Preub, Hermann, Hofmann, & Kohnle NIMPR.
 # Section A, Volume 481, Issues 1-3, 1 April 2002, Pages 229-240
-tatmdat = "MEGARA_TRANSM_0.1aa/atmt_total_0.1aa.dat"
+tatmdat = "MEGARA_TRANSM_0.1aa_OLD/atmt_total_0.1aa.dat"
 
 # Reading transmission curve of atmosphere
 lamb, tatm = reading(tatmdat, 2)
@@ -798,6 +798,9 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
         # They include: GTC 3-mirrors + FC subsystem + spectrograph (main optics + detector QE) + grating subsystem
         # (including additional optics + coatings + SO filters + vignetting when required)
         # Configuration and transmissions as intended in the CDR level of the instrument
+        #
+        # updated on Feb.7, 2017 by AB to reflect the new values in RPT-AIV_MEG_002-1C.doc
+        # old file were moved to MEGARA_TRANSM_0.1aa_OLD
 
         if spectrograph_conf == 'HR' and vph_val == 'HR-R' and om_val == 'LCB':
             lamb, tgtcinst = reading('MEGARA_TRANSM_0.1aa/t_LCB_VPH665.dat', 2)
@@ -1057,17 +1060,21 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
         # fsky is assumed to be valid in the wavelength range of the selected VPH, as it is derived in the
         # most similar band to the VPH range.
         skybf = -0.000278719 * (airmass_val ** 3) - 0.0653841 * (airmass_val ** 2) + 1.11979 * (airmass_val) - 0.0552132
+
         skymag1 = skymag_list[bandsky_list.index(bandsky)]
         skymag = skymag1 + extraskyemission[moon_list.index(moon_val)]
+
         textcalc += "skybf = -0.000278719 * $(airmass^{3}_{val})$ - 0.0653841 * $(airmass^{2}_{val})$ + 1.11979 * $(airmass_{val})$ - 0.0552132 <br />"
         textcalc += "skybf = %s <br />" % skybf
         textcalc += "bandsky = %s <br />" % bandsky
         textcalc += "skymag = skymag$(bandsky)$ + extraskyemission$(moon_{val})$ = %s + %s = %s <br />" % (skymag1, extraskyemission[moon_list.index(moon_val)], skymag)
+
         vegafeatures = vegachar[bandc_list.index(bandsky)]
         magvegas = vegafeatures[0]
         fvegas = vegafeatures[1]
         fskyvega = mag2flux(magvegas, fvegas, skymag)
         fsky = fskyvega * skybf
+
         textcalc += "SKY: vegafeatures@%s <br />" % bandsky
         textcalc += "SKY: Vega mag = %s <br />" % magvegas
         textcalc += "SKY: Vega flux = %s <br />" % fvegas
@@ -1971,7 +1978,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
  \
                 'sourcespectrum': sourcespectrum, 'lamb': lamb, \
                 'spect_val': spect_val, \
-                'fc': fc, \
+                'fc': fc, 'fs': fs, \
                 'pframesn_pervoxel_fiber': pframesn_pervoxel_fiber, \
                 'allframesn_pervoxel_fiber': allframesn_pervoxel_fiber, \
                 'pframesn_pervoxel_all': pframesn_pervoxel_all, \
