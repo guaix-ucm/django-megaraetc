@@ -497,7 +497,7 @@ skymag_list = [22.0,  # Sky U
 # Atmospheric transmission at La Palma: 72% @400 nm, 80% @450 nm, 84% @500 nm
 # Preub, Hermann, Hofmann, & Kohnle NIMPR.
 # Section A, Volume 481, Issues 1-3, 1 April 2002, Pages 229-240
-tatmdat = "MEGARA_TRANSM_0.1aa_OLD/atmt_total_0.1aa.dat"
+tatmdat = "MEGARA_TRANSM_0.1aa/atmt_total_0.1aa.dat"
 
 # Reading transmission curve of atmosphere
 lamb, tatm = reading(tatmdat, 2)
