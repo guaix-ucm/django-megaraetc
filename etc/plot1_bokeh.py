@@ -23,7 +23,7 @@ def bokehplot1(x, y,
     p1.renderers.extend([vlineg, vlinemin, vlinemax])
     p1.yaxis.axis_label = "Flux (erg/s/cm2/Angstrom)"
     p1.xaxis.axis_label = "Wavelength (Angstrom)"
-    p1.x_range = Range1d(4000, max(x))
+    p1.x_range = Range1d(vph_minval-100, vph_maxval+100)
     citation1 = Label(x=450, y=100,
                       x_units='screen', y_units='screen',
                       text='Source: '+str(label1)+
