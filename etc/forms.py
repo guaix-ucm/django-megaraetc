@@ -38,6 +38,8 @@ PLOTCHOICES = [('no', 'No'),
 CONTMAGFLUX = [('M', 'Continuum mag'),
                ('F', 'Continuum flux')]
 
+CMODE = [('T', 'ExpTime to SNR'),
+         ('S', 'SNR to ExpTime')]
 
 def template_choice(iflux_var):
     if iflux_var == 'C' or iflux_var:
@@ -139,15 +141,17 @@ class ObservationalSetupForm(forms.Form):
     ntbundles_hint = hintbotton % "hint_bundles"
 
     botton = "<a class=\"splinkcol\" href=\"Javascript:newPopupBig('/static/etc/help/%s.txt');\" >"
+    cmode_help = botton % "cmode" + "Calculation mode</a>"
     numframes_help = botton % "numframes" + "Number of exp. frames</a>"
-    exptimepframe_help = botton % "exptimeperframe" + "Exptime per frame (s)</a>"
+    exptimepframe_help = botton % "exptimeperframe" + "<span id='id_nexp'>Exptime per frame (s)</span></a>"
     nsbundles_help = botton % "skybundle" + "<span id='id_nst'>Number of Sky Fibers</span></a>"
     ntbundles_help = botton % "targetbundle" + "<span id='id_ntt'>Number of Target Fibers</span></a>"
     lineap_help = botton % "lineaperture" + "Line aperture</a>"
     contap_help = botton % "continuumaperture" + "Continuum aperture</a>"
 
+    cmode = forms.ChoiceField(label=mark_safe(cmode_help), initial="T", choices=CMODE, widget=forms.RadioSelect(renderer=HorizontalRadioRenderer, attrs={'placeholder':'T', 'onclick':'selectorCmode()', 'onload':'selectorCmode()'}))
     numframes = forms.IntegerField(label=mark_safe(numframes_help), initial=1, min_value=1, widget=forms.TextInput(attrs={'placeholder':'numframes'}))
-    exptimepframe = forms.FloatField(label=mark_safe(exptimepframe_help), initial=3600.0, min_value=1.0, widget=forms.TextInput(attrs={'placeholder':'exptime'}))
+    exptimepframe = forms.FloatField(label=mark_safe(exptimepframe_help), initial=3600, min_value=1.0, widget=forms.TextInput(attrs={'placeholder':'exptime'}))
     # LCB: default=8 sky bundles (56 fibers), max=89 sky bundles (623 fibers); min= 1 bundle.
     # MOS: default=max=92 sky bundles (644 fibers), min= 1 bundle (7 fibers);
     nsbundles = forms.IntegerField(label=mark_safe(nsbundles_help), initial=56, min_value=1, max_value=567, widget=forms.TextInput(attrs={'placeholder':'56', 'oninput':'calculateNtbund()'}))

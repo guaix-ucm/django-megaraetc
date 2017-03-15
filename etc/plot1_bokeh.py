@@ -15,7 +15,7 @@ def bokehplot1(x, y,
 
     # x[0::10]    # too much datapoints, extract every 10
     # y[0::10]    # do the same here
-    p1 = figure(plot_height=400)
+    p1 = figure(plot_height=400, active_scroll="wheel_zoom")
     p1.line(x, y, color='blue')
     vlineg = Span(location=float(x3), dimension='height', line_color='green', line_width=1, line_dash='dashed')
     vlinemin = Span(location=float(vph_minval), dimension='height', line_color='red', line_width=1, line_dash='dashed')
@@ -37,7 +37,7 @@ def bokehplot1(x, y,
 
 
     p2 = figure(plot_height=400,
-                x_range=p1.x_range)
+                x_range=p1.x_range, active_scroll="wheel_zoom")
     p2.multi_line([x2, x2b, x2c, x2d], [y2, y2b, y2c,y2d],
                   color=['red', 'red', 'blue','blue'], line_dash='solid', line_width=[1,3,1,3])
     # p2.line(x2b,y2b, color='red', line_dash='dashed')

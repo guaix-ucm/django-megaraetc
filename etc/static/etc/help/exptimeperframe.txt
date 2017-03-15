@@ -1,3 +1,8 @@
 ** EXPSOURE TIME PER FRAME **
 Exposure time per frame in second.
 Each frame is assumed to have this exposure time.
+
+or
+
+** TOTAL SNR **
+Total (= all frame combined) Signal-to-Noise ratio (dimensionless).

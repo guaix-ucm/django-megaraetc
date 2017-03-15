@@ -131,7 +131,14 @@ def compute5(request):
         seeing_val = queryseeing[0]['name']
 
         numframes_val = float(request.POST['numframes'])
-        exptimepframe_val = float(request.POST['exptimepframe'])
+        # Cope for cmode variations
+        cmode_val = request.POST['cmode']
+        if cmode_val == 'T':
+            exptimepframe_val = float(request.POST['exptimepframe'])
+            snr_val = 10
+        elif cmode_val == 'S':
+            exptimepframe_val = 3600
+            snr_val = float(request.POST['exptimepframe'])
         nsbundles_val = int(request.POST['nsbundles'])
 
         plotflag_val = request.POST['plotflag']
@@ -148,6 +155,7 @@ def compute5(request):
                             spect_val, bandc_val,
                             request.POST['om_val'], vph_val,
                             skycond_val, moon_val, airmass_val, seeing_val,
+                            cmode_val, snr_val,
                             numframes_val, exptimepframe_val, nsbundles_val,
                             plotflag_val
                             )
@@ -190,7 +198,7 @@ def get_info(request):
         form4 = ObservationalSetupForm()
         form5 = OutputSetupForm()
 
-    return render(request, 'etc/webmegaraetc-0.8.1.html', {
+    return render(request, 'etc/webmegaraetc-0.9.0.html', {
         'form1': form1,
         'form2': form2,
         'form3': form3,
@@ -214,7 +222,7 @@ def etc_form(request):
                    'form5': form5,
                    }
 
-    return render(request, 'etc/webmegaraetc-0.8.1.html', total_formu)
+    return render(request, 'etc/webmegaraetc-0.9.0.html', total_formu)
 
 
 # LOADS THIS AFTER PRESSING "SUBMIT" webmegaraetc.html and
@@ -641,211 +649,35 @@ def etc_do(request):
             npixy_psp_all_val = outputofcalc['npixy_psp_all']
             npixy_psp_all_string = "{0:.2f}".format(float(npixy_psp_all_val))
 
-            outhead1string = '<hr /><span class="boldlarge">Observing Mode: ' + om_val_string + ', VPH: ' + vph_val_string + ', Source Type: ' + sourcet_val_string + ' </span>' + \
-                                '<span class="italicsmall"> Computation time: ' + "{0:.4f}".format((time.time() - start_time)) + ' seconds; </span>'
+            cmode = outputofcalc['cmode_val']
 
-            # tablecoutstring = '<hr /><br />' + \
-            #                   'OUTPUT CONTINUUM SNR:' + \
-            #                   '<br />(at lambda_c(VPH) = ' + lambdaeff_string + ' AA)' + \
-            #                   '<table border=1>' + \
-            #                   '<tr>' \
-            #                     '<th class="iconcolumn" scope="col"> </th>' \
-            #                     '<th scope="col" colspan="4">* SNR per fibre:</th>' \
-            #                     '<th scope="col"></th></tr>' + \
-            #                   '<tr>' \
-            #                     '<th class="iconcolumn" scope="row"> </th>' \
-            #                     '<td>npixx</td>' \
-            #                     '<td>npixy</td>' \
-            #                     '<td class="perframecolumn">per frame</td>' \
-            #                     '<td class="allframecolumn">all frames</td>' \
-            #                     '<td></td></tr>' + \
-            #                   '<tr>' \
-            #                     '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pdp.jpeg" /></td>' \
-            #                     '<td>' + npixx_pdp_fibre_string + '</td>' \
-            #                     '<td>' + npixy_pdp_fibre_string + '</td>' \
-            #                     '<td class="perframecolumn"> ' + sncont_pdp_fibre_string + ' </td>' \
-            #                     '<td> ' + tsncont_pdp_fibre_string + '</td>' \
-            #                     '<td> per detector pixel</td></tr>' + \
-            #                   '<tr>' \
-            #                     '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspp.jpeg" /></td>' \
-            #                     '<td>' + npixx_psp_fibre_string + '</td>' \
-            #                     '<td>' + npixy_psp_fibre_string + '</td>' \
-            #                     '<td class="perframecolumn"> ' + sncont_psp_fibre_string + ' </td>' \
-            #                     '<td> ' + tsncont_psp_fibre_string + '</td>' \
-            #                     '<td> per spectral pixel</td></tr>' + \
-            #                   '<tr>' \
-            #                     '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspfwhm.jpeg" /></td>' \
-            #                     '<td>' + npixx_p2sp_fibre_string + '</td>' \
-            #                     '<td>' + npixy_p2sp_fibre_string + '</td>' \
-            #                     '<td class="perframecolumn"> ' + sncont_p2sp_fibre_string + ' </td>' \
-            #                     '<td> ' + tsncont_p2sp_fibre_string + '</td>' \
-            #                     '<td> per voxel</td></tr>' + \
-            #                   '<tr>' \
-            #                     '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_peraa.jpeg" /></td>' \
-            #                     '<td>' + npixx_1aa_fibre_string + '</td>' \
-            #                     '<td>' + npixy_1aa_fibre_string + '</td>' \
-            #                     '<td class="perframecolumn"> ' + sncont_1aa_fibre_string + ' </td>' \
-            #                     '<td> ' + tsncont_1aa_fibre_string + '</td>' \
-            #                     '<td> per AA</td></tr>' + \
-            #                   '<tr class="rowheight">' \
-            #                     '<td> </td></tr>' + \
+            snr_val = outputofcalc['snr_val']
+            snr_string = "{0:.2f}".format(snr_val)
+            print "SNR = ", snr_string
+
+            if cmode == 'S':
+                cmode_string = 'SNR to exp. time'
+
+            elif cmode == 'T':
+                cmode_string = 'Exp. time to SNR'
+
+            outhead1string = '<hr /><span class="boldlarge">Calculation Mode: ' + cmode_string + '<br>Observing Mode: ' + om_val_string + ', VPH: ' + vph_val_string + ', Source Type: ' + sourcet_val_string + ' </span>' + \
+                            '<span class="italicsmall"> Computation time: ' + "{0:.4f}".format((time.time() - start_time)) + ' seconds; </span>'
+
             tablecoutstring = ''
-            # tablecoutstring = '<hr />' + \
-            #                   'OUTPUT CONTINUUM SNR:' + \
-            #                   '<br />(at lambda_c(VPH) = ' + lambdaeff_string + ' AA)' + \
-            #                   '<table border=1>' + \
-            #                   '<tr>' \
-            #                     '<td class="iconcolumn"> </td>' \
-            #                     '<th scope="col" colspan="4">* SNR in total source area:</th>' \
-            #                     '<th>(number of fibers = ' + nfibres_string + ')</th></tr>' + \
-            #                   '<tr>' \
-            #                     '<td class="iconcolumn"> </td>' \
-            #                     '<td>npixx</td><td>npixy</td>' \
-            #                     '<td class="perframecolumn">per frame</td>' \
-            #                     '<td class="allframecolumn">all frames</td>' \
-            #                     '<td></td></tr>' + \
-            #                   '<tr>' \
-            #                     '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspp.jpeg" /></td>' \
-            #                     '<td>' + npixx_psp_all_string + '</td>' \
-            #                     '<td>' + npixy_psp_all_string + '</td>' \
-            #                     '<td> ' + sncont_psp_all_string + ' </td>' \
-            #                     '<td> ' + tsncont_psp_all_string + '</td>' \
-            #                     '<td> per spectral pixel</td></tr>' + \
-            #                   '<tr>' \
-            #                     '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspfwhm.jpeg" /></td>' \
-            #                     '<td>' + npixx_p2sp_all_string + '</td>' \
-            #                     '<td>' + npixy_p2sp_all_string + '</td>' \
-            #                     '<td> ' + sncont_pspfwhm_all_string + ' </td>' \
-            #                     '<td> ' + tsncont_pspfwhm_all_string + '</td>' \
-            #                     '<td> per voxel</td></tr>' + \
-            #                   '<tr>' \
-            #                     '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_peraa.jpeg" /></td>' \
-            #                     '<td>' + npixx_1aa_all_string + '</td>' \
-            #                     '<td>' + npixy_1aa_all_string + '</td>' \
-            #                     '<td> ' + sncont_1aa_all_string + ' </td>' \
-            #                     '<td> ' + tsncont_1aa_all_string + '</td>' \
-            #                     '<td> per AA</td></tr>' + \
-            #                   '</table><br />'
 
-            # if sourcet_val_string == 'E':
-            #                       # '<hr />' + \
-            #                       # 'OUTPUT CONTINUUM <br />' + \
-            #                       # '(at lambda_c(VPH) = ' + lambdaeff_string + ' AA)' + \
-            #     tablecoutstring = tablecoutstring + \
-            #                       '<hr />' + \
-            #                       '<table border=1>' + \
-            #                       '<tr>' \
-            #                         '<th class="iconcolumn" scope="col"> </td>' \
-            #                         '<th scope="col" colspan="4">* SNR in one seeing:</th><th scope="col"></th></tr>' + \
-            #                       '<tr>' \
-            #                         '<th class="iconcolumn" scope="row"> </th>' \
-            #                         '<td>npixx</td>' \
-            #                         '<td>npixy</td>' \
-            #                         '<td class="perframecolumn">per frame</td>' \
-            #                         '<td class="allframecolumn">all frames</td>' \
-            #                         '<td></td></tr>' + \
-            #                       '<tr>' \
-            #                         '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspfwhm.jpeg" /></td>' \
-            #                         '<td>' + npixx_p2sp_seeing_string + '</td>' \
-            #                         '<td>' + npixy_p2sp_seeing_string + '</td>' \
-            #                         '<td> ' + sncont_p2sp_seeing_string + ' </td>' \
-            #                         '<td> ' + tsncont_p2sp_seeing_string + '</td>' \
-            #                         '<td> per voxel</td></tr>' + \
-            #                       '<tr>' \
-            #                         '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_peraa.jpeg" /></td>' \
-            #                         '<td>' + npixx_1aa_seeing_string + '</td>' \
-            #                         '<td>' + npixy_1aa_seeing_string + '</td>' \
-            #                         '<td> ' + sncont_1aa_seeing_string + ' </td>' \
-            #                         '<td> ' + tsncont_1aa_seeing_string + '</td>' \
-            #                         '<td> per AA</td></tr>' + \
-            #                       '<tr>' \
-            #                         '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_integrated.jpeg" /></td>' \
-            #                         '<td>' + npixx_band_seeing_string + '</td>' \
-            #                         '<td>' + npixy_band_seeing_string + '</td>' \
-            #                         '<td> ' + sncont_band_seeing_string + ' </td>' \
-            #                         '<td> ' + tsncont_band_seeing_string + '</td>' \
-            #                         '<td> per integrated spectrum (spaxel)</td></tr>' + \
-            #                       '</table>'
-                                  # '<tr class="rowheight">' \
-                                  #   '<td> </td></tr>' + \
-                                  # '<tr>' \
-                                  #   '<td class="iconcolumn"> </td>' \
-                                  #   '<th scope="col" colspan="4">* SNR in one arcsec^2:</th>' \
-                                  #   '<th></th></tr>' + \
-                                  # '<tr>' \
-                                  #   '<td class="iconcolumn"> </td>' \
-                                  #   '<td>npixx</td>' \
-                                  #   '<td>npixy</td>' \
-                                  #   '<td class="perframecolumn">per frame</td>' \
-                                  #   '<td class="allframecolumn">all frames</td>' \
-                                  #   '<td></td></tr>' + \
-                                  # '<tr>' \
-                                  #   '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspfwhm.jpeg" /></td>' \
-                                  #   '<td>' + npixx_p2sp_1_string + '</td>' \
-                                  #   '<td>' + npixy_p2sp_1_string + '</td>' \
-                                  #   '<td> ' + sncont_p2sp_1_string + ' </td>' \
-                                  #   '<td> ' + tsncont_p2sp_1_string + '</td>' \
-                                  #   '<td> per voxel</td></tr>' + \
-                                  # '<tr>' \
-                                  #   '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_peraa.jpeg" /></td>' \
-                                  #   '<td>' + npixx_1aa_1_string + '</td>' \
-                                  #   '<td>' + npixy_1aa_1_string + '</td>' \
-                                  #   '<td> ' + sncont_1aa_1_string + ' </td>' \
-                                  #   '<td> ' + tsncont_1aa_1_string + '</td>' \
-                                  #   '<td> per AA</td></tr>' + \
-                                  # '<tr>' \
-                                  #   '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_integrated.jpeg" /></td>' \
-                                  #   '<td>' + npixx_band_1_string + '</td>' \
-                                  #   '<td>' + npixy_band_1_string + '</td>' \
-                                  #   '<td> ' + sncont_band_1_string + ' </td>' \
-                                  #   '<td> ' + tsncont_band_1_string + '</td>' \
-                                  #   '<td> per integrated spectrum (spaxel)</td></tr>' + \
-                                  # '</table>'
 
             if fluxt_val_string == 'L':
-                tableloutstring = '<hr />' + \
-                                  'OUTPUT LINE SNR: ' + fluxt_val_string + \
-                                  '<br />(at lambda_line = ' + wline_val_string + ' AA)' + \
-                                  '<table border=1>' + \
-                                  '<tr>' \
-                                    '<th class="iconcolumn" scope="row"> </th>' \
-                                    '<td class="perframecolumn">per frame</td>' \
-                                    '<td class="allframecolumn">all frames</td>' \
-                                    '<td></td></tr>' + \
-                                  '<tr>' \
-                                    '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pdp.jpeg" /></td>' \
-                                    '<td class="perframecolumn"> ' + snline_pspp_string + '</td>' \
-                                    '<td> ' + tsnline_pspp_string + '</td>' \
-                                    '<td> per fiber per detector pixel</td></tr>' + \
-                                  '<tr>' \
-                                    '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspfwhm.jpeg" /></td>' \
-                                    '<td class="perframecolumn"> ' + snline_voxel_string + '</td>' \
-                                    '<td> ' + tsnline_voxel_string + '</td>' \
-                                    '<td> per fiber per voxel</td></tr>' + \
-                                  '<tr>' \
-                                    '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_perfibinappang.jpeg" /></td>' \
-                                    '<td class="perframecolumn"> ' + snline_fibre1aa_string + '</td>' \
-                                    '<td> ' + tsnline_fibre1aa_string + '</td>' \
-                                    '<td> per fiber in aperture per AA</td></tr>' + \
-                                  '<tr>' \
-                                    '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_perfibinap.jpeg" /></td>' \
-                                    '<td class="perframecolumn"> ' + snline_fibre_string + '</td>' \
-                                    '<td> ' + tsnline_fibre_string + '</td>' \
-                                    '<td> per fiber in aperture</td></tr>' + \
-                                  '<tr>' \
-                                    '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_totalinap.jpeg" /></td>' \
-                                    '<td class="perframecolumn"> ' + snline_all_string + '</td>' \
-                                    '<td>' + tsnline_all_string + '</td>' \
-                                    '<td> total in aperture</td></tr>' + \
-                                  '</table><br />'
-                                  # '<tr>' \
-                                  #   '<td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pasqpang.jpeg" /></td>' \
-                                  #   '<td class="perframecolumn"> ' + snline_1_aa_string + '</td>' \
-                                  #   '<td> ' + tsnline_1_aa_string + '</td>' \
-                                  #   '<td> per arcsec per AA</td></tr>' + \
-
+                from output_tablelout import tablelout
+                tableloutstring = tablelout(fluxt_val_string, wline_val_string,
+                                            snline_pspp_string, tsnline_pspp_string,
+                                            snline_voxel_string, tsnline_voxel_string,
+                                           snline_fibre1aa_string, tsnline_fibre1aa_string,
+                                            snline_fibre_string, tsnline_fibre_string,
+                                            snline_all_string, tsnline_all_string)
             else:
-                tableloutstring = 'No line input<br /><br />'
+                tableloutstring = '<hr />' + \
+                                  'No line input<br /><br />'
 
             if om_val_string == 'MOS':
                 switchstring = 'Sky-bundles:'
@@ -896,433 +728,50 @@ def etc_do(request):
 
             # NEW OUTPUT CONTINUUM TABLE FOR MOS AND LCB
             if om_val_string == 'MOS' and sourcet_val_string == 'Point':
-                tablenewpsfstring = '<hr />' + \
-                                    'OUTPUT CONTINUUM SNR' + \
-                                    '<br />(at lambda_c(VPH) = ' + lambdaeff_string + ' AA)' + \
-                                    '<table border=1>' + \
-                                    '<tr><th class="iconcolumn" scope="col"> </th>' + \
-                                        '<th scope="col" colspan="7">* Continuum SNR per spaxel zones due to PSF (MOS mode):<br />' + \
-                                        'fiber diameter=0.62 arcsec; Seeing FWHM=' + seeingx_string + ' arcsec</th>' + \
-                                        '</tr>' + \
-                                    '<tr><th class="iconcolumn" scope="row"></th>' + \
-                                        '<th scope="col" colspan="3" class="perframecolumn">** per frame</th>' + \
-                                        '<th scope="col" colspan="3" class="allframecolumn">** all frames</th>' + \
-                                        '<td></td>' + \
-                                        '</tr>' + \
-                                    '<tr><th class="iconcolumn" scope="row"><img class="iconsize" src="/static/etc/images/icon_psfrings.jpeg" /></th>' + \
-                                        '<td class="colc"><img class="iconsize" src="/static/etc/images/icon_psfrings_c.jpeg"><br />C<br />(' + seeing_centermean_string +'%)<br />1 fiber</td>' + \
-                                        '<td class="colcr1"><img class="iconsize" src="/static/etc/images/icon_psfrings_cr1.jpeg"><br />C+R1<br />(' + seeing_cr1_string + '%)<br />7 fibers</td>' + \
-                                        '<td class="coltot"><img class="iconsize" src="/static/etc/images/icon_total_area_source.jpeg"><br />Total source area <br />'+ nfibres_string + ' fibers</td>' + \
-                                        '<td class="colc"><img class="iconsize" src="/static/etc/images/icon_psfrings_c.jpeg"><br />C<br />(' + seeing_centermean_string + '%)<br />1 fiber</td>' + \
-                                        '<td class="colcr1"><img class="iconsize" src="/static/etc/images/icon_psfrings_cr1.jpeg"><br />C+R1<br />(' + seeing_cr1_string + '%)<br />7 fibers</td>' + \
-                                        '<td class="coltot"><img class="iconsize" src="/static/etc/images/icon_total_area_source.jpeg"><br />Total source area<br />' + nfibres_string + ' fibers</td>' + \
-                                        '<td></td>' + \
-                                        '</tr>' + \
-                                    '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspfwhm.jpeg" /></td>' + \
-                                        '<td class="perframecolumn"> ' + sncont_centerspaxel_voxel_string + ' </td>' + \
-                                        '<td> ' + sncont_cr1spaxels_voxel_string + '</td>' + \
-                                        '<td> ' + sncont_pspfwhm_all_string + '</td>' + \
-                                        '<td class="perframecolumn"> ' + tsncont_centerspaxel_voxel_string + ' </td>' + \
-                                        '<td> ' + tsncont_cr1spaxels_voxel_string + '</td>' + \
-                                        '<td> ' + tsncont_pspfwhm_all_string + '</td>' + \
-                                        '<td> per voxel</td>' + \
-                                        '</tr>' + \
-                                    '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_peraa.jpeg" /></td>' + \
-                                        '<td class="perframecolumn"> ' + sncont_centerspaxel_aa_string + ' </td>' + \
-                                        '<td> ' + sncont_cr1spaxels_aa_string + '</td>' + \
-                                        '<td> ' + sncont_1aa_all_string + '</td>' + \
-                                        '<td class="perframecolumn"> ' + tsncont_centerspaxel_aa_string + ' </td>' + \
-                                        '<td> ' + tsncont_cr1spaxels_aa_string + '</td>' + \
-                                        '<td> ' + tsncont_1aa_all_string + '</td>' + \
-                                        '<td> per AA</td>' + \
-                                        '</tr>' + \
-                                    '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_integrated.jpeg" /></td>' + \
-                                        '<td class="perframecolumn"> ' + sncont_centerspaxel_all_string + ' </td>' + \
-                                        '<td> ' + sncont_cr1spaxels_all_string + '</td>' + \
-                                        '<td> ' + sncont_band_all_string + '</td>' + \
-                                        '<td class="perframecolumn"> ' + tsncont_centerspaxel_all_string + ' </td>' + \
-                                        '<td> ' + tsncont_cr1spaxels_all_string + '</td>' + \
-                                        '<td> ' + tsncont_band_all_string + '</td>' + \
-                                        '<td> integrated spectrum </td>' + \
-                                        '</tr>' + \
-                                    '</table><br />'
-                                    # 'TESTING AREA: SNCONT_C_VOXEL= ' + sncont_centerspaxel_voxel_string + '<br />' + \
-                                    # 'TESTING AREA: SNCONT_R1_VOXEL= ' + sncont_r1spaxel_voxel_string + '<br />'
+                from output_table_MOS_P_T import tablenewpsfMPT
+                tablenewpsfstring = tablenewpsfMPT(lambdaeff_string, seeingx_string,
+                                                seeing_centermean_string, seeing_cr1_string,
+                                                sncont_centerspaxel_voxel_string, sncont_cr1spaxels_voxel_string,
+                                                tsncont_centerspaxel_voxel_string, tsncont_cr1spaxels_voxel_string,
+                                                sncont_centerspaxel_aa_string, sncont_cr1spaxels_aa_string,
+                                                tsncont_centerspaxel_aa_string, tsncont_cr1spaxels_aa_string,
+                                                sncont_centerspaxel_all_string, sncont_cr1spaxels_all_string,
+                                                tsncont_centerspaxel_all_string, tsncont_cr1spaxels_all_string
+                                                )
+
             elif om_val_string == 'MOS' and sourcet_val_string == 'Extended':
-                tablenewpsfstring = '<hr />' + \
-                                    'OUTPUT CONTINUUM SNR' + \
-                                    '<br />(at lambda_c(VPH) = ' + lambdaeff_string + ' AA)' + \
-                                    '<table border=1>' + \
-                                    '<tr><th class="iconcolumn" scope="col"> </th>' + \
-                                        '<th scope="col" colspan="7">* Continuum SNR per spaxel zones due to PSF (MOS mode):<br />' + \
-                                        'fiber diameter=0.62 arcsec; Seeing FWHM=' + seeingx_string + ' arcsec</th>' + \
-                                        '</tr>' + \
-                                    '<tr><th class="iconcolumn" scope="row"></th>' + \
-                                        '<th scope="col" colspan="3" class="perframecolumn">** per frame</th>' + \
-                                        '<th scope="col" colspan="3" class="allframecolumn">** all frames</th>' + \
-                                        '<td></td>' + \
-                                        '</tr>' + \
-                                    '<tr><th class="iconcolumn" scope="row"><img class="iconsize" src="/static/etc/images/icon_psfrings.jpeg" /></th>' + \
-                                        '<td class="colc"><img class="iconsize" src="/static/etc/images/icon_psfrings_c.jpeg"><br />C<br />1 fiber</td>' + \
-                                        '<td class="colcr1"><img class="iconsize" src="/static/etc/images/icon_psfrings_cr1.jpeg"><br />C+R1<br />7 fibers</td>' + \
-                                        '<td class="coltot"><img class="iconsize" src="/static/etc/images/icon_total_area_source.jpeg"><br />Total source area <br />'+ nfibres_string + ' fibers</td>' + \
-                                        '<td class="colc"><img class="iconsize" src="/static/etc/images/icon_psfrings_c.jpeg"><br />C<br />1 fiber</td>' + \
-                                        '<td class="colcr1"><img class="iconsize" src="/static/etc/images/icon_psfrings_cr1.jpeg"><br />C+R1<br />7 fibers</td>' + \
-                                        '<td class="coltot"><img class="iconsize" src="/static/etc/images/icon_total_area_source.jpeg"><br />Total source area<br />' + nfibres_string + ' fibers</td>' + \
-                                        '<td></td>' + \
-                                        '</tr>' + \
-                                    '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspfwhm.jpeg" /></td>' + \
-                                        '<td class="perframecolumn"> ' + sncont_centerspaxel_voxel_string + ' </td>' + \
-                                        '<td> ' + sncont_cr1spaxels_voxel_string + '</td>' + \
-                                        '<td> ' + sncont_pspfwhm_all_string + '</td>' + \
-                                        '<td class="perframecolumn"> ' + tsncont_centerspaxel_voxel_string + ' </td>' + \
-                                        '<td> ' + tsncont_cr1spaxels_voxel_string + '</td>' + \
-                                        '<td> ' + tsncont_pspfwhm_all_string + '</td>' + \
-                                        '<td> per voxel</td>' + \
-                                        '</tr>' + \
-                                    '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_peraa.jpeg" /></td>' + \
-                                        '<td class="perframecolumn"> ' + sncont_centerspaxel_aa_string + ' </td>' + \
-                                        '<td> ' + sncont_cr1spaxels_aa_string + '</td>' + \
-                                        '<td> ' + sncont_1aa_all_string + '</td>' + \
-                                        '<td class="perframecolumn"> ' + tsncont_centerspaxel_aa_string + ' </td>' + \
-                                        '<td> ' + tsncont_cr1spaxels_aa_string + '</td>' + \
-                                        '<td> ' + tsncont_1aa_all_string + '</td>' + \
-                                        '<td> per AA</td>' + \
-                                        '</tr>' + \
-                                    '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_integrated.jpeg" /></td>' + \
-                                        '<td class="perframecolumn"> ' + sncont_centerspaxel_all_string + ' </td>' + \
-                                        '<td> ' + sncont_cr1spaxels_all_string + '</td>' + \
-                                        '<td> ' + sncont_band_all_string + '</td>' + \
-                                        '<td class="perframecolumn"> ' + tsncont_centerspaxel_all_string + ' </td>' + \
-                                        '<td> ' + tsncont_cr1spaxels_all_string + '</td>' + \
-                                        '<td> ' + tsncont_band_all_string + '</td>' + \
-                                        '<td> integrated spectrum </td>' + \
-                                        '</tr>' + \
-                                    '</table><br />'
+                from output_table_MOS_E_T import tablenewpsfMET
+                tablenewpsfstring = tablenewpsfMET(lambdaeff_string, seeingx_string,
+                                                  nfibres_string, sncont_centerspaxel_voxel_string, sncont_cr1spaxels_voxel_string, sncont_pspfwhm_all_string,
+                                                  tsncont_centerspaxel_voxel_string, tsncont_cr1spaxels_voxel_string, tsncont_pspfwhm_all_string,
+                                                  sncont_centerspaxel_aa_string, sncont_cr1spaxels_aa_string, sncont_1aa_all_string,
+                                                  tsncont_centerspaxel_aa_string, tsncont_cr1spaxels_aa_string, tsncont_1aa_all_string,
+                                                  sncont_centerspaxel_all_string, sncont_cr1spaxels_all_string, sncont_band_all_string,
+                                                  tsncont_centerspaxel_all_string, tsncont_cr1spaxels_all_string, tsncont_band_all_string)
+
             elif om_val_string == 'LCB' and sourcet_val_string == 'Point':
-                tablenewpsfstring = '<hr />' + \
-                                    'OUTPUT CONTINUUM SNR' + \
-                                    '<br />(at lambda_c(VPH) = ' + lambdaeff_string + ' AA)' + \
-                                    '<table border=1>' + \
-                                    '<tr><th class="iconcolumn" scope="col"> </th>' + \
-                                        '<th scope="col" colspan="7">* Continuum SNR per spaxel zones due to PSF (LCB mode):<br />' + \
-                                        'fiber diameter=0.62 arcsec; Seeing FWHM=' + seeingx_string + ' arcsec</th>' + \
-                                        '</tr>' + \
-                                    '<tr><th class="iconcolumn" scope="row"></th>' + \
-                                        '<th scope="col" colspan="3" class="perframecolumn">** per frame</th>' + \
-                                        '<th scope="col" colspan="3" class="allframecolumn">** all frames</th>' + \
-                                        '<td></td>' + \
-                                        '</tr>' + \
-                                    '<tr><th class="iconcolumn" scope="row"><img class="iconsize" src="/static/etc/images/icon_psfrings.jpeg" /></th>' + \
-                                        '<td class="colc"><img class="iconsize" src="/static/etc/images/icon_psfrings_c.jpeg"><br />C<br />(' + seeing_centermean_string +'%)<br />1 fiber</td>' + \
-                                        '<td class="colcr1"><img class="iconsize" src="/static/etc/images/icon_psfrings_cr1.jpeg"><br />C+R1<br />(' + seeing_cr1_string + '%)<br />7 fibers</td>' + \
-                                        '<td class="colcr1r2"><img class="iconsize" src="/static/etc/images/icon_psfrings_cr1r2.jpeg"><br />C+R1+R2<br />(' + seeing_cr1r2_string + '%)<br />19 fibers</td>' + \
-                                        '<td class="colc"><img class="iconsize" src="/static/etc/images/icon_psfrings_c.jpeg"><br />C<br />(' + seeing_centermean_string +'%)<br />1 fiber</td>' + \
-                                        '<td class="colcr1"><img class="iconsize" src="/static/etc/images/icon_psfrings_cr1.jpeg"><br />C+R1<br />(' + seeing_cr1_string + '%)<br />7 fibers</td>' + \
-                                        '<td class="colcr1r2"><img class="iconsize" src="/static/etc/images/icon_psfrings_cr1r2.jpeg"><br />C+R1+R2<br />(' + seeing_cr1r2_string + '%)<br />19 fibers</td>' + \
-                                        '<td>percentage of enclosed total flux</td>' + \
-                                        '</tr>' + \
-                                    '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspfwhm.jpeg" /></td>' + \
-                                        '<td class="perframecolumn"> ' + sncont_centerspaxel_voxel_string + ' </td>' + \
-                                        '<td> ' + sncont_cr1spaxels_voxel_string + '</td>' + \
-                                        '<td> ' + sncont_cr1r2spaxels_voxel_string + '</td>' + \
-                                        '<td class="perframecolumn"> ' + tsncont_centerspaxel_voxel_string + ' </td>' + \
-                                        '<td> ' + tsncont_cr1spaxels_voxel_string + '</td>' + \
-                                        '<td> ' + tsncont_cr1r2spaxels_voxel_string + '</td>' + \
-                                        '<td> per voxel</td>' + \
-                                        '</tr>' + \
-                                    '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_peraa.jpeg" /></td>' + \
-                                        '<td class="perframecolumn"> ' + sncont_centerspaxel_aa_string + ' </td>' + \
-                                        '<td> ' + sncont_cr1spaxels_aa_string + '</td>' + \
-                                        '<td> ' + sncont_cr1r2spaxels_aa_string + '</td>' + \
-                                        '<td class="perframecolumn"> ' + tsncont_centerspaxel_aa_string + ' </td>' + \
-                                        '<td> ' + tsncont_cr1spaxels_aa_string + '</td>' + \
-                                        '<td> ' + tsncont_cr1r2spaxels_aa_string + '</td>' + \
-                                        '<td> per AA</td>' + \
-                                        '</tr>' + \
-                                    '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_integrated.jpeg" /></td>' + \
-                                        '<td class="perframecolumn"> ' + sncont_centerspaxel_all_string + ' </td>' + \
-                                        '<td> ' + sncont_cr1spaxels_all_string + '</td>' + \
-                                        '<td> ' + sncont_cr1r2spaxels_all_string + '</td>' + \
-                                        '<td class="perframecolumn"> ' + tsncont_centerspaxel_all_string + ' </td>' + \
-                                        '<td> ' + tsncont_cr1spaxels_all_string + '</td>' + \
-                                        '<td> ' + tsncont_cr1r2spaxels_all_string + '</td>' + \
-                                        '<td> integrated spectrum </td>' + \
-                                        '</tr>' + \
-                                        '</table><br />'
-                                    # 'TESTING AREA: SNCONT_C_VOXEL= ' + sncont_centerspaxel_voxel_string + '<br />' + \
-                                    # 'TESTING AREA: SNCONT_R1_VOXEL= ' + sncont_r1spaxel_voxel_string + '<br />' + \
-                                    # 'TESTING AREA: SNCONT_R2_VOXEL= ' + sncont_r2spaxel_voxel_string + '<br />'
+                from output_table_LCB_P_T import tablenewpsfLPT
+                tablenewpsfstring = tablenewpsfLPT(lambdaeff_string, seeingx_string,
+                                                seeing_centermean_string, seeing_cr1_string, seeing_cr1r2_string,
+                                                sncont_centerspaxel_voxel_string, sncont_cr1spaxels_voxel_string, sncont_cr1r2spaxels_voxel_string,
+                                                tsncont_centerspaxel_voxel_string, tsncont_cr1spaxels_voxel_string, tsncont_cr1r2spaxels_voxel_string,
+                                                sncont_centerspaxel_aa_string, sncont_cr1spaxels_aa_string, sncont_cr1r2spaxels_aa_string,
+                                                tsncont_centerspaxel_aa_string, tsncont_cr1spaxels_aa_string, tsncont_cr1r2spaxels_aa_string,
+                                                sncont_centerspaxel_all_string, sncont_cr1spaxels_all_string, sncont_cr1r2spaxels_all_string,
+                                                tsncont_centerspaxel_all_string, tsncont_cr1spaxels_all_string, tsncont_cr1r2spaxels_all_string)
+
             elif om_val_string == 'LCB' and sourcet_val_string == 'Extended':
-                tablenewpsfstring = '<hr />' + \
-                                    'OUTPUT CONTINUUM SNR' + \
-                                    '<br />(at lambda_c(VPH) = ' + lambdaeff_string + ' AA)' + \
-                                    '<table border=1>' + \
-                                    '<tr><th class="iconcolumn" scope="col"> </th>' + \
-                                        '<th scope="col" colspan="7">* Continuum SNR per spaxel zones due to PSF (LCB mode):<br />' + \
-                                        'fiber diameter=0.62 arcsec; Seeing FWHM=' + seeingx_string + ' arcsec</th>' + \
-                                        '</tr>' + \
-                                    '<tr><th class="iconcolumn" scope="row"></th>' + \
-                                        '<th scope="col" colspan="3" class="perframecolumn">** per frame</th>' + \
-                                        '<th scope="col" colspan="3" class="allframecolumn">** all frames</th>' + \
-                                        '<td></td>' + \
-                                        '</tr>' + \
-                                    '<tr><th class="iconcolumn" scope="row"><img class="iconsize" src="/static/etc/images/icon_psfrings.jpeg" /></th>' + \
-                                        '<td class="colc"><img class="iconsize" src="/static/etc/images/icon_psfrings_c.jpeg"><br />C<br />1 fiber</td>' + \
-                                        '<td class="colcr1"><img class="iconsize" src="/static/etc/images/icon_psfrings_cr1.jpeg"><br />C+R1<br />7 fibers</td>' + \
-                                        '<td class="colcr1r2"><img class="iconsize" src="/static/etc/images/icon_psfrings_cr1r2.jpeg"><br />C+R1+R2<br />19 fibers</td>' + \
-                                        '<td class="colc"><img class="iconsize" src="/static/etc/images/icon_psfrings_c.jpeg"><br />C<br />1 fiber</td>' + \
-                                        '<td class="colcr1"><img class="iconsize" src="/static/etc/images/icon_psfrings_cr1.jpeg"><br />C+R1<br />7 fibers</td>' + \
-                                        '<td class="colcr1r2"><img class="iconsize" src="/static/etc/images/icon_psfrings_cr1r2.jpeg"><br />C+R1+R2<br />19 fibers</td>' + \
-                                        '<td></td>' + \
-                                        '</tr>' + \
-                                    '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspfwhm.jpeg" /></td>' + \
-                                        '<td class="perframecolumn"> ' + sncont_centerspaxel_voxel_string + ' </td>' + \
-                                        '<td> ' + sncont_cr1spaxels_voxel_string + '</td>' + \
-                                        '<td> ' + sncont_cr1r2spaxels_voxel_string + '</td>' + \
-                                        '<td class="perframecolumn"> ' + tsncont_centerspaxel_voxel_string + ' </td>' + \
-                                        '<td> ' + tsncont_cr1spaxels_voxel_string + '</td>' + \
-                                        '<td> ' + tsncont_cr1r2spaxels_voxel_string + '</td>' + \
-                                        '<td> per voxel</td>' + \
-                                        '</tr>' + \
-                                    '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_peraa.jpeg" /></td>' + \
-                                        '<td class="perframecolumn"> ' + sncont_centerspaxel_aa_string + ' </td>' + \
-                                        '<td> ' + sncont_cr1spaxels_aa_string + '</td>' + \
-                                        '<td> ' + sncont_cr1r2spaxels_aa_string + '</td>' + \
-                                        '<td class="perframecolumn"> ' + tsncont_centerspaxel_aa_string + ' </td>' + \
-                                        '<td> ' + tsncont_cr1spaxels_aa_string + '</td>' + \
-                                        '<td> ' + tsncont_cr1r2spaxels_aa_string + '</td>' + \
-                                        '<td> per AA</td>' + \
-                                        '</tr>' + \
-                                    '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_integrated.jpeg" /></td>' + \
-                                        '<td class="perframecolumn"> ' + sncont_centerspaxel_all_string + ' </td>' + \
-                                        '<td> ' + sncont_cr1spaxels_all_string + '</td>' + \
-                                        '<td> ' + sncont_cr1r2spaxels_all_string + '</td>' + \
-                                        '<td class="perframecolumn"> ' + tsncont_centerspaxel_all_string + ' </td>' + \
-                                        '<td> ' + tsncont_cr1spaxels_all_string + '</td>' + \
-                                        '<td> ' + tsncont_cr1r2spaxels_all_string + '</td>' + \
-                                        '<td> integrated spectrum </td>' + \
-                                        '</tr>' + \
-                                        '</table><br />'
+                from output_table_LCB_E_T import tablenewpsfLET
+                tablenewpsfstring = tablenewpsfLET(lambdaeff_string, seeingx_string,
+                                                sncont_centerspaxel_voxel_string, sncont_cr1spaxels_voxel_string, sncont_cr1r2spaxels_voxel_string,
+                                                tsncont_centerspaxel_voxel_string, tsncont_cr1spaxels_voxel_string, tsncont_cr1r2spaxels_voxel_string,
+                                                sncont_centerspaxel_aa_string, sncont_cr1spaxels_aa_string, sncont_cr1r2spaxels_aa_string,
+                                                tsncont_centerspaxel_aa_string, tsncont_cr1spaxels_aa_string, tsncont_cr1r2spaxels_aa_string,
+                                                sncont_centerspaxel_all_string, sncont_cr1spaxels_all_string, sncont_cr1r2spaxels_all_string,
+                                                tsncont_centerspaxel_all_string, tsncont_cr1spaxels_all_string, tsncont_cr1r2spaxels_all_string)
+
             else:
                 tablenewpsfstring = ''
-            # TABLES NEWPSF LINE (ATTEMPT; TBD)
-            # if om_val_string == 'MOS' and fluxt_val_string == 'L' and sourcet_val_string == 'E':
-            #     tablenewpsflinestring = '<br />(at lambda_line = ' + wline_val_string + ' AA)' + \
-            #                         '<table border=1>' + \
-            #                         '<tr><th class="iconcolumn" scope="col"> </th>' + \
-            #                             '<th scope="col" colspan="7">* Line SNR per spaxel zones due to PSF <br />' + \
-            #                             '(MOS mode) for an extended source:<br />' + \
-            #                             'fiber diameter=0.62 arcsec; Seeing FWHM=' + seeingx_string + ' arcsec</th>' + \
-            #                             '</tr>' + \
-            #                         '<tr><th class="iconcolumn" scope="row"></th>' + \
-            #                             '<th scope="col" colspan="3" class="perframecolumn">** per frame</th>' + \
-            #                             '<th scope="col" colspan="3" class="allframecolumn">** all frames</th>' + \
-            #                             '<td></td>' + \
-            #                             '</tr>' + \
-            #                         '<tr><th class="iconcolumn" scope="row"><img class="iconsize" src="/static/etc/images/icon_psfrings.jpeg" /></th>' + \
-            #                             '<td class="colc"><img class="iconsize" src="/static/etc/images/icon_psfrings_c.jpeg"><br />C<br />1 fiber</td>' + \
-            #                             '<td class="colcr1"><img class="iconsize" src="/static/etc/images/icon_psfrings_cr1.jpeg"><br />C+R1<br />7 fibers</td>' + \
-            #                             '<td class="coltot"><img class="iconsize" src="/static/etc/images/icon_total_area_source.jpeg"><br />Total source area <br />' + nfibres_string + ' fibers</td>' + \
-            #                             '<td class="colc"><img class="iconsize" src="/static/etc/images/icon_psfrings_c.jpeg"><br />C<br />1 fiber</td>' + \
-            #                             '<td class="colcr1"><img class="iconsize" src="/static/etc/images/icon_psfrings_cr1.jpeg"><br />C+R1<br />7 fibers</td>' + \
-            #                             '<td class="coltot"><img class="iconsize" src="/static/etc/images/icon_total_area_source.jpeg"><br />Total source area<br />' + nfibres_string + ' fibers</td>' + \
-            #                             '<td></td>' + \
-            #                             '</tr>' + \
-            #                         '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspfwhm.jpeg" /></td>' + \
-            #                             '<td class="perframecolumn"> ' + sncont_centerspaxel_voxel_string + ' </td>' + \
-            #                             '<td> ' + sncont_cr1spaxels_voxel_string + '</td>' + \
-            #                             '<td> tofill </td>' + \
-            #                             '<td class="perframecolumn"> ' + tsncont_centerspaxel_voxel_string + ' </td>' + \
-            #                             '<td> ' + tsncont_cr1spaxels_voxel_string + '</td>' + \
-            #                             '<td> tofill </td>' + \
-            #                             '<td> per voxel</td>' + \
-            #                             '</tr>' + \
-            #                         '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_peraa.jpeg" /></td>' + \
-            #                             '<td class="perframecolumn"> ' + sncont_centerspaxel_aa_string + ' </td>' + \
-            #                             '<td> ' + sncont_cr1spaxels_aa_string + '</td>' + \
-            #                             '<td> tofill </td>' + \
-            #                             '<td class="perframecolumn"> ' + tsncont_centerspaxel_aa_string + ' </td>' + \
-            #                             '<td> ' + tsncont_cr1spaxels_aa_string + '</td>' + \
-            #                             '<td> tofill </td>' + \
-            #                             '<td> per AA</td>' + \
-            #                             '</tr>' + \
-            #                         '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_integrated.jpeg" /></td>' + \
-            #                             '<td class="perframecolumn"> ' + sncont_centerspaxel_all_string + ' </td>' + \
-            #                             '<td> ' + sncont_cr1spaxels_all_string + '</td>' + \
-            #                             '<td> tofill </td>' + \
-            #                             '<td class="perframecolumn"> ' + tsncont_centerspaxel_all_string + ' </td>' + \
-            #                             '<td> ' + tsncont_cr1spaxels_all_string + '</td>' + \
-            #                             '<td> tofill </td>' + \
-            #                             '<td> integrated spectrum </td>' + \
-            #                             '</tr>' + \
-            #                         '</table><br />'
-            # elif om_val_string == 'MOS' and fluxt_val_string == 'L' and sourcet_val_string == 'P':
-            #     tablenewpsflinestring = '<br />(at lambda_line = ' + wline_val_string + ' AA)' + \
-            #                             '<table border=1>' + \
-            #                             '<tr><th class="iconcolumn" scope="col"> </th>' + \
-            #                                 '<th scope="col" colspan="7">* Line SNR per spaxel zones due to PSF <br />' + \
-            #                                 '(MOS mode) for a point source:<br />' + \
-            #                                 'fiber diameter=0.62 arcsec; Seeing FWHM=' + seeingx_string + ' arcsec <br />'
-            #     if resolvedline_val_string == 'N':
-            #         tablenewpsflinestring = tablenewpsflinestring + \
-            #                             'line FWHM = VPH FWHM = ' + fwhmline_val_string + '</th>'
-            #     else:
-            #         tablenewpsflinestring = tablenewpsflinestring + \
-            #                             'input line FWHM = ' + fwhmline_val_string + '</th>'
-            #     tablenewpsflinestring = tablenewpsflinestring + \
-            #                             '</tr>' + \
-            #                             '<tr><th class="iconcolumn" scope="row"></th>' + \
-            #                                 '<th scope="col" colspan="3" class="perframecolumn">** per frame</th>' + \
-            #                                 '<th scope="col" colspan="3" class="allframecolumn">** all frames</th>' + \
-            #                                 '<td></td>' + \
-            #                                 '</tr>' + \
-            #                             '<tr><th class="iconcolumn" scope="row"><img class="iconsize" src="/static/etc/images/icon_psfrings.jpeg" /></th>' + \
-            #                                 '<td class="colc"><img class="iconsize" src="/static/etc/images/icon_psfrings_c.jpeg"><br />C<br />1 fiber</td>' + \
-            #                                 '<td class="colcr1"><img class="iconsize" src="/static/etc/images/icon_psfrings_cr1.jpeg"><br />C+R1<br />7 fibers</td>' + \
-            #                                 '<td class="coltot"><img class="iconsize" src="/static/etc/images/icon_total_area_source.jpeg"><br />Total source area <br />' + nfibres_string + ' fibers</td>' + \
-            #                                 '<td class="colc"><img class="iconsize" src="/static/etc/images/icon_psfrings_c.jpeg"><br />C<br />1 fiber</td>' + \
-            #                                 '<td class="colcr1"><img class="iconsize" src="/static/etc/images/icon_psfrings_cr1.jpeg"><br />C+R1<br />7 fibers</td>' + \
-            #                                 '<td class="coltot"><img class="iconsize" src="/static/etc/images/icon_total_area_source.jpeg"><br />Total source area<br />' + nfibres_string + ' fibers</td>' + \
-            #                                 '<td></td>' + \
-            #                                 '</tr>' + \
-            #                             '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspfwhm.jpeg" /></td>' + \
-            #                                 '<td class="perframecolumn"> ' + sncont_centerspaxel_voxel_string + ' </td>' + \
-            #                                 '<td> ' + sncont_cr1spaxels_voxel_string + '</td>' + \
-            #                                 '<td> tofill </td>' + \
-            #                                 '<td class="perframecolumn"> ' + tsncont_centerspaxel_voxel_string + ' </td>' + \
-            #                                 '<td> ' + tsncont_cr1spaxels_voxel_string + '</td>' + \
-            #                                 '<td> tofill </td>' + \
-            #                                 '<td> per voxel</td>' + \
-            #                                 '</tr>' + \
-            #                             '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_peraa.jpeg" /></td>' + \
-            #                                 '<td class="perframecolumn"> ' + sncont_centerspaxel_aa_string + ' </td>' + \
-            #                                 '<td> ' + sncont_cr1spaxels_aa_string + '</td>' + \
-            #                                 '<td> tofill </td>' + \
-            #                                 '<td class="perframecolumn"> ' + tsncont_centerspaxel_aa_string + ' </td>' + \
-            #                                 '<td> ' + tsncont_cr1spaxels_aa_string + '</td>' + \
-            #                                 '<td> tofill </td>' + \
-            #                                 '<td> per AA</td>' + \
-            #                                 '</tr>' + \
-            #                             '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_integrated.jpeg" /></td>' + \
-            #                                 '<td class="perframecolumn"> ' + sncont_centerspaxel_all_string + ' </td>' + \
-            #                                 '<td> ' + sncont_cr1spaxels_all_string + '</td>' + \
-            #                                 '<td> tofill </td>' + \
-            #                                 '<td class="perframecolumn"> ' + tsncont_centerspaxel_all_string + ' </td>' + \
-            #                                 '<td> ' + tsncont_cr1spaxels_all_string + '</td>' + \
-            #                                 '<td> tofill </td>' + \
-            #                                 '<td> integrated spectrum </td>' + \
-            #                                 '</tr>' + \
-            #                             '</table><br />'
-            # elif om_val_string == 'LCB' and fluxt_val_string == 'L' and sourcet_val_string == 'E':
-            #     tablenewpsflinestring = '<br />(at lambda_line = ' + wline_val_string + ' AA)' + \
-            #                         '<table border=1>' + \
-            #                         '<tr><th class="iconcolumn" scope="col"> </th>' + \
-            #                             '<th scope="col" colspan="7">* Line SNR per spaxel zones due to PSF <br />' + \
-            #                             '(LCB mode) for an extended source:<br />' + \
-            #                             'fiber diameter=0.62 arcsec; Seeing FWHM=' + seeingx_string + ' arcsec</th>' + \
-            #                             '</tr>' + \
-            #                         '<tr><th class="iconcolumn" scope="row"></th>' + \
-            #                             '<th scope="col" colspan="3" class="perframecolumn">** per frame</th>' + \
-            #                             '<th scope="col" colspan="3" class="allframecolumn">** all frames</th>' + \
-            #                             '<td></td>' + \
-            #                             '</tr>' + \
-            #                         '<tr><th class="iconcolumn" scope="row"><img class="iconsize" src="/static/etc/images/icon_psfrings.jpeg" /></th>' + \
-            #                             '<td class="colc"><img class="iconsize" src="/static/etc/images/icon_psfrings_c.jpeg"><br />C<br />(' + seeing_centermean_string +'%)<br />1 fiber</td>' + \
-            #                             '<td class="colcr1"><img class="iconsize" src="/static/etc/images/icon_psfrings_cr1.jpeg"><br />C+R1<br />(' + seeing_cr1_string + '%)<br />7 fibers</td>' + \
-            #                             '<td class="colcr1r2"><img class="iconsize" src="/static/etc/images/icon_psfrings_cr1r2.jpeg"><br />C+R1+R2<br />(' + seeing_cr1r2_string + '%)<br />19 fibers</td>' + \
-            #                             '<td class="colc"><img class="iconsize" src="/static/etc/images/icon_psfrings_c.jpeg"><br />C<br />(' + seeing_centermean_string +'%)<br />1 fiber</td>' + \
-            #                             '<td class="colcr1"><img class="iconsize" src="/static/etc/images/icon_psfrings_cr1.jpeg"><br />C+R1<br />(' + seeing_cr1_string + '%)<br />7 fibers</td>' + \
-            #                             '<td class="colcr1r2"><img class="iconsize" src="/static/etc/images/icon_psfrings_cr1r2.jpeg"><br />C+R1+R2<br />(' + seeing_cr1r2_string + '%)<br />19 fibers</td>' + \
-            #                             '<td>percentage of enclosed total flux</td>' + \
-            #                             '</tr>' + \
-            #                         '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspfwhm.jpeg" /></td>' + \
-            #                             '<td class="perframecolumn"> ' + sncont_centerspaxel_voxel_string + ' </td>' + \
-            #                             '<td> ' + sncont_cr1spaxels_voxel_string + '</td>' + \
-            #                             '<td> tofill </td>' + \
-            #                             '<td class="perframecolumn"> ' + tsncont_centerspaxel_voxel_string + ' </td>' + \
-            #                             '<td> ' + tsncont_cr1spaxels_voxel_string + '</td>' + \
-            #                             '<td> tofill </td>' + \
-            #                             '<td> per voxel</td>' + \
-            #                             '</tr>' + \
-            #                         '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_peraa.jpeg" /></td>' + \
-            #                             '<td class="perframecolumn"> ' + sncont_centerspaxel_aa_string + ' </td>' + \
-            #                             '<td> ' + sncont_cr1spaxels_aa_string + '</td>' + \
-            #                             '<td> tofill </td>' + \
-            #                             '<td class="perframecolumn"> ' + tsncont_centerspaxel_aa_string + ' </td>' + \
-            #                             '<td> ' + tsncont_cr1spaxels_aa_string + '</td>' + \
-            #                             '<td> tofill </td>' + \
-            #                             '<td> per AA</td>' + \
-            #                             '</tr>' + \
-            #                         '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_integrated.jpeg" /></td>' + \
-            #                             '<td class="perframecolumn"> ' + sncont_centerspaxel_all_string + ' </td>' + \
-            #                             '<td> ' + sncont_cr1spaxels_all_string + '</td>' + \
-            #                             '<td> tofill </td>' + \
-            #                             '<td class="perframecolumn"> ' + tsncont_centerspaxel_all_string + ' </td>' + \
-            #                             '<td> ' + tsncont_cr1spaxels_all_string + '</td>' + \
-            #                             '<td> tofill </td>' + \
-            #                             '<td> integrated spectrum </td>' + \
-            #                             '</tr>' + \
-            #                         '</table><br />'
-            # elif om_val_string == 'LCB' and fluxt_val_string == 'L' and sourcet_val_string == 'P':
-            #     tablenewpsflinestring = '<br />(at lambda_line = ' + wline_val_string + ' AA)' + \
-            #                         '<table border=1>' + \
-            #                         '<tr><th class="iconcolumn" scope="col"> </th>' + \
-            #                             '<th scope="col" colspan="7">* Line SNR per spaxel zones due to PSF <br />' + \
-            #                             '(LCB mode) for a point source:<br />' + \
-            #                             'fiber diameter=0.62 arcsec; Seeing FWHM=' + seeingx_string + ' arcsec<br />'
-            #     if resolvedline_val_string == 'N':
-            #         tablenewpsflinestring = tablenewpsflinestring + \
-            #                             'line FWHM = VPH FWHM = ' + fwhmline_val_string + '</th>'
-            #     else:
-            #         tablenewpsflinestring = tablenewpsflinestring + \
-            #                             'input line FWHM = ' + fwhmline_val_string + '</th>'
-            #     tablenewpsflinestring = tablenewpsflinestring + \
-            #                             '</tr>' + \
-            #                         '<tr><th class="iconcolumn" scope="row"></th>' + \
-            #                             '<th scope="col" colspan="3" class="perframecolumn">** per frame</th>' + \
-            #                             '<th scope="col" colspan="3" class="allframecolumn">** all frames</th>' + \
-            #                             '<td></td>' + \
-            #                             '</tr>' + \
-            #                         '<tr><th class="iconcolumn" scope="row"><img class="iconsize" src="/static/etc/images/icon_psfrings.jpeg" /></th>' + \
-            #                             '<td class="colc"><img class="iconsize" src="/static/etc/images/icon_psfrings_c.jpeg"><br />C<br />(' + seeing_centermean_string +'%)<br />1 fiber</td>' + \
-            #                             '<td class="colcr1"><img class="iconsize" src="/static/etc/images/icon_psfrings_cr1.jpeg"><br />C+R1<br />(' + seeing_cr1_string + '%)<br />7 fibers</td>' + \
-            #                             '<td class="colcr1r2"><img class="iconsize" src="/static/etc/images/icon_psfrings_cr1r2.jpeg"><br />C+R1+R2<br />(' + seeing_cr1r2_string + '%)<br />19 fibers</td>' + \
-            #                             '<td class="colc"><img class="iconsize" src="/static/etc/images/icon_psfrings_c.jpeg"><br />C<br />(' + seeing_centermean_string +'%)<br />1 fiber</td>' + \
-            #                             '<td class="colcr1"><img class="iconsize" src="/static/etc/images/icon_psfrings_cr1.jpeg"><br />C+R1<br />(' + seeing_cr1_string + '%)<br />7 fibers</td>' + \
-            #                             '<td class="colcr1r2"><img class="iconsize" src="/static/etc/images/icon_psfrings_cr1r2.jpeg"><br />C+R1+R2<br />(' + seeing_cr1r2_string + '%)<br />19 fibers</td>' + \
-            #                             '<td>percentage of enclosed total flux</td>' + \
-            #                             '</tr>' + \
-            #                         '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_pspfwhm.jpeg" /></td>' + \
-            #                             '<td class="perframecolumn"> ' + sncont_centerspaxel_voxel_string + ' </td>' + \
-            #                             '<td> ' + sncont_cr1spaxels_voxel_string + '</td>' + \
-            #                             '<td> tofill </td>' + \
-            #                             '<td class="perframecolumn"> ' + tsncont_centerspaxel_voxel_string + ' </td>' + \
-            #                             '<td> ' + tsncont_cr1spaxels_voxel_string + '</td>' + \
-            #                             '<td> tofill </td>' + \
-            #                             '<td> per voxel</td>' + \
-            #                             '</tr>' + \
-            #                         '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_peraa.jpeg" /></td>' + \
-            #                             '<td class="perframecolumn"> ' + sncont_centerspaxel_aa_string + ' </td>' + \
-            #                             '<td> ' + sncont_cr1spaxels_aa_string + '</td>' + \
-            #                             '<td> tofill </td>' + \
-            #                             '<td class="perframecolumn"> ' + tsncont_centerspaxel_aa_string + ' </td>' + \
-            #                             '<td> ' + tsncont_cr1spaxels_aa_string + '</td>' + \
-            #                             '<td> tofill </td>' + \
-            #                             '<td> per AA</td>' + \
-            #                             '</tr>' + \
-            #                         '<tr><td class="iconcolumn"><img class="iconsize" src="/static/etc/images/icon_integrated.jpeg" /></td>' + \
-            #                             '<td class="perframecolumn"> ' + sncont_centerspaxel_all_string + ' </td>' + \
-            #                             '<td> ' + sncont_cr1spaxels_all_string + '</td>' + \
-            #                             '<td> tofill </td>' + \
-            #                             '<td class="perframecolumn"> ' + tsncont_centerspaxel_all_string + ' </td>' + \
-            #                             '<td> ' + tsncont_cr1spaxels_all_string + '</td>' + \
-            #                             '<td> tofill </td>' + \
-            #                             '<td> integrated spectrum </td>' + \
-            #                             '</tr>' + \
-            #                         '</table><br />'
-            # else:
-            #     tablenewpsflinestring = "no line output"
 
             # NOT WORKING YET SO SETTING TO EMPTY
             tablenewpsflinestring = ''
@@ -1346,8 +795,6 @@ def etc_do(request):
             forfileoutput2string = ''
             footerstring = ''
 
-        html2 = ''  # for testing
-        # print html2
 
         print "### LOG: ABOUT TO QUIT ETC_DO; JSON OUTPUT TO JAVASCRIPT."
         from django.http import JsonResponse

@@ -534,6 +534,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
          spect_val, bandc_val, \
          om_val, vph_val, \
          skycond_val, moon_val, airmass_val, seeing_val, \
+         cmode_val, snr_val, \
          numframe_val, exptimepframe_val, nsbundles_val, \
          plotflag_val):
     global texti, textoc, textol, textcalc
@@ -663,18 +664,37 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
         errind = warn(outtext, frame0, 'MEGARA ETC Warning')
     textcalc += "Number of frames is %s <br />" % numframe_val
 
-    # Exptime per frame
-    exptimepframe_val = isafloat(exptimepframe_val, 1)
-    if exptimepframe_val <= 0.0 or exptimepframe_val >= 1.e6:
-        exptimepframe_val = 3600.
-        outtext = outmessage(114)
-        errind = warn(outtext, frame0, 'MEGARA ETC Warning')
-    textcalc += "Exposure time per frame is %s <br />" % exptimepframe_val
+    # Calculation mode
+    if cmode_val == 'T':
+        # Exptime per frame
+        exptimepframe_val = isafloat(exptimepframe_val, 1)
+        snr_val = isafloat(snr_val, 1)
 
-    # Exptime
+        if exptimepframe_val <= 0.0 or exptimepframe_val >= 1.e6:
+            exptimepframe_val = 3600.
+            outtext = outmessage(114)
+            errind = warn(outtext, frame0, 'MEGARA ETC Warning')
+        textcalc += "Exposure time per frame is %s <br />" % exptimepframe_val
+        textcalc += "Total SNR is %s <br />" % snr_val
+
+    elif cmode_val == 'S':
+        # Total SNR
+        exptimepframe_val = isafloat(exptimepframe_val, 1)
+        snr_val = isafloat(snr_val, 1)
+
+        if snr_val <= 0.0 or snr_val >= 1.e6:
+            snr_val = 3600.
+            outtext = outmessage(114)
+            errind = warn(outtext, frame0, 'MEGARA ETC Warning')
+        textcalc += "Exposure time per frame is %s <br />" % exptimepframe_val
+        textcalc += "Total SNR is %s <br />" % snr_val
+
+
+    # Total Exptime
     exptime_val = numframe_val * exptimepframe_val
     # exptime_val = exptime_entry.get()
     exptime_val = isafloat(exptime_val, 3600.0)
+
     if exptime_val <= 0.0 or exptime_val >= 1.e6:
         exptime_val = 3600.
         outtext = outmessage(109)
@@ -1968,6 +1988,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                 'moon_val': moon_val, \
                 'airmass_val': airmass_val, 'seeing_zenith': seeing_zenith, \
                 'fsky': fsky, 'numframe_val': numframe_val, \
+                'cmode_val': cmode_val, 'snr_val': snr_val, \
                 'exptimepframe_val': exptimepframe_val,
                 'exptime_val': exptime_val, \
                 'npdark_val': npdark_val, \

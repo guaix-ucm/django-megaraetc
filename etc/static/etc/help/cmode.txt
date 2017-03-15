@@ -1,0 +1,4 @@
+** CALCULATION MODE **
+Choices:
+- Exposure time to SNR: input the exposure time per frame and output the SNR (default).
+- SNR to exposure time: input the total SNR and output total exposure time and exposure time per frame.

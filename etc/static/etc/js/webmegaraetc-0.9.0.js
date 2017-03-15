@@ -330,6 +330,20 @@ function selectorOmode() {
     document.getElementById('id_ntbundles').value = ntdefval;
 }
 
+//change exptime per frame into SNR per frame when calculation mode changes
+function selectorCmode() {
+    if (document.getElementById('id_cmode_0').checked==true) {
+        var nexp = 'Exptime per frame (s)';
+        var nexpdefval = 3600.0;
+    }
+    else if (document.getElementById('id_cmode_0').checked==false) {
+        var nexp = 'Total SNR';
+        var nexpdefval = 10.0;
+    }
+    document.getElementById('id_nexp').innerHTML = nexp;
+    document.getElementById('id_exptimepframe').value = nexpdefval;
+}
+
 // FOR COOKIES
 // get cookie = read cookie and return
 function getCookie(cname) {
@@ -411,6 +425,13 @@ function storeValues(form)
     setCookie("the_seeing", myform.id_seeing.options[myform.id_seeing.selectedIndex].text, 365);
     setCookie("the_seeing_pk", myform.id_seeing.value, 365);
 
+    if (document.getElementById("id_cmode_0").checked == true) {
+        setCookie("the_cmode", myform.id_cmode_0.value, 365);
+    }
+    else if (document.getElementById("id_cmode_1").checked == true) {
+        setCookie("the_cmode", myform.id_cmode_1.value, 365);
+    }
+
     setCookie("the_numframes", myform.id_numframes.value, 365);
     setCookie("the_exptimepframe", myform.id_exptimepframe.value, 365);
     setCookie("the_nsbundles", myform.id_nsbundles.value, 365);
@@ -466,6 +487,7 @@ function displayCookies() {
     var fname_seeing=getCookie("the_seeing");
     var fname_seeing_pk=getCookie("the_seeing_pk");
 
+    var fname_cmode=getCookie("the_cmode");
     var fname_numframes=getCookie("the_numframes");
     var fname_exptimepframe=getCookie("the_exptimepframe");
     var fname_nsbundles=getCookie("the_nsbundles");
@@ -503,6 +525,8 @@ function displayCookies() {
 	'\nwith moonph = '+fname_moonph+
 	'\nwith airmass = '+fname_airmass+
 	'\nwith seeing = '+fname_seeing+' (pk='+fname_seeing_pk+')'+
+
+	'\nwith cmode = '+fname_cmode+
 	'\nwith numframes = '+fname_numframes+
 	'\nwith exptimepframe = '+fname_exptimepframe+
 	'\nwith nsbundles = '+fname_nsbundles+
@@ -542,6 +566,8 @@ function deleteCookies(name) {
       document.cookie = "the_airmass=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
       document.cookie = "the_seeing=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
       document.cookie = "the_seeing_pk=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
+
+      document.cookie = "the_cmode=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
       document.cookie = "the_numframes=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
       document.cookie = "the_exptimepframe=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
       document.cookie = "the_nsbundles=; expires=Thu, 01 Jan 2000 00:00:00 GMT";
@@ -620,6 +646,14 @@ function readCookies() {
         document.getElementById('id_moonph').value = getCookie('the_moonph');
         document.getElementById('id_airmass').value = getCookie('the_airmass');
         document.getElementById('id_seeing').value = getCookie('the_seeing_pk');
+
+        if (getCookie("the_cmode") == 'T') {
+            document.getElementById('id_cmode_0').checked = true;
+            }
+        else if (getCookie("the_cmode") == 'S') {
+            document.getElementById('id_cmode_1').checked = true;
+            document.getElementById('id_cmode_1').onload = selectorCmode();
+        }
 
         document.getElementById('id_numframes').value = getCookie('the_numframes');
         document.getElementById('id_exptimepframe').value = getCookie('the_exptimepframe');
