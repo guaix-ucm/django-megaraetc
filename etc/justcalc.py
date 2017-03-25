@@ -1474,7 +1474,6 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                     textcalc += "SNR in central spaxel per frame = %s <br />" % sncont_c_voxel
                     textcalc += "SNR in C+R1 spaxels per frame = %s <br />" % sncont_cr1_voxel
                     textcalc += "SNR in C+R1+R2 spaxels per frame = %s <br />" % sncont_cr1r2_voxel
-                    etpframe_c_voxel_val = 1
 
                 elif sourcet_val=='E':
                     sncont_c_voxel = sncont
@@ -1487,7 +1486,6 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                     tsncont_cr1_voxel = sncont_cr1_voxel * math.sqrt(numframe_val)
                     tsncont_cr1r2_voxel = sncont_cr1r2_voxel * math.sqrt(numframe_val)
 
-                    etpframe_c_voxel_val = 1
 
                 else:
                     sncont_c_voxel = 99999
@@ -1503,7 +1501,6 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                     npixx_spaxel_all = 99999
                     npixy_spaxel_all = 99999
                     #
-                    etpframe_c_voxel_val = 1
 
             elif xit == 13: # C R1 and R2 spaxels SNR per AA
                 print 'xit==13'
@@ -1607,218 +1604,259 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
         ######################################################################
         ############################ SNR to exptime ##########################
         ######################################################################
-        def SNRfunc(et):
-            # Deriving spectroscopic parameters for each case:
-            xit = 12
-            deltalambda, omegasource, \
-            npixx, npixy, \
-            nfib, nfib1, \
-            omegaskysource, specparstring = specpar(
-                om_val, xit, disp, ps,
-                nfibres, nfibresy, areafibre, rfibre, deltab, areasource,
-                diamsource, areaseeing, seeingx)
-
-            # Number of pixels in detector under consideration: just counting the factor in area
-            # when we consider the used sky minibundles
-            npix = npixx * npixy
-            npixsky = (omegasky / omegaskysource) * npix
-
-            # Source continuum signal in defined spectral and spatial resolution element
-            signalcont, signalcontverb = signal(fc, deltalambda, lambdaeff, effsys, stel, omegasource, et, enph, lamb)
-
-            if xit in [12,13,14]:
-                signalcont_c, signalcont_cverb = signal(fcctr, deltalambda, lambdaeff, effsys, stel, omegasource, et, enph, lamb)
-                signalcont_r1, signalcont_r1verb = signal(fcr1, deltalambda, lambdaeff, effsys, stel, omegasource, et, enph, lamb)
-                signalcont_r2, signalcont_r2verb = signal(fcr2, deltalambda, lambdaeff, effsys, stel, omegasource, et, enph, lamb)
-
-                fcctrr1 = fcctr + 6*fcr1
-                fcctrr1r2 = fcctr + 6*fcr1 + 12*fcr2
-                signalcont_cr1, signalcont_cr1verb = signal(fcctrr1, deltalambda, lambdaeff, effsys, stel, omegasource, et, enph, lamb)
-                signalcont_cr1r2, signalcont_cr1r2verb = signal(fcctrr1r2, deltalambda, lambdaeff, effsys, stel, omegasource, et, enph, lamb)
-            else:
-                signalcont_c = 1
-                signalcont_r1 = 1
-                signalcont_r2 = 1
-                signalcont_cr1 = 1
-                signalcont_cr1r2 = 1
-
-            # Sky signal in defined spectral and spatial resolution element
-            signalsky, signalskyverb = signal(fs, deltalambda, lambdaeff, effsys, stel, omegaskysource, et, enph, lamb)
-
-            # Dark signal
-            signaldark, sdverbose = dark(et, dc, npix)
-
-            # Noise due to dark measurement to the square
-            noisedarksq, noisedarksqverb = darknoisesq(npix, npdark_val, et, dc, ron)
-
-            # RON
-            ronoise, ronoiseverb = readoutnoise(npix, ron)
-
-            # Noise due to sky substraction
-            # Sky signal *MEASURED* in defined spectral and spatial resolution element
-            signalskymeasured, signalskymeasuredverb = signal(fs, deltalambda, lambdaeff, effsys, stel, omegasky, et, enph, lamb)
-            ronoiseskymeasured, ronoiseskymeasuredverb = readoutnoise(npixsky, ron)
-            signaldarkskymeasured, sdsmverbose = dark(et, dc, npixsky)
-            noisedarksqskymeasured, noisedarksqskymeasuredverb = darknoisesq(npixsky, npdark_val, et, dc, ron)
-            noiseskysq = (omegaskysource / omegasky) ** 2 * (signalskymeasured + ronoiseskymeasured + signaldarkskymeasured + noisedarksqskymeasured)
-
-            # Source continuum noise in defined spectral and spatial resolution element
-            noisecont = math.sqrt(signalcont + signalsky + signaldark + ronoise + noisedarksq + noiseskysq)
-            if xit in [12,13,14]:
-                noisecont_c = math.sqrt(signalcont_c + signalsky + signaldark + ronoise + noisedarksq + noiseskysq)
-                noisecont_r1 = math.sqrt(signalcont_r1 + signalsky + signaldark + ronoise + noisedarksq + noiseskysq)
-                noisecont_r2 = math.sqrt(signalcont_r2 + signalsky + signaldark + ronoise + noisedarksq + noiseskysq)
-
-                noisecont_cr1 = math.sqrt(signalcont_cr1 + 7*(signalsky + signaldark + ronoise + noisedarksq + noiseskysq))
-                noisecont_cr1r2 = math.sqrt(signalcont_cr1r2 + 19*(signalsky + signaldark + ronoise + noisedarksq + noiseskysq))
-            else:
-                noisecont_c = 1
-                noisecont_r1 = 1
-                noisecont_r2 = 1
-                noisecont_cr1 = 1
-                noisecont_cr1r2 = 1
-
-            # Signal-to-noise of continuum
-            sncont = signalcont / noisecont
-            if xit in [12,13,14]:
-                sncont_c = signalcont_c / noisecont_c
-                sncont_r1 = signalcont_r1 / noisecont_r1
-                sncont_r2 = signalcont_r2 / noisecont_r2
-                sncont_cr1 = signalcont_cr1 / noisecont_cr1
-                sncont_cr1r2 = signalcont_cr1r2 / noisecont_cr1r2
-
-            return sncont_c
-
         if cmode_val == 'S':
-            print ""
-            print "ENTERING BISECTION METHOD"
-            counter = 0  #reset counter
-            limit = 20   #set limit
-            dec = 2  #change rounding precision here
-            SNR = numpy.round(snrpframe_val, 1)
-
-            print 'SNR = ', SNR
-
-            xa = 1200
-            ya = SNRfunc(xa)
-
-            xb = xa*2
-            yb = SNRfunc(xb)
-
-            print 'f(xa)= f(',xa,')=',ya
-            print 'f(xb)= f(',xb,')=',yb
-
-            # cope for signs
-            if yb < ya:
-                print "ya is bigger than yb"
-                # find the right range from the single value xa
-                if ya < SNR:
-                    while ya < SNR and counter <= limit:
-                        counter += 1
-                        print 'ya < SNR', xa, ya
-                        xa = xa * 2
-                        ya = numpy.round(SNRfunc(xa), dec)
-                        print xa, ya
-                    else:
-                        if counter == limit+1:
-                            print "FAILED TO FIND A GOOD RANGE! ya < SNR"
-                        else:
-                            counter += 1
-                            print counter, xa, ya
-                            print 'FOUND a RANGE! \n A good value for xa is =', xa, 'which gives', ya, 'at step', counter
-
-                elif yb > SNR:
-                    while yb > SNR and counter <= limit:
-                        counter += 1
-                        print 'yb > SNR', xb, yb
-                        xb = xb * 0.5
-                        yb = numpy.round(SNRfunc(xb), dec)
-                    else:
-                        if counter == limit+1:
-                            print "FAILED TO FIND A GOOD RANGE! yb > SNR"
-                        else:
-                            counter += 1
-                            print counter, xb, yb
-                            print 'FOUND a RANGE! \n A good value for xa is =', xb, 'which gives', yb, 'at step', counter
-
-            elif yb > ya:
-                print "yb is bigger than ya"
-                # find the right range from the single value xa
-                if yb < SNR:
-                    while yb < SNR and counter <= limit:
-                        counter += 1
-                        print 'yb < SNR', xb, yb
-                        xb = xb * 2
-                        yb = numpy.round(SNRfunc(xb), dec)
-                    else:
-                        if counter == limit+1:
-                            print "FAILED TO FIND A GOOD RANGE! yb < SNR"
-                        else:
-                            counter += 1
-                            print counter, xa, ya
-                            print 'SUCCESS! \n The best value for xb is =', xb, 'which gives', yb, 'at step', counter
-                elif ya > SNR:
-                    while ya > SNR and counter <= limit:
-                        counter += 1
-                        print 'ya > SNR', xa, ya
-                        xa = xa * 0.5
-                        ya = numpy.round(SNRfunc(xa), dec)
-                    else:
-                        if counter == limit+1:
-                            print "FAILED TO FIND GOOD RANGE! ya > SNR"
-                        else:
-                            counter += 1
-                            print counter, xa, ya
-                            print 'SUCCESS! \n The best value for xa is =', xa, 'which gives', ya, 'at step', counter
-
-            elif yb == ya:
-                print "ya == yb"
-
-
-
-            print 'exptime is between', xa, 'and', xb
-            xc = numpy.abs(xa - xb)/2
-            yc = numpy.round(SNRfunc(xc), dec)
-            print 'f(xc)= f(',xc,')=',yc
-            print 'SNR to reach is',SNR
-
-            listofxc = [xc]
-            listofyc = [yc]
-
-            counter = 0  #reset counter
-            limit = 20   #set limit
-            while yc != SNR and counter <= limit:
-                counter += 1
-                print counter, xc, yc
-                if yc < SNR < yb:
-                    xa = xc
-                    ya = yc
-                    xc = xa + numpy.abs(xa - xb)/2
-                    yc = numpy.round(SNRfunc(xc), dec)
-                    listofxc.append(xc)
-                    listofyc.append(yc)
-
-                elif ya < SNR < yc:
-                    xb = xc
-                    yb = yc
-                    xc = xb - numpy.abs(xa - xb)/2
-                    yc = numpy.round(SNRfunc(xc), dec)
-                    listofxc.append(xc)
-                    listofyc.append(yc)
-
-            else:
-                if counter == limit+1:
-                    print "FAILED TO CONVERGE!"
-
+            def SNRfunc(et,xxit):
+                # Deriving spectroscopic parameters for each case:
+                xit=xxit
+                deltalambda, omegasource, \
+                npixx, npixy, \
+                nfib, nfib1, \
+                omegaskysource, specparstring = specpar(
+                    om_val, xit, disp, ps,
+                    nfibres, nfibresy, areafibre, rfibre, deltab, areasource,
+                    diamsource, areaseeing, seeingx)
+    
+                # Number of pixels in detector under consideration: just counting the factor in area
+                # when we consider the used sky minibundles
+                npix = npixx * npixy
+                npixsky = (omegasky / omegaskysource) * npix
+    
+                # Source continuum signal in defined spectral and spatial resolution element
+                signalcont, signalcontverb = signal(fc, deltalambda, lambdaeff, effsys, stel, omegasource, et, enph, lamb)
+    
+                if xit in [12,13,14]:
+                    signalcont_c, signalcont_cverb = signal(fcctr, deltalambda, lambdaeff, effsys, stel, omegasource, et, enph, lamb)
+                    signalcont_r1, signalcont_r1verb = signal(fcr1, deltalambda, lambdaeff, effsys, stel, omegasource, et, enph, lamb)
+                    signalcont_r2, signalcont_r2verb = signal(fcr2, deltalambda, lambdaeff, effsys, stel, omegasource, et, enph, lamb)
+    
+                    fcctrr1 = fcctr + 6*fcr1
+                    fcctrr1r2 = fcctr + 6*fcr1 + 12*fcr2
+                    signalcont_cr1, signalcont_cr1verb = signal(fcctrr1, deltalambda, lambdaeff, effsys, stel, omegasource, et, enph, lamb)
+                    signalcont_cr1r2, signalcont_cr1r2verb = signal(fcctrr1r2, deltalambda, lambdaeff, effsys, stel, omegasource, et, enph, lamb)
                 else:
+                    signalcont_c = 1
+                    signalcont_r1 = 1
+                    signalcont_r2 = 1
+                    signalcont_cr1 = 1
+                    signalcont_cr1r2 = 1
+    
+                # Sky signal in defined spectral and spatial resolution element
+                signalsky, signalskyverb = signal(fs, deltalambda, lambdaeff, effsys, stel, omegaskysource, et, enph, lamb)
+    
+                # Dark signal
+                signaldark, sdverbose = dark(et, dc, npix)
+    
+                # Noise due to dark measurement to the square
+                noisedarksq, noisedarksqverb = darknoisesq(npix, npdark_val, et, dc, ron)
+    
+                # RON
+                ronoise, ronoiseverb = readoutnoise(npix, ron)
+    
+                # Noise due to sky substraction
+                # Sky signal *MEASURED* in defined spectral and spatial resolution element
+                signalskymeasured, signalskymeasuredverb = signal(fs, deltalambda, lambdaeff, effsys, stel, omegasky, et, enph, lamb)
+                ronoiseskymeasured, ronoiseskymeasuredverb = readoutnoise(npixsky, ron)
+                signaldarkskymeasured, sdsmverbose = dark(et, dc, npixsky)
+                noisedarksqskymeasured, noisedarksqskymeasuredverb = darknoisesq(npixsky, npdark_val, et, dc, ron)
+                noiseskysq = (omegaskysource / omegasky) ** 2 * (signalskymeasured + ronoiseskymeasured + signaldarkskymeasured + noisedarksqskymeasured)
+    
+                # Source continuum noise in defined spectral and spatial resolution element
+                noisecont = math.sqrt(signalcont + signalsky + signaldark + ronoise + noisedarksq + noiseskysq)
+                if xit in [12,13,14]:
+                    noisecont_c = math.sqrt(signalcont_c + signalsky + signaldark + ronoise + noisedarksq + noiseskysq)
+                    noisecont_r1 = math.sqrt(signalcont_r1 + signalsky + signaldark + ronoise + noisedarksq + noiseskysq)
+                    noisecont_r2 = math.sqrt(signalcont_r2 + signalsky + signaldark + ronoise + noisedarksq + noiseskysq)
+    
+                    noisecont_cr1 = math.sqrt(signalcont_cr1 + 7*(signalsky + signaldark + ronoise + noisedarksq + noiseskysq))
+                    noisecont_cr1r2 = math.sqrt(signalcont_cr1r2 + 19*(signalsky + signaldark + ronoise + noisedarksq + noiseskysq))
+                else:
+                    noisecont_c = 1
+                    noisecont_r1 = 1
+                    noisecont_r2 = 1
+                    noisecont_cr1 = 1
+                    noisecont_cr1r2 = 1
+    
+                # Signal-to-noise of continuum
+                sncont = signalcont / noisecont
+                if xit in [12,13,14]:
+                    sncont_c = signalcont_c / noisecont_c
+                    sncont_r1 = signalcont_r1 / noisecont_r1
+                    sncont_r2 = signalcont_r2 / noisecont_r2
+                    sncont_cr1 = signalcont_cr1 / noisecont_cr1
+                    sncont_cr1r2 = signalcont_cr1r2 / noisecont_cr1r2
+    
+                return [sncont_c,sncont_cr1,sncont_cr1r2]
+    
+            
+            def bisec(i,xxit):
+                print ""
+                print "ENTERING BISECTION METHOD"
+                counter = 0  #reset counter
+                limit = 20   #set limit
+                dec = 2  #change rounding precision here
+                SNR = numpy.round(snrpframe_val, 1)
+
+                print 'SNR = ', SNR
+
+                xa = 1200
+                ya = SNRfunc(xa,xxit)[i]
+
+                xb = xa*2
+                yb = SNRfunc(xb,xxit)[i]
+
+                print 'f(xa)= f(',xa,')=',ya
+                print 'f(xb)= f(',xb,')=',yb
+
+                # cope for signs
+                if yb < ya:
+                    print "ya is bigger than yb"
+                    # find the right range from the single value xa
+                    if ya < SNR:
+                        while ya < SNR and counter <= limit:
+                            counter += 1
+                            print 'ya < SNR', xa, ya
+                            xa = xa * 2
+                            ya = numpy.round(SNRfunc(xa,xxit)[i], dec)
+                            print xa, ya
+                        else:
+                            if counter == limit+1:
+                                print "FAILED TO FIND A GOOD RANGE! ya < SNR"
+                            else:
+                                counter += 1
+                                print counter, xa, ya
+                                print 'FOUND a RANGE! \n A good value for xa is =', xa, 'which gives', ya, 'at step', counter
+
+                    elif yb > SNR:
+                        while yb > SNR and counter <= limit:
+                            counter += 1
+                            print 'yb > SNR', xb, yb
+                            xb = xb * 0.5
+                            yb = numpy.round(SNRfunc(xb,xxit)[i], dec)
+                        else:
+                            if counter == limit+1:
+                                print "FAILED TO FIND A GOOD RANGE! yb > SNR"
+                            else:
+                                counter += 1
+                                print counter, xb, yb
+                                print 'FOUND a RANGE! \n A good value for xa is =', xb, 'which gives', yb, 'at step', counter
+
+                elif yb > ya:
+                    print "yb is bigger than ya"
+                    # find the right range from the single value xa
+                    if yb < SNR:
+                        while yb < SNR and counter <= limit:
+                            counter += 1
+                            print 'yb < SNR', xb, yb
+                            xb = xb * 2
+                            yb = numpy.round(SNRfunc(xb,xxit)[i], dec)
+                        else:
+                            if counter == limit+1:
+                                print "FAILED TO FIND A GOOD RANGE! yb < SNR"
+                            else:
+                                counter += 1
+                                print counter, xa, ya
+                                print 'SUCCESS! \n The best value for xb is =', xb, 'which gives', yb, 'at step', counter
+                    elif ya > SNR:
+                        while ya > SNR and counter <= limit:
+                            counter += 1
+                            print 'ya > SNR', xa, ya
+                            xa = xa * 0.5
+                            ya = numpy.round(SNRfunc(xa,xxit)[i], dec)
+                        else:
+                            if counter == limit+1:
+                                print "FAILED TO FIND GOOD RANGE! ya > SNR"
+                            else:
+                                counter += 1
+                                print counter, xa, ya
+                                print 'SUCCESS! \n The best value for xa is =', xa, 'which gives', ya, 'at step', counter
+
+                elif yb == ya:
+                    print "ya == yb"
+
+
+
+                print 'exptime is between', xa, 'and', xb
+                xc = numpy.abs(xa - xb)/2
+                yc = numpy.round(SNRfunc(xc,xxit)[i], dec)
+                print 'f(xc)= f(',xc,')=',yc
+                print 'SNR to reach is',SNR
+
+                listofxc = [xc]
+                listofyc = [yc]
+
+                counter = 0  #reset counter
+                limit = 20   #set limit
+                while yc != SNR and counter <= limit:
                     counter += 1
                     print counter, xc, yc
-                    print 'SUCCESS! \n The best exptime is =', xc, 'which gives', yc, 'at step', counter
+                    if yc < SNR < yb:
+                        xa = xc
+                        ya = yc
+                        xc = xa + numpy.abs(xa - xb)/2
+                        yc = numpy.round(SNRfunc(xc,xxit)[i], dec)
+                        listofxc.append(xc)
+                        listofyc.append(yc)
 
-            etpframe_c_voxel_val = xc
+                    elif ya < SNR < yc:
+                        xb = xc
+                        yb = yc
+                        xc = xb - numpy.abs(xa - xb)/2
+                        yc = numpy.round(SNRfunc(xc,xxit)[i], dec)
+                        listofxc.append(xc)
+                        listofyc.append(yc)
 
+                else:
+                    if counter == limit+1:
+                        print "FAILED TO CONVERGE!"
+                        xc = -999
+
+                    else:
+                        counter += 1
+                        print counter, xc, yc
+                        print 'SUCCESS! \n The best exptime is =', xc, 'which gives', yc, 'at step', counter
+                return xc
+            #
+
+            etpframe_c_voxel_val = bisec(0,12)
+            etallframe_c_voxel_val = bisec(0,12) * numframe_val
+            etpframe_cr1_voxel_val = bisec(1,12)
+            etallframe_cr1_voxel_val = bisec(1,12) * numframe_val
+            etpframe_cr1r2_voxel_val = bisec(2,12)
+            etallframe_cr1r2_voxel_val = bisec(2,12) * numframe_val
+    
+            etpframe_c_aa_val = bisec(0,13)
+            etallframe_c_aa_val = bisec(0,13) * numframe_val
+            etpframe_cr1_aa_val = bisec(1,13)
+            etallframe_cr1_aa_val = bisec(1,13) * numframe_val
+            etpframe_cr1r2_aa_val = bisec(2,13)
+            etallframe_cr1r2_aa_val = bisec(2,13) * numframe_val
+
+            etpframe_c_all_val = bisec(0,14)
+            etallframe_c_all_val = bisec(0,14) * numframe_val
+            etpframe_cr1_all_val = bisec(1,14)
+            etallframe_cr1_all_val = bisec(1,14) * numframe_val
+            etpframe_cr1r2_all_val = bisec(2,14)
+            etallframe_cr1r2_all_val = bisec(2,14) * numframe_val
+            
         else:
             etpframe_c_voxel_val = 0
+            etallframe_c_voxel_val = 0
+            etpframe_cr1_voxel_val = 0
+            etallframe_cr1_voxel_val = 0
+            etpframe_cr1r2_voxel_val = 0
+            etallframe_cr1r2_voxel_val = 0
+            etpframe_c_aa_val = 0
+            etallframe_c_aa_val = 0
+            etpframe_cr1_aa_val = 0
+            etallframe_cr1_aa_val = 0
+            etpframe_cr1r2_aa_val = 0
+            etallframe_cr1r2_aa_val = 0
+            etpframe_c_all_val = 0
+            etallframe_c_all_val = 0
+            etpframe_cr1_all_val = 0
+            etallframe_cr1_all_val = 0
+            etpframe_cr1r2_all_val = 0
+            etallframe_cr1r2_all_val = 0
 
 
         ######################################################################
@@ -2228,6 +2266,23 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                 'exptimepframe_val': exptimepframe_val,
                 'exptime_val': exptime_val, \
                 'etpframe_c_voxel_val' : etpframe_c_voxel_val, \
+                'etallframe_c_voxel_val' : etallframe_c_voxel_val, \
+                'etpframe_cr1_voxel_val' : etpframe_cr1_voxel_val, \
+                'etallframe_cr1_voxel_val' : etallframe_cr1_voxel_val, \
+                'etpframe_cr1r2_voxel_val' : etpframe_cr1r2_voxel_val, \
+                'etallframe_cr1r2_voxel_val' : etallframe_cr1r2_voxel_val, \
+                'etpframe_c_aa_val' : etpframe_c_aa_val, \
+                'etallframe_c_aa_val' : etallframe_c_aa_val, \
+                'etpframe_cr1_aa_val' : etpframe_cr1_aa_val, \
+                'etallframe_cr1_aa_val' : etallframe_cr1_aa_val, \
+                'etpframe_cr1r2_aa_val' : etpframe_cr1r2_aa_val, \
+                'etallframe_cr1r2_aa_val' : etallframe_cr1r2_aa_val, \
+                'etpframe_c_all_val' : etpframe_c_all_val, \
+                'etallframe_c_all_val' : etallframe_c_all_val, \
+                'etpframe_cr1_all_val' : etpframe_cr1_all_val, \
+                'etallframe_cr1_all_val' : etallframe_cr1_all_val, \
+                'etpframe_cr1r2_all_val' : etpframe_cr1r2_all_val, \
+                'etallframe_cr1r2_all_val' : etallframe_cr1r2_all_val, \
 \
                 'npdark_val': npdark_val, \
                 'nsbundles_val': nsbundles_val, 'nsfib_val': nsfib_val, \

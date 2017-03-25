@@ -170,5 +170,5 @@ class UploadFileForm(forms.Form):
 
     # testfield = forms.IntegerField(initial=9999999)
 
-    # fileupload = forms.FileField(label=mark_safe(fileupload_help), widget=forms.FileInput(attrs={'size':'7', 'name':'myfile', 'title':'fileupload', 'type':'file'}))
+    # fileupload = forms.FileField(label=mark_safe(fileupload_help), widget=forms.FileInput(attrs={'size':'7', 'name':'myfile', 'title':'fileupload', 'type':'file', 'onchange':'handleFiles(); showFileSize()', 'accept':'.txt,.csv'}))
     # file = forms.FileField()

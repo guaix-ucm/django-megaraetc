@@ -8,7 +8,7 @@ from .forms import TargetForm, InstrumentForm
 from .forms import OutputSetupForm, UploadFileForm
 from .models import PhotometricFilter, SeeingTemplate
 from .models import SpectralTemplate, VPHSetup
-# from .models import MyModel, Document
+# from .models import MyModel #, Document
 
 from justcalc import calc
 # from plot1 import plot_and_save_new, plot_and_save2_new
@@ -234,8 +234,11 @@ def etc_form(request):
 
     return render(request, 'etc/webmegaraetc-0.9.0.html', total_formu)
 
-
+########################
 # ON HOLD UNTIL I FIND A GOOD WAY TO UPLOAD FILES
+# MIGRATING MODELS DIDN'T WORK EITHER.
+#
+########################
 def uploadView(request):
     # phase = get_object_or_404(Phase, pk=int(phase_id))
     if request.method == 'POST':
@@ -255,11 +258,11 @@ def uploadView(request):
         print ''
         print 'OK UP TO HERE'
         print request.FILES
-        # print 'REQUEST FILES=', request.FILES['myfile']
+        print 'REQUEST FILES=', request.FILES['myfile']
         print ''
         if form.is_valid():
             print 'VALID'
-            # newdoc = Document(filename = request.FILES['myfile'])
+            # newdoc = MyModel(filename = request.FILES['myfile'])
             # newdoc.save()
             # doc_to_save = request.FILES['fileupload']
             # filename = doc_to_save._get_name()
@@ -278,11 +281,12 @@ def uploadView(request):
     return render(request, 'etc/upload.html', {'form': form})
 
 
-
-# LOADS THIS AFTER PRESSING "SUBMIT" webmegaraetc.html and
-# OUTPUT RESULTS in JSON HTTP Response directly into html page
-# FINAL STRING CLEANSING/FILTERING HERE
-#
+##############################################
+##############################################
+### PERFORM CALCULATIONS.
+### THIS RETURNS THE OUTPUT IN JSON FORMAT AND IS USED IN THE JS FILE
+### FINAL STRING CLEANSING/FILTERING HERE
+###
 #
 def etc_do(request):
     if request.method == 'GET':
@@ -300,14 +304,21 @@ def etc_do(request):
         start_time_string = time.strftime("%H:%M:%S")
         print 'Start time: ', str(start_time)
         print 'Date time: ', start_time_string
-        outputofcalc = compute5(request)
-        print '### LOG: ETC_DO: OUTPUTOFCALC SUCCESSFULLY COMPUTED'
-
 
         ##############################################
         ##############################################
         ### ATTEMPT TO PRINT UPLOADED FILENAME (TEST)
         # up = uploadView(request)
+
+        print request.body
+
+
+        ##############################################
+        ##############################################
+        ### LAUNCH COMPUTATION
+        outputofcalc = compute5(request)
+        print '### LOG: ETC_DO: OUTPUTOFCALC SUCCESSFULLY COMPUTED'
+
 
         ##############################################
         ##############################################
@@ -457,7 +468,7 @@ def etc_do(request):
             seeing_zenith_string = str(outputofcalc['seeing_zenith'])
             fsky_string = '%.3e' % outputofcalc['fsky']
             numframe_val = outputofcalc['numframe_val']
-            numframe_val_string = str(numframe_val)
+            numframe_val_string = "{0:.0f}".format(float(numframe_val))
             exptimepframe_val_string = str(outputofcalc['exptimepframe_val'])
             exptime_val_string = str(outputofcalc['exptime_val'])
             npdark_val_string = str(outputofcalc['npdark_val'])
@@ -772,16 +783,52 @@ def etc_do(request):
             snrpframe_string = "{0:.2f}".format(snrpframe_val)
 
             etpframe_c_voxel_val = outputofcalc['etpframe_c_voxel_val']
-            etpframe_c_voxel_string = "{0:.2f}".format(etpframe_c_voxel_val)
+            etpframe_c_voxel_string = "{0:.0f}".format(etpframe_c_voxel_val)
+            etallframe_c_voxel_val = outputofcalc['etallframe_c_voxel_val']
+            etallframe_c_voxel_string = "{0:.0f}".format(etallframe_c_voxel_val)
+            etpframe_cr1_voxel_val = outputofcalc['etpframe_cr1_voxel_val']
+            etpframe_cr1_voxel_string = "{0:.0f}".format(etpframe_cr1_voxel_val)
+            etallframe_cr1_voxel_val = outputofcalc['etallframe_cr1_voxel_val']
+            etallframe_cr1_voxel_string = "{0:.0f}".format(etallframe_cr1_voxel_val)
+            etpframe_cr1r2_voxel_val = outputofcalc['etpframe_cr1r2_voxel_val']
+            etpframe_cr1r2_voxel_string = "{0:.0f}".format(etpframe_cr1r2_voxel_val)
+            etallframe_cr1r2_voxel_val = outputofcalc['etallframe_cr1r2_voxel_val']
+            etallframe_cr1r2_voxel_string = "{0:.0f}".format(etallframe_cr1r2_voxel_val)
+
+            etpframe_c_aa_val = outputofcalc['etpframe_c_aa_val']
+            etpframe_c_aa_string = "{0:.0f}".format(etpframe_c_aa_val)
+            etallframe_c_aa_val = outputofcalc['etallframe_c_aa_val']
+            etallframe_c_aa_string = "{0:.0f}".format(etallframe_c_aa_val)
+            etpframe_cr1_aa_val = outputofcalc['etpframe_cr1_aa_val']
+            etpframe_cr1_aa_string = "{0:.0f}".format(etpframe_cr1_aa_val)
+            etallframe_cr1_aa_val = outputofcalc['etallframe_cr1_aa_val']
+            etallframe_cr1_aa_string = "{0:.0f}".format(etallframe_cr1_aa_val)
+            etpframe_cr1r2_aa_val = outputofcalc['etpframe_cr1r2_aa_val']
+            etpframe_cr1r2_aa_string = "{0:.0f}".format(etpframe_cr1r2_aa_val)
+            etallframe_cr1r2_aa_val = outputofcalc['etallframe_cr1r2_aa_val']
+            etallframe_cr1r2_aa_string = "{0:.0f}".format(etallframe_cr1r2_aa_val)
+
+            etpframe_c_all_val = outputofcalc['etpframe_c_all_val']
+            etpframe_c_all_string = "{0:.0f}".format(etpframe_c_all_val)
+            etallframe_c_all_val = outputofcalc['etallframe_c_all_val']
+            etallframe_c_all_string = "{0:.0f}".format(etallframe_c_all_val)
+            etpframe_cr1_all_val = outputofcalc['etpframe_cr1_all_val']
+            etpframe_cr1_all_string = "{0:.0f}".format(etpframe_cr1_all_val)
+            etallframe_cr1_all_val = outputofcalc['etallframe_cr1_all_val']
+            etallframe_cr1_all_string = "{0:.0f}".format(etallframe_cr1_all_val)
+            etpframe_cr1r2_all_val = outputofcalc['etpframe_cr1r2_all_val']
+            etpframe_cr1r2_all_string = "{0:.0f}".format(etpframe_cr1r2_all_val)
+            etallframe_cr1r2_all_val = outputofcalc['etallframe_cr1r2_all_val']
+            etallframe_cr1r2_all_string = "{0:.0f}".format(etallframe_cr1r2_all_val)
+            
             if cmode == 'S':
-                cmode_string = 'SNR to exp. time'
+                cmode_string = 'SNR to exposure time'
 
             elif cmode == 'T':
-                cmode_string = 'Exp. time to SNR'
+                cmode_string = 'Exposure time to SNR'
 
             outhead1string = '<hr /><span class="boldlarge">Calculation Mode: ' + cmode_string + '<br>Observing Mode: ' + om_val_string + ', VPH: ' + vph_val_string + ', Source Type: ' + sourcet_val_string + ' </span>' + \
-                             '<span class="italicsmall"> Computation time: ' + "{0:.4f}".format(
-                (time.time() - start_time)) + ' seconds; </span>'
+                             '<br /><span class="italicsmall"> Computation time: ' + "{0:.1f}".format((time.time() - start_time)) + ' seconds; </span>'
 
             tablecoutstring = ''
 
@@ -958,6 +1005,23 @@ def etc_do(request):
                                                        exptimepframe_val_string,
                                                        exptime_val_string,
                                                        etpframe_c_voxel_string,
+                                                       etallframe_c_voxel_string,
+                                                       etpframe_cr1_voxel_string,
+                                                       etallframe_cr1_voxel_string,
+                                                       etpframe_cr1r2_voxel_string,
+                                                       etallframe_cr1r2_voxel_string,
+                                                       etpframe_c_aa_string,
+                                                       etallframe_c_aa_string,
+                                                       etpframe_cr1_aa_string,
+                                                       etallframe_cr1_aa_string,
+                                                       etpframe_cr1r2_aa_string,
+                                                       etallframe_cr1r2_aa_string,
+                                                       etpframe_c_all_string,
+                                                       etallframe_c_all_string,
+                                                       etpframe_cr1_all_string,
+                                                       etallframe_cr1_all_string,
+                                                       etpframe_cr1r2_all_string,
+                                                       etallframe_cr1r2_all_string,
                                                        lambdaeff_string,
                                                        seeingx_string,
                                                        sncont_centerspaxel_voxel_string,

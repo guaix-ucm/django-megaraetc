@@ -17,6 +17,7 @@ $( document ).ready(function() {
 //    // ON HOLD: attempt to upload file
 //    // PROBLEM: submit goes through this, but loses file info
 //    var fileSelect = document.getElementById('id_fileupload');
+//    // PARTIAL SOLUTION: READ THE FILE ONCHANGE! ALSO GET CONTENT AND JSONIFY
 
     $( "#myform" ).submit(function( event ) {
         // Stop form from submitting normally
@@ -45,9 +46,53 @@ $( document ).ready(function() {
             alert('WARNING: VPH Setup is set to -empty-! Choose a VPH.')
         }
         else {
+            //// ATTEMPT TO ADD FILE CONTENTS TO POST
+//            var selectedFileName = document.getElementById('id_fileupload').files[0].name;
+//            console.log(selectedFileName);
+//
+//            var thepost = $(this).serializeArray();  //TEST
+//            var selectedFile = document.getElementById('id_fileupload').files[0];
+//                if (selectedFile) {
+//                    const file = selectedFile;
+//                    const reader = new FileReader();
+//                    reader.onload = (event) => {
+//                        const file = event.target.result;
+//                        const allLines = file.split(/\r\n|\n/);
+//                        bodyAppendMod("demo", "\nContent:\n"+csvJSON(file));    //TEST
+//                        // Reading line by line
+//                        allLines.map((line) => {
+//                            console.log(line);
+//                        });
+//                        for (var i = 0; i < allLines.length; i++) {
+//                            thepost.push({name:"fileline"+[i], value:allLines[i]});
+//                        };
+//                    };
+//                    reader.onerror = (evt) => {
+//                        alert(evt.target.error.name);
+//                    };
+//                    reader.readAsText(file);
+//                }
+//                else {
+//                    console.log("FILE IS EMPTY?");
+//                }
+//            console.log(thepost);   //TEST WORKS UP TO HERE!!!
+            //PROBLEM: CANNOT SEEM TO BE ABLE TO SEE THE PUSHED PARTS
+            //INTO REQUEST.POST IN VIEWS.PY
+//            thepost.push({name: "TEST", value: 'YEP'});  //TEST
+
             //// Send the data using post
             var posting = $.post("/etc/do", $(this).serialize());
+
+//            var thepostmod = {data:thepost};
+//            var thepostmod = {data:[{"a":1, "b":2},{"a":2, "b":2}]}
+//            thepostmod = JSON.stringify(thepost);
+//            var thepostmod = $(thepost).serialize();
+//            var posting = $.post("/etc/do", thepostmod);
+
+            console.log(posting);
             //
+            //
+            // DATA COMES FROM THE OUTPUT OF FUNCTION ETC_DO IN VIEWS.PY
             // Put the results in div
             posting.done(function (data) {
                 console.log($(data))
@@ -101,6 +146,122 @@ $( document ).ready(function() {
         }
     });
 });
+
+/* handle file(s) */
+//var inputElement = document.getElementById("id_fileupload");
+
+function handleFiles() {
+    var selectedFile = document.getElementById('id_fileupload').files[0];
+    if (selectedFile) {
+        document.getElementById("demo").innerHTML = selectedFile.name;
+
+        const file = selectedFile;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const file = event.target.result;
+            const allLines = file.split(/\r\n|\n/);
+            bodyAppendMod("demo", "\nContent:\n"+csvJSON(file));    //TEST
+            // Reading line by line
+            allLines.map((line) => {
+                console.log(line);
+            });
+        };
+        reader.onerror = (evt) => {
+            alert(evt.target.error.name);
+        };
+        reader.readAsText(file);
+    }
+    else {
+        console.log("WHAT FILE?");
+    }
+//}
+//      // GET SIZE AND GIVE SIZE LIMIT
+//    f = selectedFile;
+//    if (f) {
+//      var r = new FileReader();
+//      r.onload = function(e) {
+//          var contents = e.target.result;
+//        alert( "Got the file.n"
+//              +"name: " + f.name + "n"
+//              +"type: " + f.type + "n"
+//              +"size: " + f.size + " bytesn"
+//              + "starts with: " + contents.substr(1, contents.indexOf("n"))
+//        );
+//        if(f.size > 2097152) {
+//               alert('File size Greater then 5MB!');
+//                }
+//      }
+//      r.readAsText(f);
+//    } else {
+//      alert("Failed to load file");
+//    }
+}
+
+function showFileSize() {
+    var input, file;
+
+    // (Can't use `typeof FileReader === "function"` because apparently
+    // it comes back as "object" on some browsers. So just see if it's there
+    // at all.)
+    if (!window.FileReader) {
+        bodyAppendMod("demo", "The file API isn't supported on this browser yet.");
+        return;
+    }
+
+    input = document.getElementById('id_fileupload');
+    if (!input) {
+        bodyAppendMod("demo", "Um, couldn't find the fileinput element.");
+    }
+    else if (!input.files) {
+        bodyAppendMod("demo", "This browser doesn't seem to support the `files` property of file inputs.");
+    }
+    else if (!input.files[0]) {
+        bodyAppendMod("demo", "No file chosen. Please choose a file.");
+    }
+    else {
+        file = input.files[0];
+        bodyAppendMod("demo", "File " + file.name + " is " + file.size + " bytes in size");
+    }
+}
+
+// MODIFIED FROM ORIGINAL TO WORK WITH OUR HTML
+function bodyAppendMod(IdName, innerHTML) {
+    var elm;
+
+    elm = document.getElementById(IdName);
+    elm.innerHTML = innerHTML;
+//    document.body.appendChild(elm);
+}
+
+//var csv is the CSV file with headers
+function csvJSON(csv){
+
+  var lines=csv.split("\n");
+
+  var result = [];
+
+  var headers=lines[0].split(",");
+
+  for(var i=1;i<lines.length;i++){
+
+	  var obj = {};
+	  var currentline=lines[i].split(",");
+
+	  for(var j=0;j<headers.length;j++){
+		  obj[headers[j]] = currentline[j];
+	  }
+
+	  result.push(obj);
+
+  }
+
+  //return result; //JavaScript object
+  return JSON.stringify(result); //JSON
+}
+
+
+
+
 
 
 function downloadFile(forfile) {
