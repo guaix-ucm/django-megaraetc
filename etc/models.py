@@ -58,3 +58,18 @@ class SeeingTemplate(models.Model):
 
     def __str__(self):
         return  str(self.name)
+
+# class MyModel(models.Model):
+#     # file will be uploaded to MEDIA_ROOT/uploads; MEDIA_ROOT e.g. "/var/www/example.com/media/"
+#     myfile = models.FileField(upload_to='uploads/')
+#     # mag = models.FloatField()
+#     # filt = models.CharField(max_length=100)
+#     # print 'uploaded'
+#     #
+#     # def __str__(self):
+#     #     return  str(self.filename)
+#
+# class Document(models.Model):
+#     description = models.CharField(max_length=255, blank=True)
+#     document = models.FileField(upload_to='uploads/')
+#     uploaded_at = models.DateTimeField(auto_now_add=True)

@@ -14,9 +14,33 @@ $( document ).ready(function() {
         ajaxStop: function() { $body.removeClass("loading"); }
     });
 
+//    // ON HOLD: attempt to upload file
+//    // PROBLEM: submit goes through this, but loses file info
+//    var fileSelect = document.getElementById('id_fileupload');
+
     $( "#myform" ).submit(function( event ) {
         // Stop form from submitting normally
         event.preventDefault();
+
+//        // ON HOLD!
+//        // Get the selected files from the input.
+//        var files = fileSelect.files;
+//        // Create a new FormData object.
+//        var formData = new FormData();
+//        // Loop through each of the selected files.
+//        for (var i = 0; i < files.length; i++) {
+//          var file = files[i];
+//
+//          // Check the file type.
+//          if (!file.type.match('text.*')) {
+//            continue;
+//          }
+//
+//          // Add the file to the request.
+//          formData.append('upload[]', file, file.name);
+//        }
+//      // ON HOLD END!
+
         if ($('#id_vph').val() == 1){
             alert('WARNING: VPH Setup is set to -empty-! Choose a VPH.')
         }
@@ -55,11 +79,16 @@ $( document ).ready(function() {
                 $("#store_result").css('visibility', 'visible');
                 forfile = $(data)[0]['forfile'];    // global variable update
                 calcfile = $(data)[0]['forfile2'];  // global variable update
+
                 // Graphics
                 var thediv = $(data)[0]['thediv'];
                 var thescript = $(data)[0]['thescript'];
                 $("#othergraphic").empty().append(thediv);
                 $("#othergraphic").append(thescript);
+
+                // Seeing the uploaded file
+                var uploadedfile = $(data)[0]['theuploadedfile'];
+                $("#uploadedfile").empty().append(uploadedfile);
 
                 var footers = $(data)[0]['footerstring'];
                 $("#extrafooter").empty().append(footers);

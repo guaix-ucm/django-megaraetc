@@ -70,7 +70,7 @@ class TargetForm(forms.Form):
     stype_help2 = botton2 % "sourcetype"
 
     botton = "<a class=\"splinkcol\" href=\"Javascript:newPopupBig('/static/etc/help/%s.txt');\" type=\"link\" >"
-    suf = "Radius</a>"
+
     stype_help = botton % "sourcetype" + "Source Type</a>"
     inputsize_help = botton % "inputsize" + "Input Size</a>"
     size_help = botton % "size" + "Area (sq.arcsec)</a>"
@@ -91,6 +91,7 @@ class TargetForm(forms.Form):
 
     # stype = forms.ChoiceField(label="Source type", help_text=stype_help2, initial="P", choices=STYPE, widget=forms.RadioSelect(renderer=HorizontalRadioRenderer, attrs={'onclick':'selector()'}))
     stype = forms.ChoiceField(label=mark_safe(stype_help), initial="P", choices=STYPE, widget=forms.RadioSelect(renderer=HorizontalRadioRenderer, attrs={'onclick':'selector()'}))
+
     isize = forms.ChoiceField(label=mark_safe(inputsize_help), initial="A", choices=ISIZE, widget=forms.RadioSelect(renderer=HorizontalRadioRenderer, attrs={'onclick':'selectInputSize()','disabled':'true', 'placeholder':'inputsize'}))
     size = forms.FloatField(label=mark_safe(size_help), initial=1.0, min_value=0.0, max_value=3600, widget=forms.TextInput(attrs={'disabled':'true', 'placeholder':'Area'}))
     radius = forms.FloatField(label=mark_safe(radius_help), initial=1.0, min_value=0.0, max_value=3600, widget=forms.TextInput(attrs={'disabled':'true', 'placeholder':'Radius (arcsec)'}))
@@ -161,3 +162,13 @@ class ObservationalSetupForm(forms.Form):
 
 class OutputSetupForm(forms.Form):
     plotflag = forms.ChoiceField(label="Graphic output?", initial="no", choices=PLOTCHOICES, widget=forms.RadioSelect(renderer=HorizontalRadioRenderer))
+
+
+class UploadFileForm(forms.Form):
+    botton = "<a class=\"splinkcol\" href=\"Javascript:newPopupBig('/static/etc/help/%s.txt');\" type=\"link\" >"
+    fileupload_help = botton % "fileupload" + "Upload file</a>"
+
+    # testfield = forms.IntegerField(initial=9999999)
+
+    # fileupload = forms.FileField(label=mark_safe(fileupload_help), widget=forms.FileInput(attrs={'size':'7', 'name':'myfile', 'title':'fileupload', 'type':'file'}))
+    # file = forms.FileField()

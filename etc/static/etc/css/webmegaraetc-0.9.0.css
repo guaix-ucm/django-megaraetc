@@ -177,6 +177,10 @@ label.control-label {
 /*    height: 100%;*/
 }
 
+#uploadedfile {
+    width: 100%;
+}
+
 #extrafooter {
     width: 100%;
 }

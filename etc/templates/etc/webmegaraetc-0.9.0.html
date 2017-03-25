@@ -45,10 +45,11 @@
 
     <div id="wrapper">
         <div id="theformcontainer">
-            <form id="myform" method="post" onsubmit="return storeValues(this);">{% csrf_token %}
+            <form id="myform" method="post" action="/uploads/" enctype="multipart/form-data" onsubmit="return storeValues(this);">{% csrf_token %}
                 <div id="leftdiv">
                     <h4>Target Input Flux Distribution</h4>
                     {% bootstrap_form form1 %}
+                    {% bootstrap_form formU %}
                 </div>
 
                 <div id="rightdiv">
@@ -63,6 +64,15 @@
                 </div>
 
                 <div id="submitbuttonsdiv">
+                    <!-- MAKE A BUTTON THAT DISPLAYS THE NUMBER OF FIELDS -->
+                    <!--<button onclick="myFunction()">Try it</button>-->
+                    <!--<p id="demo"></p>-->
+                    <!--<script>-->
+                    <!--function myFunction() {-->
+                        <!--var x = document.getElementById("myform").elements.length;-->
+                        <!--document.getElementById("demo").innerHTML = "Found " + x + " elements in the form.";-->
+                    <!--}-->
+                    <!--</script>-->
                 {% buttons class="aux" %}
                     {% bootstrap_button "Submit" button_type="submit" button_class="btn-primary" icon="star" %}
                     {% bootstrap_button "Reset" button_type="reset" button_class="btn-primary" icon="remove" href="Javascript:deleteCookies();" %}
@@ -118,6 +128,8 @@
                 </div>
                 <div id="rightcolumn">
                     <div id="result4"> <!-- TABLES -->
+                    </div>
+                    <div id="uploadedfile">
                     </div>
                     <!--<div id="resultmath"> &lt;!&ndash; MATHJAX TEST &ndash;&gt; -->
                     <!--</div>  -->

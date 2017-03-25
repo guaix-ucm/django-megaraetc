@@ -1,0 +1,16 @@
+** UPLOAD FILE **
+File upload works only when SOURCE TYPE is set to POINT.
+
+The file should be prepared in csv format,
+with 3 columns: a name, the UBVRI filter band,
+and the AB magnitude in that band.
+The characters '# (sharp)' are considered as comments
+and are not read by the program.
+
+EXAMPLE:
+
+#name,UBVRI,ABmag
+V* T Dra,B,18.08
+LHS 1903,V,12.21
+GD 299,B,11.824
+

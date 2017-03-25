@@ -1,10 +1,14 @@
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.http import HttpResponseRedirect
+from django.shortcuts import render, render_to_response
+from django.core.urlresolvers import reverse
+
 from .forms import AtmosphericConditionsForm, ObservationalSetupForm
 from .forms import TargetForm, InstrumentForm
-from .forms import OutputSetupForm
+from .forms import OutputSetupForm, UploadFileForm
 from .models import PhotometricFilter, SeeingTemplate
 from .models import SpectralTemplate, VPHSetup
+# from .models import MyModel, Document
 
 from justcalc import calc
 # from plot1 import plot_and_save_new, plot_and_save2_new
@@ -22,6 +26,8 @@ import time
 from time import strftime
 import os
 
+from django.conf import settings #or from my_project import settings
+
 def compute5(request):
     print request.POST['stype']
     print '### LOG: Entered compute5'
@@ -38,11 +44,9 @@ def compute5(request):
         else:
             isize_val = request.POST['isize']
             radius_val = float(request.POST['radius'])
-            size_val = numpy.pi * (radius_val**2)
-    mag_val = float(request.POST['contmagval']) if request.POST[
-                                                       'contmagflux'] == 'M' else 20.0
-    fc_val = 1e-16 if request.POST['contmagflux'] == 'M' else float(
-        request.POST['contfluxval'])
+            size_val = numpy.pi * (radius_val ** 2)
+    mag_val = float(request.POST['contmagval']) if request.POST['contmagflux'] == 'M' else 20.0
+    fc_val = 1e-16 if request.POST['contmagflux'] == 'M' else float(request.POST['contfluxval'])
 
     fluxt_val = request.POST['iflux']
     if fluxt_val == "C":
@@ -127,7 +131,8 @@ def compute5(request):
         moon_val = request.POST['moonph']
         airmass_val = float(request.POST['airmass'])
 
-        queryseeing = SeeingTemplate.objects.filter(pk=request.POST['seeing']).values()
+        queryseeing = SeeingTemplate.objects.filter(
+            pk=request.POST['seeing']).values()
         seeing_val = queryseeing[0]['name']
 
         numframes_val = float(request.POST['numframes'])
@@ -185,6 +190,7 @@ def get_info(request):
     if request.method == 'GET':
         # create a form instance and populate it with data from the request:
         form1 = TargetForm(request.GET)
+        formU = UploadFileForm(request.GET)
         form2 = InstrumentForm(request.GET)
         form3 = AtmosphericConditionsForm(request.GET)
         form4 = ObservationalSetupForm(request.GET)
@@ -193,6 +199,7 @@ def get_info(request):
     # if a GET (or any other method) we'll create a blank form
     else:
         form1 = TargetForm()
+        formU = UploadFileForm()
         form2 = InstrumentForm()
         form3 = AtmosphericConditionsForm()
         form4 = ObservationalSetupForm()
@@ -200,6 +207,7 @@ def get_info(request):
 
     return render(request, 'etc/webmegaraetc-0.9.0.html', {
         'form1': form1,
+        'formU': formU,
         'form2': form2,
         'form3': form3,
         'form4': form4,
@@ -210,12 +218,14 @@ def get_info(request):
 # LOADS THIS AFTER PUSHING "START" in index.html
 def etc_form(request):
     form1 = TargetForm()
+    formU = UploadFileForm()
     form2 = InstrumentForm()
     form3 = AtmosphericConditionsForm()
     form4 = ObservationalSetupForm()
     form5 = OutputSetupForm()
 
     total_formu = {'form1': form1,
+                   'formU': formU,
                    'form2': form2,
                    'form3': form3,
                    'form4': form4,
@@ -223,6 +233,50 @@ def etc_form(request):
                    }
 
     return render(request, 'etc/webmegaraetc-0.9.0.html', total_formu)
+
+
+# ON HOLD UNTIL I FIND A GOOD WAY TO UPLOAD FILES
+def uploadView(request):
+    # phase = get_object_or_404(Phase, pk=int(phase_id))
+    if request.method == 'POST':
+        # form = UploadFileForm(request.POST, request.FILES)
+        form = UploadFileForm(request.POST, request.FILES)
+        # print dir(request)
+        formg = TargetForm(request.POST)
+        print form
+        print formg['pfilter']
+
+        print settings.MEDIA_ROOT
+        print ""
+        print "REQUEST.POST=", request.POST
+        # print request.META
+        # print request.encoding
+        print (form.errors)
+        print ''
+        print 'OK UP TO HERE'
+        print request.FILES
+        # print 'REQUEST FILES=', request.FILES['myfile']
+        print ''
+        if form.is_valid():
+            print 'VALID'
+            # newdoc = Document(filename = request.FILES['myfile'])
+            # newdoc.save()
+            # doc_to_save = request.FILES['fileupload']
+            # filename = doc_to_save._get_name()
+            # fd = open('uploads/'+str(filename),'wb')
+            # for chunk in doc_to_save.chunks():
+            #     fd.write(chunk)
+            # fd.close()
+            # return HttpResponseRedirect(reverse('uploadView'))
+            return HttpResponseRedirect('/success/url/')
+        else:
+            print 'WARNING: INVALID FORM!'
+            print (form.errors)
+            form = UploadFileForm()
+        # documents = Document.objects.filter(phase=phase_id)
+
+    return render(request, 'etc/upload.html', {'form': form})
+
 
 
 # LOADS THIS AFTER PRESSING "SUBMIT" webmegaraetc.html and
@@ -248,6 +302,16 @@ def etc_do(request):
         print 'Date time: ', start_time_string
         outputofcalc = compute5(request)
         print '### LOG: ETC_DO: OUTPUTOFCALC SUCCESSFULLY COMPUTED'
+
+
+        ##############################################
+        ##############################################
+        ### ATTEMPT TO PRINT UPLOADED FILENAME (TEST)
+        # up = uploadView(request)
+
+        ##############################################
+        ##############################################
+
         tocheck = str(outputofcalc['outtext'])
         if not tocheck:
             outtextstring = ""  # No warning.
@@ -260,7 +324,8 @@ def etc_do(request):
         inputstring = '<br /><p>' + str(outputofcalc['texti']) + '</p>'
         coutputstring = '<br /><p>' + str(outputofcalc['textoc']) + '</p>'
         loutputstring = '<br /><p>' + str(outputofcalc['textol']) + '</p>'
-        textcalcstring = '<br /><table border=1 id="mathtextid"><tr><td>' + str(outputofcalc['textcalc']) + '</td></tr></table>'
+        textcalcstring = '<br /><table border=1 id="mathtextid"><tr><td>' + str(
+            outputofcalc['textcalc']) + '</td></tr></table>'
 
         # Suck out relevant data from database
         vph = request.POST['vph']
@@ -271,7 +336,6 @@ def etc_do(request):
         spec = request.POST['spectype']
         queryspec = SpectralTemplate.objects.filter(pk=spec).values()
         entry_spec_name = queryspec[0]['name']
-
 
         ################################################################
         ########################## GRAPHICS ############################
@@ -284,17 +348,18 @@ def etc_do(request):
             # Check if computation outputs are conform
             if not tocheck:
                 x = outputofcalc['lamb']
-                y = outputofcalc['fc'] + outputofcalc['fs']
+                y = outputofcalc['fc'] #+ outputofcalc['fs']
                 label1 = entry_spec_name
                 label2 = outputofcalc['mag_val']
                 label3 = outputofcalc['bandc_val']
+                lc = outputofcalc['lambdaeff']
 
                 x2 = x
                 x2b = x2
                 x2c = x2
                 x2d = x2
 
-                if outputofcalc['fluxt_val']=='L':
+                if outputofcalc['fluxt_val'] == 'L':
                     y2 = outputofcalc['pframesn_pervoxel_fiber']
                     y2b = outputofcalc['allframesn_pervoxel_fiber']
                     y2c = outputofcalc['pframesn_pervoxel_all']
@@ -323,6 +388,7 @@ def etc_do(request):
                 label1 = "none"
                 label2 = 20.0  # Float
                 label3 = "none"
+                lc = "none"
                 label2a = "none"
                 label2b = "none"
                 label2c = "none"
@@ -351,7 +417,8 @@ def etc_do(request):
                                            x2, y2, x2b, y2b,
                                            x2c, y2c, x2d, y2d,
                                            label2a, label2b, label2c,
-                                           outputofcalc['fluxt_val'])
+                                           outputofcalc['fluxt_val'],
+                                           lc)
         else:
             thescript = ""
             thediv = ""
@@ -389,7 +456,8 @@ def etc_do(request):
             airmass_val_string = str(outputofcalc['airmass_val'])
             seeing_zenith_string = str(outputofcalc['seeing_zenith'])
             fsky_string = '%.3e' % outputofcalc['fsky']
-            numframe_val_string = str(outputofcalc['numframe_val'])
+            numframe_val = outputofcalc['numframe_val']
+            numframe_val_string = str(numframe_val)
             exptimepframe_val_string = str(outputofcalc['exptimepframe_val'])
             exptime_val_string = str(outputofcalc['exptime_val'])
             npdark_val_string = str(outputofcalc['npdark_val'])
@@ -413,7 +481,7 @@ def etc_do(request):
             nfib1def_string = str(outputofcalc['nfib1def'])
             sncont_p2sp_all_string = "{0:.2f}".format(
                 float(outputofcalc['sncont_p2sp_all']) / 2)
-            tsncont_p2sp_all_val = float(outputofcalc['tsncont_p2sp_all']/2)
+            tsncont_p2sp_all_val = float(outputofcalc['tsncont_p2sp_all'] / 2)
             tsncont_p2sp_all_string = "{0:.2f}".format(
                 float(outputofcalc['tsncont_p2sp_all']) / 2)
             sncont_pspfwhm_all_string = "{0:.2f}".format(
@@ -517,57 +585,93 @@ def etc_do(request):
             seeing_cr1r2_val = seeing_centermean_val + seeing_ring1mean_val + seeing_ring2mean_val
             seeing_cr1r2_string = "{0:.2f}".format(round(seeing_cr1r2_val))
 
-            tsncont_centermean = "{0:.2f}".format((seeing_centermean_val/100) * tsncont_p2sp_all_val)
-            tsncont_ring1mean = "{0:.2f}".format((seeing_ring1mean_val/100) * tsncont_p2sp_all_val)
-            tsncont_ring2mean = "{0:.2f}".format((seeing_ring2mean_val/100) * tsncont_p2sp_all_val)
-            tsncont_total = "{0:.2f}".format((seeing_total_val/100) * tsncont_p2sp_all_val)
+            tsncont_centermean = "{0:.2f}".format(
+                (seeing_centermean_val / 100) * tsncont_p2sp_all_val)
+            tsncont_ring1mean = "{0:.2f}".format(
+                (seeing_ring1mean_val / 100) * tsncont_p2sp_all_val)
+            tsncont_ring2mean = "{0:.2f}".format(
+                (seeing_ring2mean_val / 100) * tsncont_p2sp_all_val)
+            tsncont_total = "{0:.2f}".format(
+                (seeing_total_val / 100) * tsncont_p2sp_all_val)
 
-            sncont_centerspaxel_voxel_val = outputofcalc['sncont_centerspaxel_voxel']
-            sncont_centerspaxel_voxel_string = "{0:.2f}".format(float(sncont_centerspaxel_voxel_val))
+            sncont_centerspaxel_voxel_val = outputofcalc[
+                'sncont_centerspaxel_voxel']
+            sncont_centerspaxel_voxel_string = "{0:.2f}".format(
+                float(sncont_centerspaxel_voxel_val))
             sncont_r1spaxel_voxel_val = outputofcalc['sncont_r1spaxel_voxel']
-            sncont_r1spaxel_voxel_string = "{0:.2f}".format(float(sncont_r1spaxel_voxel_val))
+            sncont_r1spaxel_voxel_string = "{0:.2f}".format(
+                float(sncont_r1spaxel_voxel_val))
             sncont_r2spaxel_voxel_val = outputofcalc['sncont_r2spaxel_voxel']
-            sncont_r2spaxel_voxel_string = "{0:.2f}".format(float(sncont_r2spaxel_voxel_val))
+            sncont_r2spaxel_voxel_string = "{0:.2f}".format(
+                float(sncont_r2spaxel_voxel_val))
 
-            sncont_cr1spaxels_voxel_val = outputofcalc['sncont_cr1spaxels_voxel']
-            sncont_cr1spaxels_voxel_string = "{0:.2f}".format(float(sncont_cr1spaxels_voxel_val))
-            sncont_cr1r2spaxels_voxel_val = outputofcalc['sncont_cr1r2spaxels_voxel']
-            sncont_cr1r2spaxels_voxel_string = "{0:.2f}".format(float(sncont_cr1r2spaxels_voxel_val))
+            sncont_cr1spaxels_voxel_val = outputofcalc[
+                'sncont_cr1spaxels_voxel']
+            sncont_cr1spaxels_voxel_string = "{0:.2f}".format(
+                float(sncont_cr1spaxels_voxel_val))
+            sncont_cr1r2spaxels_voxel_val = outputofcalc[
+                'sncont_cr1r2spaxels_voxel']
+            sncont_cr1r2spaxels_voxel_string = "{0:.2f}".format(
+                float(sncont_cr1r2spaxels_voxel_val))
             #
-            tsncont_centerspaxel_voxel_val = outputofcalc['tsncont_centerspaxel_voxel']
-            tsncont_centerspaxel_voxel_string = "{0:.2f}".format(float(tsncont_centerspaxel_voxel_val))
-            tsncont_cr1spaxels_voxel_val = outputofcalc['tsncont_cr1spaxels_voxel']
-            tsncont_cr1spaxels_voxel_string = "{0:.2f}".format(float(tsncont_cr1spaxels_voxel_val))
-            tsncont_cr1r2spaxels_voxel_val = outputofcalc['tsncont_cr1r2spaxels_voxel']
-            tsncont_cr1r2spaxels_voxel_string = "{0:.2f}".format(float(tsncont_cr1r2spaxels_voxel_val))
-            
+            tsncont_centerspaxel_voxel_val = outputofcalc[
+                'tsncont_centerspaxel_voxel']
+            tsncont_centerspaxel_voxel_string = "{0:.2f}".format(
+                float(tsncont_centerspaxel_voxel_val))
+            tsncont_cr1spaxels_voxel_val = outputofcalc[
+                'tsncont_cr1spaxels_voxel']
+            tsncont_cr1spaxels_voxel_string = "{0:.2f}".format(
+                float(tsncont_cr1spaxels_voxel_val))
+            tsncont_cr1r2spaxels_voxel_val = outputofcalc[
+                'tsncont_cr1r2spaxels_voxel']
+            tsncont_cr1r2spaxels_voxel_string = "{0:.2f}".format(
+                float(tsncont_cr1r2spaxels_voxel_val))
+
             sncont_centerspaxel_aa_val = outputofcalc['sncont_centerspaxel_aa']
-            sncont_centerspaxel_aa_string = "{0:.2f}".format(float(sncont_centerspaxel_aa_val))
+            sncont_centerspaxel_aa_string = "{0:.2f}".format(
+                float(sncont_centerspaxel_aa_val))
             sncont_cr1spaxels_aa_val = outputofcalc['sncont_cr1spaxels_aa']
-            sncont_cr1spaxels_aa_string = "{0:.2f}".format(float(sncont_cr1spaxels_aa_val))
+            sncont_cr1spaxels_aa_string = "{0:.2f}".format(
+                float(sncont_cr1spaxels_aa_val))
             sncont_cr1r2spaxels_aa_val = outputofcalc['sncont_cr1r2spaxels_aa']
-            sncont_cr1r2spaxels_aa_string = "{0:.2f}".format(float(sncont_cr1r2spaxels_aa_val))
+            sncont_cr1r2spaxels_aa_string = "{0:.2f}".format(
+                float(sncont_cr1r2spaxels_aa_val))
             #
-            tsncont_centerspaxel_aa_val = outputofcalc['tsncont_centerspaxel_aa']
-            tsncont_centerspaxel_aa_string = "{0:.2f}".format(float(tsncont_centerspaxel_aa_val))
+            tsncont_centerspaxel_aa_val = outputofcalc[
+                'tsncont_centerspaxel_aa']
+            tsncont_centerspaxel_aa_string = "{0:.2f}".format(
+                float(tsncont_centerspaxel_aa_val))
             tsncont_cr1spaxels_aa_val = outputofcalc['tsncont_cr1spaxels_aa']
-            tsncont_cr1spaxels_aa_string = "{0:.2f}".format(float(tsncont_cr1spaxels_aa_val))
-            tsncont_cr1r2spaxels_aa_val = outputofcalc['tsncont_cr1r2spaxels_aa']
-            tsncont_cr1r2spaxels_aa_string = "{0:.2f}".format(float(tsncont_cr1r2spaxels_aa_val))
-            
-            sncont_centerspaxel_all_val = outputofcalc['sncont_centerspaxel_all']
-            sncont_centerspaxel_all_string = "{0:.2f}".format(float(sncont_centerspaxel_all_val))
+            tsncont_cr1spaxels_aa_string = "{0:.2f}".format(
+                float(tsncont_cr1spaxels_aa_val))
+            tsncont_cr1r2spaxels_aa_val = outputofcalc[
+                'tsncont_cr1r2spaxels_aa']
+            tsncont_cr1r2spaxels_aa_string = "{0:.2f}".format(
+                float(tsncont_cr1r2spaxels_aa_val))
+
+            sncont_centerspaxel_all_val = outputofcalc[
+                'sncont_centerspaxel_all']
+            sncont_centerspaxel_all_string = "{0:.2f}".format(
+                float(sncont_centerspaxel_all_val))
             sncont_cr1spaxels_all_val = outputofcalc['sncont_cr1spaxels_all']
-            sncont_cr1spaxels_all_string = "{0:.2f}".format(float(sncont_cr1spaxels_all_val))
-            sncont_cr1r2spaxels_all_val = outputofcalc['sncont_cr1r2spaxels_all']
-            sncont_cr1r2spaxels_all_string = "{0:.2f}".format(float(sncont_cr1r2spaxels_all_val))
+            sncont_cr1spaxels_all_string = "{0:.2f}".format(
+                float(sncont_cr1spaxels_all_val))
+            sncont_cr1r2spaxels_all_val = outputofcalc[
+                'sncont_cr1r2spaxels_all']
+            sncont_cr1r2spaxels_all_string = "{0:.2f}".format(
+                float(sncont_cr1r2spaxels_all_val))
             #
-            tsncont_centerspaxel_all_val = outputofcalc['tsncont_centerspaxel_all']
-            tsncont_centerspaxel_all_string = "{0:.2f}".format(float(tsncont_centerspaxel_all_val))
+            tsncont_centerspaxel_all_val = outputofcalc[
+                'tsncont_centerspaxel_all']
+            tsncont_centerspaxel_all_string = "{0:.2f}".format(
+                float(tsncont_centerspaxel_all_val))
             tsncont_cr1spaxels_all_val = outputofcalc['tsncont_cr1spaxels_all']
-            tsncont_cr1spaxels_all_string = "{0:.2f}".format(float(tsncont_cr1spaxels_all_val))
-            tsncont_cr1r2spaxels_all_val = outputofcalc['tsncont_cr1r2spaxels_all']
-            tsncont_cr1r2spaxels_all_string = "{0:.2f}".format(float(tsncont_cr1r2spaxels_all_val))
+            tsncont_cr1spaxels_all_string = "{0:.2f}".format(
+                float(tsncont_cr1spaxels_all_val))
+            tsncont_cr1r2spaxels_all_val = outputofcalc[
+                'tsncont_cr1r2spaxels_all']
+            tsncont_cr1r2spaxels_all_string = "{0:.2f}".format(
+                float(tsncont_cr1r2spaxels_all_val))
 
             npixx_p2sp_all_val = outputofcalc['npixx_p2sp_all']
             npixx_p2sp_all_string = "{0:.2f}".format(npixx_p2sp_all_val)
@@ -623,27 +727,36 @@ def etc_do(request):
             npixy_psp_pspp_string = "{0:.2f}".format(npixy_psp_pspp_val)
 
             sncont_pdp_fibre_val = outputofcalc['sncont_pdp_fibre']
-            sncont_pdp_fibre_string = "{0:.2f}".format(float(sncont_pdp_fibre_val))
+            sncont_pdp_fibre_string = "{0:.2f}".format(
+                float(sncont_pdp_fibre_val))
             tsncont_pdp_fibre_val = outputofcalc['tsncont_pdp_fibre']
-            tsncont_pdp_fibre_string = "{0:.2f}".format(float(tsncont_pdp_fibre_val))
+            tsncont_pdp_fibre_string = "{0:.2f}".format(
+                float(tsncont_pdp_fibre_val))
             npixx_pdp_fibre_val = outputofcalc['npixx_pdp_fibre']
-            npixx_pdp_fibre_string = "{0:.2f}".format(float(npixx_pdp_fibre_val))
+            npixx_pdp_fibre_string = "{0:.2f}".format(
+                float(npixx_pdp_fibre_val))
             npixy_pdp_fibre_val = outputofcalc['npixy_pdp_fibre']
-            npixy_pdp_fibre_string = "{0:.2f}".format(float(npixy_pdp_fibre_val))
+            npixy_pdp_fibre_string = "{0:.2f}".format(
+                float(npixy_pdp_fibre_val))
 
             sncont_psp_fibre_val = outputofcalc['sncont_psp_fibre']
-            sncont_psp_fibre_string = "{0:.2f}".format(float(sncont_psp_fibre_val))
+            sncont_psp_fibre_string = "{0:.2f}".format(
+                float(sncont_psp_fibre_val))
             tsncont_psp_fibre_val = outputofcalc['tsncont_psp_fibre']
-            tsncont_psp_fibre_string = "{0:.2f}".format(float(tsncont_psp_fibre_val))
+            tsncont_psp_fibre_string = "{0:.2f}".format(
+                float(tsncont_psp_fibre_val))
             npixx_psp_fibre_val = outputofcalc['npixx_psp_fibre']
-            npixx_psp_fibre_string = "{0:.2f}".format(float(npixx_psp_fibre_val))
+            npixx_psp_fibre_string = "{0:.2f}".format(
+                float(npixx_psp_fibre_val))
             npixy_psp_fibre_val = outputofcalc['npixy_psp_fibre']
-            npixy_psp_fibre_string = "{0:.2f}".format(float(npixy_psp_fibre_val))
+            npixy_psp_fibre_string = "{0:.2f}".format(
+                float(npixy_psp_fibre_val))
 
             sncont_psp_all_val = outputofcalc['sncont_psp_all']
             sncont_psp_all_string = "{0:.2f}".format(float(sncont_psp_all_val))
             tsncont_psp_all_val = outputofcalc['tsncont_psp_all']
-            tsncont_psp_all_string = "{0:.2f}".format(float(tsncont_psp_all_val))
+            tsncont_psp_all_string = "{0:.2f}".format(
+                float(tsncont_psp_all_val))
             npixx_psp_all_val = outputofcalc['npixx_psp_all']
             npixx_psp_all_string = "{0:.2f}".format(float(npixx_psp_all_val))
             npixy_psp_all_val = outputofcalc['npixy_psp_all']
@@ -654,7 +767,12 @@ def etc_do(request):
             snr_val = outputofcalc['snr_val']
             snr_string = "{0:.2f}".format(snr_val)
             print "SNR = ", snr_string
+            # snrpframe_val = snr_val / numpy.sqrt(numframe_val)
+            snrpframe_val = outputofcalc['snrpframe_val']
+            snrpframe_string = "{0:.2f}".format(snrpframe_val)
 
+            etpframe_c_voxel_val = outputofcalc['etpframe_c_voxel_val']
+            etpframe_c_voxel_string = "{0:.2f}".format(etpframe_c_voxel_val)
             if cmode == 'S':
                 cmode_string = 'SNR to exp. time'
 
@@ -662,19 +780,24 @@ def etc_do(request):
                 cmode_string = 'Exp. time to SNR'
 
             outhead1string = '<hr /><span class="boldlarge">Calculation Mode: ' + cmode_string + '<br>Observing Mode: ' + om_val_string + ', VPH: ' + vph_val_string + ', Source Type: ' + sourcet_val_string + ' </span>' + \
-                            '<span class="italicsmall"> Computation time: ' + "{0:.4f}".format((time.time() - start_time)) + ' seconds; </span>'
+                             '<span class="italicsmall"> Computation time: ' + "{0:.4f}".format(
+                (time.time() - start_time)) + ' seconds; </span>'
 
             tablecoutstring = ''
-
 
             if fluxt_val_string == 'L':
                 from output_tablelout import tablelout
                 tableloutstring = tablelout(fluxt_val_string, wline_val_string,
-                                            snline_pspp_string, tsnline_pspp_string,
-                                            snline_voxel_string, tsnline_voxel_string,
-                                           snline_fibre1aa_string, tsnline_fibre1aa_string,
-                                            snline_fibre_string, tsnline_fibre_string,
-                                            snline_all_string, tsnline_all_string)
+                                            snline_pspp_string,
+                                            tsnline_pspp_string,
+                                            snline_voxel_string,
+                                            tsnline_voxel_string,
+                                            snline_fibre1aa_string,
+                                            tsnline_fibre1aa_string,
+                                            snline_fibre_string,
+                                            tsnline_fibre_string,
+                                            snline_all_string,
+                                            tsnline_all_string)
             else:
                 tableloutstring = '<hr />' + \
                                   'No line input<br /><br />'
@@ -686,6 +809,7 @@ def etc_do(request):
 
             tableinputstring = '<table border=1>' + \
                                '<tr><td>INPUT PARAMETERS:</td><td></td></tr>' + \
+                               '<tr><td>Calculation mode:</td><td>' + cmode_string + '</td></tr>' + \
                                '<tr><td>Source type:</td><td>' + sourcet_val_string + '</td></tr>' + \
                                '<tr><td>Area:</td><td>' + size_val_string + ' arcsec^2</td></tr>' + \
                                '<tr><td>Observing mode:</td><td>' + om_val_string + '</td></tr>' + \
@@ -696,7 +820,7 @@ def etc_do(request):
                                '<tr><td>Continuum flux:</td><td>' + netflux_string + ' cgs</td></tr>' + \
                                '<tr><td>Resolved line?:</td><td>' + resolvedline_val_string + '</td></tr>' + \
                                '<tr><td>Line wavelength:</td><td>' + wline_val_string + ' AA</td></tr>' + \
-                               '<tr><td>Line flux:</td><td>' + fline_val_string + ' erg/s/cm2</td></tr>' + \
+                               '<tr><td>Line flux (integrated):</td><td>' + fline_val_string + ' erg/s/cm2</td></tr>' + \
                                '<tr><td>Line FWHM:</td><td>' + fwhmline_val_string + ' AA</td></tr>' + \
                                '<tr><td>*Sky Condition:</td><td>' + skycond_val_string + '</td></tr>' + \
                                '<tr><td>Moon:</td><td>' + moon_val_string + '</td></tr>' + \
@@ -708,8 +832,9 @@ def etc_do(request):
                                '<tr><td>Number of frames:</td><td>' + numframe_val_string + '</td></tr>' + \
                                '<tr><td>Exptime per frame:</td><td>' + exptimepframe_val_string + ' s</td></tr>' + \
                                '<tr><td>Total exptime:</td><td>' + exptime_val_string + ' s</td></tr>' + \
+                               '<tr><td>Total SNR:</td><td>' + snr_string + '</td></tr>' + \
                                '<tr><td>NP_Dark:</td><td>' + npdark_val_string + '</td></tr>' + \
-                               '<tr><td>'+switchstring+'</td><td>' + nsbundles_val_string + '</td></tr>' + \
+                               '<tr><td>' + switchstring + '</td><td>' + nsbundles_val_string + '</td></tr>' + \
                                '</table><br />'
 
             # NOT USED BUT KEEP FOR TESTING
@@ -717,7 +842,7 @@ def etc_do(request):
                               '<p id="mathid">Details of calculations (TEST):<br />' + \
                               '$$\\textrm{Radius of source, } R_{source} = ' + radius_val_string + '\\textrm{ arcsec}$$' + \
                               '$$\\textrm{Area of source, } \Omega_{source} = \pi \\times ' + radius_val_string + '^{2} = ' + size_val_string + '\\textrm{ arcsec}^{2}$$' + \
-                              '$$\\textrm{Radius of one fiber, } R_{fiber} = 0.31 \\textrm{ arcsec}$$'+ \
+                              '$$\\textrm{Radius of one fiber, } R_{fiber} = 0.31 \\textrm{ arcsec}$$' + \
                               '$$\\textrm{Area of one fiber, } \Omega_{fiber} =  3\sqrt{3} \left( \\frac{R_{fiber}^{2}}{2} \\right)$$' + \
                               '$$\\textrm{Number of fibers used to measure sky} = \\frac{\Omega_{source}}{\Omega_{fiber}} = ' + nfibres_string + '$$' + \
                               '$$\\textrm{Area in which sky has been measured, } \Omega_{sky} = ' + nfibres_string + '\\times \Omega_{fiber}$$' + \
@@ -727,51 +852,135 @@ def etc_do(request):
             # print 'PID = ', os.getpid()
 
             # NEW OUTPUT CONTINUUM TABLE FOR MOS AND LCB
-            if om_val_string == 'MOS' and sourcet_val_string == 'Point':
-                from output_table_MOS_P_T import tablenewpsfMPT
-                tablenewpsfstring = tablenewpsfMPT(lambdaeff_string, seeingx_string,
-                                                seeing_centermean_string, seeing_cr1_string,
-                                                sncont_centerspaxel_voxel_string, sncont_cr1spaxels_voxel_string,
-                                                tsncont_centerspaxel_voxel_string, tsncont_cr1spaxels_voxel_string,
-                                                sncont_centerspaxel_aa_string, sncont_cr1spaxels_aa_string,
-                                                tsncont_centerspaxel_aa_string, tsncont_cr1spaxels_aa_string,
-                                                sncont_centerspaxel_all_string, sncont_cr1spaxels_all_string,
-                                                tsncont_centerspaxel_all_string, tsncont_cr1spaxels_all_string
-                                                )
 
-            elif om_val_string == 'MOS' and sourcet_val_string == 'Extended':
-                from output_table_MOS_E_T import tablenewpsfMET
-                tablenewpsfstring = tablenewpsfMET(lambdaeff_string, seeingx_string,
-                                                  nfibres_string, sncont_centerspaxel_voxel_string, sncont_cr1spaxels_voxel_string, sncont_pspfwhm_all_string,
-                                                  tsncont_centerspaxel_voxel_string, tsncont_cr1spaxels_voxel_string, tsncont_pspfwhm_all_string,
-                                                  sncont_centerspaxel_aa_string, sncont_cr1spaxels_aa_string, sncont_1aa_all_string,
-                                                  tsncont_centerspaxel_aa_string, tsncont_cr1spaxels_aa_string, tsncont_1aa_all_string,
-                                                  sncont_centerspaxel_all_string, sncont_cr1spaxels_all_string, sncont_band_all_string,
-                                                  tsncont_centerspaxel_all_string, tsncont_cr1spaxels_all_string, tsncont_band_all_string)
+            if cmode == 'T':
+                if om_val_string == 'MOS' and sourcet_val_string == 'Point':
+                    from output_table_MOS_P_T import tablenewpsfMPT
+                    tablenewpsfstring = tablenewpsfMPT(lambdaeff_string,
+                                                       seeingx_string,
+                                                       seeing_centermean_string,
+                                                       seeing_cr1_string,
+                                                       sncont_centerspaxel_voxel_string,
+                                                       sncont_cr1spaxels_voxel_string,
+                                                       tsncont_centerspaxel_voxel_string,
+                                                       tsncont_cr1spaxels_voxel_string,
+                                                       sncont_centerspaxel_aa_string,
+                                                       sncont_cr1spaxels_aa_string,
+                                                       tsncont_centerspaxel_aa_string,
+                                                       tsncont_cr1spaxels_aa_string,
+                                                       sncont_centerspaxel_all_string,
+                                                       sncont_cr1spaxels_all_string,
+                                                       tsncont_centerspaxel_all_string,
+                                                       tsncont_cr1spaxels_all_string
+                                                       )
 
-            elif om_val_string == 'LCB' and sourcet_val_string == 'Point':
-                from output_table_LCB_P_T import tablenewpsfLPT
-                tablenewpsfstring = tablenewpsfLPT(lambdaeff_string, seeingx_string,
-                                                seeing_centermean_string, seeing_cr1_string, seeing_cr1r2_string,
-                                                sncont_centerspaxel_voxel_string, sncont_cr1spaxels_voxel_string, sncont_cr1r2spaxels_voxel_string,
-                                                tsncont_centerspaxel_voxel_string, tsncont_cr1spaxels_voxel_string, tsncont_cr1r2spaxels_voxel_string,
-                                                sncont_centerspaxel_aa_string, sncont_cr1spaxels_aa_string, sncont_cr1r2spaxels_aa_string,
-                                                tsncont_centerspaxel_aa_string, tsncont_cr1spaxels_aa_string, tsncont_cr1r2spaxels_aa_string,
-                                                sncont_centerspaxel_all_string, sncont_cr1spaxels_all_string, sncont_cr1r2spaxels_all_string,
-                                                tsncont_centerspaxel_all_string, tsncont_cr1spaxels_all_string, tsncont_cr1r2spaxels_all_string)
+                elif om_val_string == 'MOS' and sourcet_val_string == 'Extended':
+                    from output_table_MOS_E_T import tablenewpsfMET
+                    tablenewpsfstring = tablenewpsfMET(lambdaeff_string,
+                                                       seeingx_string,
+                                                       nfibres_string,
+                                                       sncont_centerspaxel_voxel_string,
+                                                       sncont_cr1spaxels_voxel_string,
+                                                       sncont_pspfwhm_all_string,
+                                                       tsncont_centerspaxel_voxel_string,
+                                                       tsncont_cr1spaxels_voxel_string,
+                                                       tsncont_pspfwhm_all_string,
+                                                       sncont_centerspaxel_aa_string,
+                                                       sncont_cr1spaxels_aa_string,
+                                                       sncont_1aa_all_string,
+                                                       tsncont_centerspaxel_aa_string,
+                                                       tsncont_cr1spaxels_aa_string,
+                                                       tsncont_1aa_all_string,
+                                                       sncont_centerspaxel_all_string,
+                                                       sncont_cr1spaxels_all_string,
+                                                       sncont_band_all_string,
+                                                       tsncont_centerspaxel_all_string,
+                                                       tsncont_cr1spaxels_all_string,
+                                                       tsncont_band_all_string)
 
-            elif om_val_string == 'LCB' and sourcet_val_string == 'Extended':
-                from output_table_LCB_E_T import tablenewpsfLET
-                tablenewpsfstring = tablenewpsfLET(lambdaeff_string, seeingx_string,
-                                                sncont_centerspaxel_voxel_string, sncont_cr1spaxels_voxel_string, sncont_cr1r2spaxels_voxel_string,
-                                                tsncont_centerspaxel_voxel_string, tsncont_cr1spaxels_voxel_string, tsncont_cr1r2spaxels_voxel_string,
-                                                sncont_centerspaxel_aa_string, sncont_cr1spaxels_aa_string, sncont_cr1r2spaxels_aa_string,
-                                                tsncont_centerspaxel_aa_string, tsncont_cr1spaxels_aa_string, tsncont_cr1r2spaxels_aa_string,
-                                                sncont_centerspaxel_all_string, sncont_cr1spaxels_all_string, sncont_cr1r2spaxels_all_string,
-                                                tsncont_centerspaxel_all_string, tsncont_cr1spaxels_all_string, tsncont_cr1r2spaxels_all_string)
+                elif om_val_string == 'LCB' and sourcet_val_string == 'Point':
+                    from output_table_LCB_P_T import tablenewpsfLPT
+                    tablenewpsfstring = tablenewpsfLPT(lambdaeff_string,
+                                                       seeingx_string,
+                                                       seeing_centermean_string,
+                                                       seeing_cr1_string,
+                                                       seeing_cr1r2_string,
+                                                       sncont_centerspaxel_voxel_string,
+                                                       sncont_cr1spaxels_voxel_string,
+                                                       sncont_cr1r2spaxels_voxel_string,
+                                                       tsncont_centerspaxel_voxel_string,
+                                                       tsncont_cr1spaxels_voxel_string,
+                                                       tsncont_cr1r2spaxels_voxel_string,
+                                                       sncont_centerspaxel_aa_string,
+                                                       sncont_cr1spaxels_aa_string,
+                                                       sncont_cr1r2spaxels_aa_string,
+                                                       tsncont_centerspaxel_aa_string,
+                                                       tsncont_cr1spaxels_aa_string,
+                                                       tsncont_cr1r2spaxels_aa_string,
+                                                       sncont_centerspaxel_all_string,
+                                                       sncont_cr1spaxels_all_string,
+                                                       sncont_cr1r2spaxels_all_string,
+                                                       tsncont_centerspaxel_all_string,
+                                                       tsncont_cr1spaxels_all_string,
+                                                       tsncont_cr1r2spaxels_all_string)
 
-            else:
-                tablenewpsfstring = ''
+                elif om_val_string == 'LCB' and sourcet_val_string == 'Extended':
+                    from output_table_LCB_E_T import tablenewpsfLET
+                    tablenewpsfstring = tablenewpsfLET(lambdaeff_string,
+                                                       seeingx_string,
+                                                       sncont_centerspaxel_voxel_string,
+                                                       sncont_cr1spaxels_voxel_string,
+                                                       sncont_cr1r2spaxels_voxel_string,
+                                                       tsncont_centerspaxel_voxel_string,
+                                                       tsncont_cr1spaxels_voxel_string,
+                                                       tsncont_cr1r2spaxels_voxel_string,
+                                                       sncont_centerspaxel_aa_string,
+                                                       sncont_cr1spaxels_aa_string,
+                                                       sncont_cr1r2spaxels_aa_string,
+                                                       tsncont_centerspaxel_aa_string,
+                                                       tsncont_cr1spaxels_aa_string,
+                                                       tsncont_cr1r2spaxels_aa_string,
+                                                       sncont_centerspaxel_all_string,
+                                                       sncont_cr1spaxels_all_string,
+                                                       sncont_cr1r2spaxels_all_string,
+                                                       tsncont_centerspaxel_all_string,
+                                                       tsncont_cr1spaxels_all_string,
+                                                       tsncont_cr1r2spaxels_all_string)
+
+                else:
+                    tablenewpsfstring = ''
+            elif cmode == 'S':
+                if om_val_string == 'LCB' and sourcet_val_string == 'Extended':
+                    from output_table_LCB_E_S import tablenewpsfLES
+                    tablenewpsfstring = tablenewpsfLES(snr_string,
+                                                       numframe_val_string,
+                                                       snrpframe_string,
+                                                       exptimepframe_val_string,
+                                                       exptime_val_string,
+                                                       etpframe_c_voxel_string,
+                                                       lambdaeff_string,
+                                                       seeingx_string,
+                                                       sncont_centerspaxel_voxel_string,
+                                                       sncont_cr1spaxels_voxel_string,
+                                                       sncont_cr1r2spaxels_voxel_string,
+                                                       tsncont_centerspaxel_voxel_string,
+                                                       tsncont_cr1spaxels_voxel_string,
+                                                       tsncont_cr1r2spaxels_voxel_string,
+                                                       sncont_centerspaxel_aa_string,
+                                                       sncont_cr1spaxels_aa_string,
+                                                       sncont_cr1r2spaxels_aa_string,
+                                                       tsncont_centerspaxel_aa_string,
+                                                       tsncont_cr1spaxels_aa_string,
+                                                       tsncont_cr1r2spaxels_aa_string,
+                                                       sncont_centerspaxel_all_string,
+                                                       sncont_cr1spaxels_all_string,
+                                                       sncont_cr1r2spaxels_all_string,
+                                                       tsncont_centerspaxel_all_string,
+                                                       tsncont_cr1spaxels_all_string,
+                                                       tsncont_cr1r2spaxels_all_string)
+
+                else:
+                    tablenewpsfstring = ''
 
             # NOT WORKING YET SO SETTING TO EMPTY
             tablenewpsflinestring = ''
@@ -781,7 +990,8 @@ def etc_do(request):
             forfileoutput2string = outputofcalc['forfileoutput2']
 
             # EXTRA FOOTER
-            footerstring = '<span class="italicsmall">Time of request: ' + start_time_string + ' ; End of request: ' + time.strftime("%H:%M:%S") + '</span>'
+            footerstring = '<span class="italicsmall">Time of request: ' + start_time_string + ' ; End of request: ' + time.strftime(
+                "%H:%M:%S") + '</span>'
 
         else:
             outhead1string = ''
@@ -794,7 +1004,6 @@ def etc_do(request):
             forfileoutputstring = ''
             forfileoutput2string = ''
             footerstring = ''
-
 
         print "### LOG: ABOUT TO QUIT ETC_DO; JSON OUTPUT TO JAVASCRIPT."
         from django.http import JsonResponse
