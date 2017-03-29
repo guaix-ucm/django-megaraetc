@@ -397,7 +397,7 @@ vph_list = list([str(p.name) for p in queryvph if p.name != u'-empty-'])
 #            'LR-U', 'LR-B', 'LR-V', 'LR-R', 'LR-I', 'LR-Z']
 
 vphchar = list([(p.fwhm, p.dispersion, p.deltab, p.lambdac, p.relatedband, \
-                 p.lambda_b, p.lambda_e, p.specconf) for p in queryvph if
+                 p.lambda_b, p.lambda_e, p.specconf, p.specconf2) for p in queryvph if
                 p.name != u'-empty-'])
 # VPH configurations: FWHM @lambda_c, Dispersion (AA/pix), DeltaB (AA),
 #                     lambda_c (AA)  Band_of_VPH_to_relate_with_Vega_zp lambda_0 lambda_f Spectrograph_configuration
@@ -541,7 +541,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
          skycond_val, moon_val, airmass_val, seeing_val, \
          cmode_val, snr_val, \
          numframe_val, exptimepframe_val, nsbundles_val, \
-         plotflag_val):
+         plotflag_val, batchyesno_val, batchdata):
     global texti, textoc, textol, textcalc
     # Clear previous outputs
     # Warning
@@ -751,6 +751,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
     lambdaeff = vphfeatures[3]
     bandsky = vphfeatures[4]
     spectrograph_conf = vphfeatures[7]
+    vphname = vphfeatures[8]
     #
     # Lower and upper wavelengths of VPH
     # querylvph1 = list(VPHSetup.objects.filter(name=vph_val).values('lambda_b'))
@@ -786,6 +787,13 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
 
         # Reading template of sky emission [code to be done HERE]
         skyspectrum = sourcespectrum
+
+
+
+
+
+
+
 
         textcalc += "Source spectrum template is %s <br />" % spect_val
         # Characteristics depending on observing mode:
@@ -1169,6 +1177,37 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
         textcalc += "Number of sky fibers $N_{fiber,sky} = %s $<br />" % nfibresky
         textcalc += "Area in which sky has been measured $\Omega_{sky} = N_{fiber,sky} \\times A_{fiber} = %s \\times %s = %s \\textrm{arcsec}^{2}$ <br />" % (nfibresky, areafibre, omegasky)
 
+        ###
+        batchname, batchband, batchmag, batch_c, batch_cr1, batch_cr1r2 = ([] for i in range(6))
+        if sourcet_val=='P' and batchyesno_val=='batchyes':
+            # print batchdata
+            batchdata = batchdata.encode('utf-8')   # remove 'u'
+            # print batchdata
+            filelength = len(batchdata.split("\n")) # lines are split by \r
+            print filelength
+            if filelength > 92:
+                print "INPUT DATA CONTAINS MORE THAN 92 LINES: NOT COMPUTING"
+            else:
+                thedata = batchdata.split("\n")
+                print thedata
+                numcol = len(thedata)
+                if numcol < 3 or numcol > 3:
+                    print "SOMETHING WRONG WITH THE INPUT"
+                else:
+                    for i in range(numcol):
+                        line=thedata[i]
+                        print line
+                        if "#" not in line:
+                            data = line.split(',')
+                            batchname.append(data[0])
+                            batchband.append(data[1])
+                            batchmag.append(data[2].strip('\r'))
+                            batch_c.append('0')
+                            batch_cr1.append('0')
+                            batch_cr1r2.append('0')
+                    print batchmag
+        ###
+
         # Different spatial and resolution elements to consider, depending on whether the source is punctual or extended.
         # Starting FOR loop for computations of SNR per frame
         textcalc += "<br /><br />### SNR CALCULATIONS (per frame) ###<br />"
@@ -1343,7 +1382,6 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
             textcalc += "### XIT=%s RESULTS <br />" % xit
             textcalc += "### SNR of continuum @$\lambda_{eff} = %s$ Angstroms ### <br />" % lambdaeff
             textcalc += "### SNR of continuum = $\\frac{S}{N} = \\frac{%s}{%s} = %s $ <br />" % (signalcont, noisecont, sncont)
-
 
             if xit == 0:  # P2SP (per 2 spectral pixels), All area
                 sncont_p2sp_all = sncont
@@ -1615,20 +1653,20 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                     om_val, xit, disp, ps,
                     nfibres, nfibresy, areafibre, rfibre, deltab, areasource,
                     diamsource, areaseeing, seeingx)
-    
+
                 # Number of pixels in detector under consideration: just counting the factor in area
                 # when we consider the used sky minibundles
                 npix = npixx * npixy
                 npixsky = (omegasky / omegaskysource) * npix
-    
+
                 # Source continuum signal in defined spectral and spatial resolution element
                 signalcont, signalcontverb = signal(fc, deltalambda, lambdaeff, effsys, stel, omegasource, et, enph, lamb)
-    
+
                 if xit in [12,13,14]:
                     signalcont_c, signalcont_cverb = signal(fcctr, deltalambda, lambdaeff, effsys, stel, omegasource, et, enph, lamb)
                     signalcont_r1, signalcont_r1verb = signal(fcr1, deltalambda, lambdaeff, effsys, stel, omegasource, et, enph, lamb)
                     signalcont_r2, signalcont_r2verb = signal(fcr2, deltalambda, lambdaeff, effsys, stel, omegasource, et, enph, lamb)
-    
+
                     fcctrr1 = fcctr + 6*fcr1
                     fcctrr1r2 = fcctr + 6*fcr1 + 12*fcr2
                     signalcont_cr1, signalcont_cr1verb = signal(fcctrr1, deltalambda, lambdaeff, effsys, stel, omegasource, et, enph, lamb)
@@ -1639,19 +1677,19 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                     signalcont_r2 = 1
                     signalcont_cr1 = 1
                     signalcont_cr1r2 = 1
-    
+
                 # Sky signal in defined spectral and spatial resolution element
                 signalsky, signalskyverb = signal(fs, deltalambda, lambdaeff, effsys, stel, omegaskysource, et, enph, lamb)
-    
+
                 # Dark signal
                 signaldark, sdverbose = dark(et, dc, npix)
-    
+
                 # Noise due to dark measurement to the square
                 noisedarksq, noisedarksqverb = darknoisesq(npix, npdark_val, et, dc, ron)
-    
+
                 # RON
                 ronoise, ronoiseverb = readoutnoise(npix, ron)
-    
+
                 # Noise due to sky substraction
                 # Sky signal *MEASURED* in defined spectral and spatial resolution element
                 signalskymeasured, signalskymeasuredverb = signal(fs, deltalambda, lambdaeff, effsys, stel, omegasky, et, enph, lamb)
@@ -1659,14 +1697,14 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                 signaldarkskymeasured, sdsmverbose = dark(et, dc, npixsky)
                 noisedarksqskymeasured, noisedarksqskymeasuredverb = darknoisesq(npixsky, npdark_val, et, dc, ron)
                 noiseskysq = (omegaskysource / omegasky) ** 2 * (signalskymeasured + ronoiseskymeasured + signaldarkskymeasured + noisedarksqskymeasured)
-    
+
                 # Source continuum noise in defined spectral and spatial resolution element
                 noisecont = math.sqrt(signalcont + signalsky + signaldark + ronoise + noisedarksq + noiseskysq)
                 if xit in [12,13,14]:
                     noisecont_c = math.sqrt(signalcont_c + signalsky + signaldark + ronoise + noisedarksq + noiseskysq)
                     noisecont_r1 = math.sqrt(signalcont_r1 + signalsky + signaldark + ronoise + noisedarksq + noiseskysq)
                     noisecont_r2 = math.sqrt(signalcont_r2 + signalsky + signaldark + ronoise + noisedarksq + noiseskysq)
-    
+
                     noisecont_cr1 = math.sqrt(signalcont_cr1 + 7*(signalsky + signaldark + ronoise + noisedarksq + noiseskysq))
                     noisecont_cr1r2 = math.sqrt(signalcont_cr1r2 + 19*(signalsky + signaldark + ronoise + noisedarksq + noiseskysq))
                 else:
@@ -1675,7 +1713,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                     noisecont_r2 = 1
                     noisecont_cr1 = 1
                     noisecont_cr1r2 = 1
-    
+
                 # Signal-to-noise of continuum
                 sncont = signalcont / noisecont
                 if xit in [12,13,14]:
@@ -1684,10 +1722,10 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                     sncont_r2 = signalcont_r2 / noisecont_r2
                     sncont_cr1 = signalcont_cr1 / noisecont_cr1
                     sncont_cr1r2 = signalcont_cr1r2 / noisecont_cr1r2
-    
+
                 return [sncont_c,sncont_cr1,sncont_cr1r2]
-    
-            
+
+
             def bisec(i,xxit):
                 print ""
                 print "ENTERING BISECTION METHOD"
@@ -1859,6 +1897,174 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
             etallframe_cr1r2_all_val = 0
 
 
+        #############################################
+        ### BATCH PROCESS
+        ###
+        ### DEFINE FUNCTION
+
+        batchname, batchband, batchmag, batch_c, batch_cr1, batch_cr1r2 = ([] for i in range(6))
+        if sourcet_val=='P' and batchyesno_val=='batchyes':
+            #
+            def SNRfuncbatch(themag, thefilter, xxit):
+                print 'themag=',themag
+                print 'thefilter=',thefilter
+                print 'xxit=',xxit
+                filtercdat = filterc_list[bandc_list.index(thefilter)]
+                lamb, tfilterc = reading(filtercdat, 2)
+                tfilterc = numpy.array(tfilterc)
+                filtercar = filterchar_list[bandc_list.index(thefilter)]
+                lc1 = filtercar[2]
+                lc2 = filtercar[3]
+                filtercar = filterchar_list[bandc_list.index(bandsky)]
+                ls1 = filtercar[2]
+                ls2 = filtercar[3]
+                vegafeatures = vegachar[bandc_list.index(thefilter)]
+                magvegac = vegafeatures[0]
+                fvegac = vegafeatures[1]
+                netflux = mag2flux(magvegac, fvegac, themag)
+                fcont = netflux / areaseeing
+                normc, fc = sclspect(fcont, lamb, lc1, lc2, sourcespectrum, tfilterc, wline_val, fline_val, fwhmline_val)
+                fcctr = fc * seeing_centermean/(1*100)  # 1 spaxel
+                fcr1 = fc * seeing_ring1mean/(6*100)    # 6 spaxels
+                fcr2 = fc * seeing_ring2mean/(12*100)   # 12 spaxels
+
+                vegafeatures = vegachar[bandc_list.index(bandsky)]
+                magvegas = vegafeatures[0]
+                fvegas = vegafeatures[1]
+                fskyvega = mag2flux(magvegas, fvegas, skymag)
+                fsky = fskyvega * skybf
+
+                norms, fs = sclspect(fsky, lamb, ls1, ls2, skyspectrum, tfiltercvph, wline_val, fline_val, fwhmline_val)
+
+                # Deriving spectroscopic parameters for each case:
+                xit=xxit
+                deltalambda, omegasource, \
+                npixx, npixy, \
+                nfib, nfib1, \
+                omegaskysource, specparstring = specpar(
+                    om_val, xit, disp, ps,
+                    nfibres, nfibresy, areafibre, rfibre, deltab, areasource,
+                    diamsource, areaseeing, seeingx)
+
+                # Number of pixels in detector under consideration: just counting the factor in area
+                # when we consider the used sky minibundles
+                npix = npixx * npixy
+                npixsky = (omegasky / omegaskysource) * npix
+
+                # Source continuum signal in defined spectral and spatial resolution element
+                signalcont, signalcontverb = signal(fc, deltalambda, lambdaeff, effsys, stel, omegasource, exptime_val, enph, lamb)
+
+                if xit in [12,13,14]:
+                    signalcont_c, signalcont_cverb = signal(fcctr, deltalambda, lambdaeff, effsys, stel, omegasource, exptime_val, enph, lamb)
+                    signalcont_r1, signalcont_r1verb = signal(fcr1, deltalambda, lambdaeff, effsys, stel, omegasource, exptime_val, enph, lamb)
+                    signalcont_r2, signalcont_r2verb = signal(fcr2, deltalambda, lambdaeff, effsys, stel, omegasource, exptime_val, enph, lamb)
+
+                    fcctrr1 = fcctr + 6*fcr1
+                    fcctrr1r2 = fcctr + 6*fcr1 + 12*fcr2
+                    signalcont_cr1, signalcont_cr1verb = signal(fcctrr1, deltalambda, lambdaeff, effsys, stel, omegasource, exptime_val, enph, lamb)
+                    signalcont_cr1r2, signalcont_cr1r2verb = signal(fcctrr1r2, deltalambda, lambdaeff, effsys, stel, omegasource, exptime_val, enph, lamb)
+                else:
+                    print 'this'
+                    signalcont_c = 1
+                    signalcont_r1 = 1
+                    signalcont_r2 = 1
+                    signalcont_cr1 = 1
+                    signalcont_cr1r2 = 1
+
+                # Sky signal in defined spectral and spatial resolution element
+                signalsky, signalskyverb = signal(fs, deltalambda, lambdaeff, effsys, stel, omegaskysource, exptime_val, enph, lamb)
+
+                # Dark signal
+                signaldark, sdverbose = dark(exptime_val, dc, npix)
+
+                # Noise due to dark measurement to the square
+                noisedarksq, noisedarksqverb = darknoisesq(npix, npdark_val, exptime_val, dc, ron)
+
+                # RON
+                ronoise, ronoiseverb = readoutnoise(npix, ron)
+
+                # Noise due to sky substraction
+                # Sky signal *MEASURED* in defined spectral and spatial resolution element
+                signalskymeasured, signalskymeasuredverb = signal(fs, deltalambda, lambdaeff, effsys, stel, omegasky, exptime_val, enph, lamb)
+                ronoiseskymeasured, ronoiseskymeasuredverb = readoutnoise(npixsky, ron)
+                signaldarkskymeasured, sdsmverbose = dark(exptime_val, dc, npixsky)
+                noisedarksqskymeasured, noisedarksqskymeasuredverb = darknoisesq(npixsky, npdark_val, exptime_val, dc, ron)
+                noiseskysq = (omegaskysource / omegasky) ** 2 * (signalskymeasured + ronoiseskymeasured + signaldarkskymeasured + noisedarksqskymeasured)
+
+                # Source continuum noise in defined spectral and spatial resolution element
+                noisecont = math.sqrt(signalcont + signalsky + signaldark + ronoise + noisedarksq + noiseskysq)
+                if xit in [12,13,14]:
+                    noisecont_c = math.sqrt(signalcont_c + signalsky + signaldark + ronoise + noisedarksq + noiseskysq)
+                    noisecont_r1 = math.sqrt(signalcont_r1 + signalsky + signaldark + ronoise + noisedarksq + noiseskysq)
+                    noisecont_r2 = math.sqrt(signalcont_r2 + signalsky + signaldark + ronoise + noisedarksq + noiseskysq)
+
+                    noisecont_cr1 = math.sqrt(signalcont_cr1 + 7*(signalsky + signaldark + ronoise + noisedarksq + noiseskysq))
+                    noisecont_cr1r2 = math.sqrt(signalcont_cr1r2 + 19*(signalsky + signaldark + ronoise + noisedarksq + noiseskysq))
+                else:
+                    noisecont_c = 1
+                    noisecont_r1 = 1
+                    noisecont_r2 = 1
+                    noisecont_cr1 = 1
+                    noisecont_cr1r2 = 1
+
+                # Signal-to-noise of continuum
+                sncont = signalcont / noisecont
+                if xit in [12,13,14]:
+                    snr_c = signalcont_c / noisecont_c
+                    sncont_r1 = signalcont_r1 / noisecont_r1
+                    sncont_r2 = signalcont_r2 / noisecont_r2
+                    snr_cr1 = signalcont_cr1 / noisecont_cr1
+                    snr_cr1r2 = signalcont_cr1r2 / noisecont_cr1r2
+                else:
+                    snr_c = -999
+                    snr_cr1 = -999
+                    snr_cr1r2 = -999
+
+                print 'inside snr_c=', snr_c
+                return [snr_c, snr_cr1, snr_cr1r2]
+            #
+
+
+            # print batchdata
+            batchdata = batchdata.encode('utf-8')   # remove 'u'
+            # print batchdata
+            filelength = len(batchdata.split("\n")) # lines are split by \r
+            print filelength
+            if filelength > 92:
+                print "INPUT DATA CONTAINS MORE THAN 92 LINES: NOT COMPUTING"
+            else:
+                thedata = batchdata.split("\n")
+                print 'thedata=', thedata
+                numcol = len(thedata)
+                if numcol < 3 or numcol > 3:
+                    print "SOMETHING WRONG WITH THE INPUT"
+                else:
+                    for i in range(numcol):
+                        line=thedata[i]
+                        print line
+                        if "#" not in line:
+                            data = line.split(',')
+                            batchname.append(data[0])
+                            batchband.append(data[1])
+                            batchmag.append(float(data[2].strip('\r')))
+                            # batch_c.append()
+                            # batch_cr1.append('0')
+                            # batch_cr1r2.append('0')
+                    print batchmag
+
+                for i in range(filelength):
+                    print 'batchmag',i,batchmag[i]
+                    print 'batchband',i,batchband[i]
+                    snr = SNRfuncbatch(batchmag[i],batchband[i],12)
+                    snr2 = SNRfuncbatch(30,batchband[i],12)
+                    batch_c.append(snr[0])
+                    batch_cr1.append(snr[1])
+                    batch_cr1r2.append(snr[2])
+                    print 'snc, sncr1, sncr1r2 = ', snr
+                    print 'Bsnc, sncr1, sncr1r2 = ', snr2
+
+
+        ###
         ######################################################################
         ############################### GRAPHICS #############################
         ######################################################################
@@ -2238,6 +2444,18 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                         'displayAlign: "left"});</script>' \
                         '<script type="text/javascript" async ' \
                         'src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>' + textcalc
+        ###
+        batchout = ''
+        headstring0 = '# SNR calculated at lambda_c='+str(lambdaeff)+' Angstroms for VPH='+str(vphname)+ ' \n'
+        headstring1 = "# name, band, mag, SNR_perfr_c_voxel, SNR_perfr_cr1_voxel, SNR_perfr_cr1r2_voxel \n"
+        batchout = batchout + headstring0
+        batchout = batchout + headstring1
+        if batchyesno_val=='batchyes':
+            for j in range(filelength):
+                stringout = batchname[j] +','+ batchband[j] +','+ str(batchmag[j]) +','+ str(batch_c[j][0]) +','+  str(batch_cr1[j][0]) +','+  str(batch_cr1r2[j][0])
+                batchout = batchout + stringout + '\n'
+        batchout = str(batchout)
+        ###
 
         # print 'globals=', globals()
         # print 'locals=', locals()
@@ -2418,7 +2636,8 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                 'npixy_psp_all': npixy_psp_all, \
 \
                 'forfileoutput': forfileoutput, \
-                'forfileoutput2': forfileoutput2 \
+                'forfileoutput2': forfileoutput2, \
+                'batchout': batchout \
                 }  # ADDED FOR DJANGO (for views.py)
     # Avoiding computations in case of exception of errind
     else:

@@ -1,4 +1,4 @@
-def tablenewpsfLES(snr_string, numframe_val_string, snrpframe_string,
+def tablenewpsfLPS(snr_string, numframe_val_string, snrpframe_string,
 exptimepframe_string, exptimeval_string,
 etpframe_c_voxel_string, etallframe_c_voxel_string,
 etpframe_cr1_voxel_string, etallframe_cr1_voxel_string,

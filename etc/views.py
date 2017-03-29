@@ -148,6 +148,13 @@ def compute5(request):
 
         plotflag_val = request.POST['plotflag']
 
+        if request.POST['stype'] == 'P' and request.POST['batchyesno']=='batchyes':
+            thebatchdata = request.POST['comment']
+        else:
+            thebatchdata = "empty,empty,empty"
+
+        batchyesno_val = request.POST['batchyesno']
+
         outputofcalc = calc(request.POST['stype'],
                             request.POST['contmagflux'],
                             mag_val, fc_val,
@@ -162,7 +169,7 @@ def compute5(request):
                             skycond_val, moon_val, airmass_val, seeing_val,
                             cmode_val, snr_val,
                             numframes_val, exptimepframe_val, nsbundles_val,
-                            plotflag_val
+                            plotflag_val, batchyesno_val, thebatchdata
                             )
 
     # cleanstring = string1.replace("\'", '\n')
@@ -205,7 +212,7 @@ def get_info(request):
         form4 = ObservationalSetupForm()
         form5 = OutputSetupForm()
 
-    return render(request, 'etc/webmegaraetc-0.9.0.html', {
+    return render(request, 'etc/webmegaraetc-0.9.5.html', {
         'form1': form1,
         'formU': formU,
         'form2': form2,
@@ -232,7 +239,7 @@ def etc_form(request):
                    'form5': form5,
                    }
 
-    return render(request, 'etc/webmegaraetc-0.9.0.html', total_formu)
+    return render(request, 'etc/webmegaraetc-0.9.5.html', total_formu)
 
 ########################
 # ON HOLD UNTIL I FIND A GOOD WAY TO UPLOAD FILES
@@ -312,13 +319,15 @@ def etc_do(request):
 
         print request.body
 
-
         ##############################################
         ##############################################
         ### LAUNCH COMPUTATION
+        if request.POST['stype'] == 'P' and request.POST['batchyesno']=='batchyes':
+            print request.POST['batchyesno']
+            print request.POST['comment']
+
         outputofcalc = compute5(request)
         print '### LOG: ETC_DO: OUTPUTOFCALC SUCCESSFULLY COMPUTED'
-
 
         ##############################################
         ##############################################
@@ -997,7 +1006,96 @@ def etc_do(request):
                 else:
                     tablenewpsfstring = ''
             elif cmode == 'S':
-                if om_val_string == 'LCB' and sourcet_val_string == 'Extended':
+                if om_val_string == 'MOS' and sourcet_val_string == 'Point':
+                    from output_table_MOS_P_S import tablenewpsfMPS
+                    tablenewpsfstring = tablenewpsfMPS(snr_string,
+                                                       numframe_val_string,
+                                                       snrpframe_string,
+                                                       exptimepframe_val_string,
+                                                       exptime_val_string,
+                                                       etpframe_c_voxel_string,
+                                                       etallframe_c_voxel_string,
+                                                       etpframe_cr1_voxel_string,
+                                                       etallframe_cr1_voxel_string,
+                                                       etpframe_cr1r2_voxel_string,
+                                                       etallframe_cr1r2_voxel_string,
+                                                       etpframe_c_aa_string,
+                                                       etallframe_c_aa_string,
+                                                       etpframe_cr1_aa_string,
+                                                       etallframe_cr1_aa_string,
+                                                       etpframe_cr1r2_aa_string,
+                                                       etallframe_cr1r2_aa_string,
+                                                       etpframe_c_all_string,
+                                                       etallframe_c_all_string,
+                                                       etpframe_cr1_all_string,
+                                                       etallframe_cr1_all_string,
+                                                       etpframe_cr1r2_all_string,
+                                                       etallframe_cr1r2_all_string,
+                                                       lambdaeff_string,
+                                                       seeingx_string,
+                                                       sncont_centerspaxel_voxel_string,
+                                                       sncont_cr1spaxels_voxel_string,
+                                                       sncont_cr1r2spaxels_voxel_string,
+                                                       tsncont_centerspaxel_voxel_string,
+                                                       tsncont_cr1spaxels_voxel_string,
+                                                       tsncont_cr1r2spaxels_voxel_string,
+                                                       sncont_centerspaxel_aa_string,
+                                                       sncont_cr1spaxels_aa_string,
+                                                       sncont_cr1r2spaxels_aa_string,
+                                                       tsncont_centerspaxel_aa_string,
+                                                       tsncont_cr1spaxels_aa_string,
+                                                       tsncont_cr1r2spaxels_aa_string,
+                                                       sncont_centerspaxel_all_string,
+                                                       sncont_cr1spaxels_all_string,
+                                                       )
+                elif om_val_string == 'MOS' and sourcet_val_string == 'Extended':
+                    from output_table_MOS_E_S import tablenewpsfMES
+                    tablenewpsfstring = tablenewpsfMES(snr_string,
+                                                       numframe_val_string,
+                                                       snrpframe_string,
+                                                       exptimepframe_val_string,
+                                                       exptime_val_string,
+                                                       etpframe_c_voxel_string,
+                                                       etallframe_c_voxel_string,
+                                                       etpframe_cr1_voxel_string,
+                                                       etallframe_cr1_voxel_string,
+                                                       etpframe_cr1r2_voxel_string,
+                                                       etallframe_cr1r2_voxel_string,
+                                                       etpframe_c_aa_string,
+                                                       etallframe_c_aa_string,
+                                                       etpframe_cr1_aa_string,
+                                                       etallframe_cr1_aa_string,
+                                                       etpframe_cr1r2_aa_string,
+                                                       etallframe_cr1r2_aa_string,
+                                                       etpframe_c_all_string,
+                                                       etallframe_c_all_string,
+                                                       etpframe_cr1_all_string,
+                                                       etallframe_cr1_all_string,
+                                                       etpframe_cr1r2_all_string,
+                                                       etallframe_cr1r2_all_string,
+                                                       lambdaeff_string, seeingx_string,
+                                                       nfibres_string,
+                                                       sncont_centerspaxel_voxel_string,
+                                                       sncont_cr1spaxels_voxel_string,
+                                                       sncont_pspfwhm_all_string,
+                                                       tsncont_centerspaxel_voxel_string,
+                                                       tsncont_cr1spaxels_voxel_string,
+                                                       tsncont_pspfwhm_all_string,
+                                                       sncont_centerspaxel_aa_string,
+                                                       sncont_cr1spaxels_aa_string,
+                                                       sncont_1aa_all_string,
+                                                       tsncont_centerspaxel_aa_string,
+                                                       tsncont_cr1spaxels_aa_string,
+                                                       tsncont_1aa_all_string,
+                                                       sncont_centerspaxel_all_string,
+                                                       sncont_cr1spaxels_all_string,
+                                                       sncont_band_all_string,
+                                                       tsncont_centerspaxel_all_string,
+                                                       tsncont_cr1spaxels_all_string,
+                                                       tsncont_band_all_string,
+                                                       )
+
+                elif om_val_string == 'LCB' and sourcet_val_string == 'Extended':
                     from output_table_LCB_E_S import tablenewpsfLES
                     tablenewpsfstring = tablenewpsfLES(snr_string,
                                                        numframe_val_string,
@@ -1042,7 +1140,51 @@ def etc_do(request):
                                                        tsncont_centerspaxel_all_string,
                                                        tsncont_cr1spaxels_all_string,
                                                        tsncont_cr1r2spaxels_all_string)
-
+                elif om_val_string == 'LCB' and sourcet_val_string == 'Point':
+                    from output_table_LCB_P_S import tablenewpsfLPS
+                    tablenewpsfstring = tablenewpsfLPS(snr_string,
+                                                       numframe_val_string,
+                                                       snrpframe_string,
+                                                       exptimepframe_val_string,
+                                                       exptime_val_string,
+                                                       etpframe_c_voxel_string,
+                                                       etallframe_c_voxel_string,
+                                                       etpframe_cr1_voxel_string,
+                                                       etallframe_cr1_voxel_string,
+                                                       etpframe_cr1r2_voxel_string,
+                                                       etallframe_cr1r2_voxel_string,
+                                                       etpframe_c_aa_string,
+                                                       etallframe_c_aa_string,
+                                                       etpframe_cr1_aa_string,
+                                                       etallframe_cr1_aa_string,
+                                                       etpframe_cr1r2_aa_string,
+                                                       etallframe_cr1r2_aa_string,
+                                                       etpframe_c_all_string,
+                                                       etallframe_c_all_string,
+                                                       etpframe_cr1_all_string,
+                                                       etallframe_cr1_all_string,
+                                                       etpframe_cr1r2_all_string,
+                                                       etallframe_cr1r2_all_string,
+                                                       lambdaeff_string,
+                                                       seeingx_string,
+                                                       sncont_centerspaxel_voxel_string,
+                                                       sncont_cr1spaxels_voxel_string,
+                                                       sncont_cr1r2spaxels_voxel_string,
+                                                       tsncont_centerspaxel_voxel_string,
+                                                       tsncont_cr1spaxels_voxel_string,
+                                                       tsncont_cr1r2spaxels_voxel_string,
+                                                       sncont_centerspaxel_aa_string,
+                                                       sncont_cr1spaxels_aa_string,
+                                                       sncont_cr1r2spaxels_aa_string,
+                                                       tsncont_centerspaxel_aa_string,
+                                                       tsncont_cr1spaxels_aa_string,
+                                                       tsncont_cr1r2spaxels_aa_string,
+                                                       sncont_centerspaxel_all_string,
+                                                       sncont_cr1spaxels_all_string,
+                                                       sncont_cr1r2spaxels_all_string,
+                                                       tsncont_centerspaxel_all_string,
+                                                       tsncont_cr1spaxels_all_string,
+                                                       tsncont_cr1r2spaxels_all_string)
                 else:
                     tablenewpsfstring = ''
 
@@ -1052,6 +1194,7 @@ def etc_do(request):
             # FOR DOWNLOADABLE FILES
             forfileoutputstring = outputofcalc['forfileoutput']
             forfileoutput2string = outputofcalc['forfileoutput2']
+            forfileoutput3string = outputofcalc['batchout']
 
             # EXTRA FOOTER
             footerstring = '<span class="italicsmall">Time of request: ' + start_time_string + ' ; End of request: ' + time.strftime(
@@ -1067,6 +1210,7 @@ def etc_do(request):
             tablenewpsflinestring = ''
             forfileoutputstring = ''
             forfileoutput2string = ''
+            forfileoutput3string = ''
             footerstring = ''
 
         print "### LOG: ABOUT TO QUIT ETC_DO; JSON OUTPUT TO JAVASCRIPT."
@@ -1087,5 +1231,6 @@ def etc_do(request):
                              'outhead1': outhead1string,
                              'forfile': forfileoutputstring,
                              'forfile2': forfileoutput2string,
+                             'batchout': forfileoutput3string,
                              'footerstring': footerstring,
                              })

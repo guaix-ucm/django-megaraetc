@@ -1,5 +1,6 @@
-var forfile = ''
-var calcfile = ''
+var forfile = '';
+var calcfile = '';
+var batchfile = '';
 
 $( document ).ready(function() {
     console.log( "MEGARA Online ETC ready!" );
@@ -43,7 +44,7 @@ $( document ).ready(function() {
 //      // ON HOLD END!
 
         if ($('#id_vph').val() == 1){
-            alert('WARNING: VPH Setup is set to -empty-! Choose a VPH.')
+            alert('WARNING: VPH Setup is set to -empty-! Choose a VPH.');
         }
         else {
             //// ATTEMPT TO ADD FILE CONTENTS TO POST
@@ -124,6 +125,7 @@ $( document ).ready(function() {
                 $("#store_result").css('visibility', 'visible');
                 forfile = $(data)[0]['forfile'];    // global variable update
                 calcfile = $(data)[0]['forfile2'];  // global variable update
+                batchfile = $(data)[0]['batchout'];
 
                 // Graphics
                 var thediv = $(data)[0]['thediv'];
@@ -132,8 +134,8 @@ $( document ).ready(function() {
                 $("#othergraphic").append(thescript);
 
                 // Seeing the uploaded file
-                var uploadedfile = $(data)[0]['theuploadedfile'];
-                $("#uploadedfile").empty().append(uploadedfile);
+//                var uploadedfile = $(data)[0]['theuploadedfile'];
+//                $("#uploadedfile").empty().append(uploadedfile);
 
                 var footers = $(data)[0]['footerstring'];
                 $("#extrafooter").empty().append(footers);
@@ -146,6 +148,7 @@ $( document ).ready(function() {
         }
     });
 });
+
 
 /* handle file(s) */
 //var inputElement = document.getElementById("id_fileupload");
@@ -290,6 +293,18 @@ function downloadCalcFile(calcfile){
     save.dispatchEvent(event);
 }
 
+function downloadBatchFile(batchfile){
+    var save = document.createElement('a');
+    save.href = 'data:attachment/csv,' + encodeURI(batchfile);
+    save.download = 'batch-details.csv' || batchfile;
+    var event = document.createEvent("MouseEvents");
+        event.initMouseEvent(
+                "click", true, false, window, 0, 0, 0, 0, 0
+                , false, false, false, false, 0, null
+        );
+    save.dispatchEvent(event);
+}
+
 // pop-up window
 function newPopup(url) {
 popupWindow = window.open(
@@ -311,10 +326,6 @@ function closeWin() {
 // for source type
 function selector() {
     if (document.getElementById("id_stype_0").checked == true) {
-        $('label[for="id_isize_0"]').each(function() {
-            this.style.color = "grey"
-        });
-//        document.getElementById("id_isize_0").checked = true;
         document.getElementById("id_isize_0").disabled = true;
         document.getElementById("id_isize_1").disabled = true;
         document.getElementById("id_size").disabled = true;
@@ -322,9 +333,6 @@ function selector() {
         document.getElementById("id_radius").disabled = true;
         document.getElementById("id_radius").style.color = "grey";
 
-//        $('label[for="id_size"]').each(function() {
-//            this.style.color = "grey"
-//        });
         $('label[for="id_isize_0"]').each(function() {
             this.style.color = "grey"
         });
@@ -332,14 +340,24 @@ function selector() {
             this.style.color = "grey"
         });
 
-        //document.getElementById("sizet").style.color = "grey";
-    } else if (document.getElementById("id_stype_0").checked == false) {
-        $('label[for="id_isize_0"]').each(function() {
-            this.checked = true
-        });
-        $('label[for="id_isize_0"]').each(function() {
+        document.getElementById("id_batchyesno_0").disabled = false;
+        document.getElementById("id_batchyesno_1").disabled = false;
+        if (document.getElementById("id_batchyesno_0").checked == true) {
+            document.getElementById("id_comment").disabled = true;
+        } else if (document.getElementById("id_batchyesno_0").checked == false) {
+            document.getElementById("id_comment").disabled = false;
+        }
+
+//        document.getElementById("id_batchyesno").style.color = "black";
+//        document.getElementById("id_comment").disabled = false;
+        $('label[for="id_batchyesno_0"]').each(function() {
             this.style.color = "black"
         });
+        $('label[for="id_batchyesno_1"]').each(function() {
+            this.style.color = "black"
+        });
+
+    } else if (document.getElementById("id_stype_0").checked == false) {
         if (document.getElementById("id_isize_0").checked == true) {
             document.getElementById("id_size").disabled = false;
             document.getElementById("id_size").style.color = "black";
@@ -352,8 +370,6 @@ function selector() {
             document.getElementById("id_radius").disabled = false;
             document.getElementById("id_radius").style.color = "black";
         }
-//        document.getElementById("id_size").disabled = true;
-//        document.getElementById("id_size").style.color = "black";
 
         document.getElementById("id_isize_0").disabled = false;
         document.getElementById("id_isize_1").disabled = false;
@@ -366,6 +382,17 @@ function selector() {
         });
         $('label[for="id_isize_1"]').each(function() {
             this.style.color = "black"
+        });
+
+        document.getElementById("id_batchyesno_0").disabled = true;
+        document.getElementById("id_batchyesno_1").disabled = true;
+        document.getElementById("id_comment").disabled = true;
+
+        $('label[for="id_batchyesno_0"]').each(function() {
+            this.style.color = "grey"
+        });
+        $('label[for="id_batchyesno_1"]').each(function() {
+            this.style.color = "grey"
         });
 
     }
@@ -534,7 +561,21 @@ function selectorCmode() {
     document.getElementById('id_exptimepframe').value = nexpdefval;
 }
 
-// FOR COOKIES
+//change exptime per frame into SNR per frame when calculation mode changes
+function selectorBmode() {
+    if (document.getElementById('id_batchyesno_0').checked==false) {
+        document.getElementById('id_comment').disabled = false;
+    }
+    else if (document.getElementById('id_batchyesno_0').checked==true) {
+        document.getElementById('id_comment').disabled = true;
+    }
+}
+
+
+
+
+
+//////////////////////////////////////////// FOR COOKIES
 // get cookie = read cookie and return
 function getCookie(cname) {
 	var name = cname + "=";

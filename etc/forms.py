@@ -41,6 +41,10 @@ CONTMAGFLUX = [('M', 'Continuum mag'),
 CMODE = [('T', 'ExpTime to SNR'),
          ('S', 'SNR to ExpTime')]
 
+BATCHMODE = [('batchno', 'No'),
+             ('batchyes', 'Yes')]
+
+
 def template_choice(iflux_var):
     if iflux_var == 'C' or iflux_var:
         q = SpectralTemplate.objects.all()#[0:46]
@@ -121,8 +125,9 @@ class InstrumentForm(forms.Form):
     vph = forms.ChoiceField(label=mark_safe(vph_help), initial=1, choices=vph_choice())
 
 class AtmosphericConditionsForm(forms.Form):
-    hintbotton = "<a class=\"\" href=\"Javascript:newPopupBig('/static/etc/help/%s.pdf');\" type=\"link\"><span class=\"glyphicon glyphicon-question-sign\"></span></a>"
-    seeing_hint = hintbotton % "seeing_values.xlsx"
+    hintbotton = "<a class=\"\" href=\"Javascript:newPopupBig('/static/etc/help/%s');\" type=\"link\"><span class=\"glyphicon glyphicon-question-sign\"></span></a>"
+    seeing_hint = hintbotton % "seeing_values.html"
+
     botton = "<a class=\"splinkcol\" href=\"Javascript:newPopupBig('/static/etc/help/%s.txt');\" >"
     bottonht = "<a class=\"splinkcol\" href=\"Javascript:newPopupBig('/static/etc/help/%s.html');\" >"
     skycond_help = botton % "skycond" + "Sky condition</a>"
@@ -166,8 +171,11 @@ class OutputSetupForm(forms.Form):
 
 class UploadFileForm(forms.Form):
     botton = "<a class=\"splinkcol\" href=\"Javascript:newPopupBig('/static/etc/help/%s.txt');\" type=\"link\" >"
-    fileupload_help = botton % "fileupload" + "Upload file</a>"
+    # fileupload_help = botton % "fileupload" + "Upload file</a>"
+    batchyesno_help = botton % "batchyesno" + "Batch process?</a>"
 
+    batchyesno = forms.ChoiceField(label=mark_safe(batchyesno_help), initial="batchno", choices=BATCHMODE, widget=forms.RadioSelect(renderer=HorizontalRadioRenderer, attrs={'placeholder':'batchno', 'onclick':'selectorBmode()', 'onload':'selectorBmode()'}))
+    comment = forms.CharField(label=" ", initial="empty", widget=forms.Textarea(attrs={'rows':'3','cols':'50', 'disabled':'true'}))
     # testfield = forms.IntegerField(initial=9999999)
 
     # fileupload = forms.FileField(label=mark_safe(fileupload_help), widget=forms.FileInput(attrs={'size':'7', 'name':'myfile', 'title':'fileupload', 'type':'file', 'onchange':'handleFiles(); showFileSize()', 'accept':'.txt,.csv'}))
