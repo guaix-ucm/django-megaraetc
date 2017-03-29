@@ -1178,35 +1178,36 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
         textcalc += "Area in which sky has been measured $\Omega_{sky} = N_{fiber,sky} \\times A_{fiber} = %s \\times %s = %s \\textrm{arcsec}^{2}$ <br />" % (nfibresky, areafibre, omegasky)
 
         ###
-        batchname, batchband, batchmag, batch_c, batch_cr1, batch_cr1r2 = ([] for i in range(6))
-        if sourcet_val=='P' and batchyesno_val=='batchyes':
-            # print batchdata
-            batchdata = batchdata.encode('utf-8')   # remove 'u'
-            # print batchdata
-            filelength = len(batchdata.split("\n")) # lines are split by \r
-            print filelength
-            if filelength > 92:
-                print "INPUT DATA CONTAINS MORE THAN 92 LINES: NOT COMPUTING"
-            else:
-                thedata = batchdata.split("\n")
-                print thedata
-                numcol = len(thedata)
-                if numcol < 3 or numcol > 3:
-                    print "SOMETHING WRONG WITH THE INPUT"
-                else:
-                    for i in range(numcol):
-                        line=thedata[i]
-                        print line
-                        if "#" not in line:
-                            data = line.split(',')
-                            batchname.append(data[0])
-                            batchband.append(data[1])
-                            batchmag.append(data[2].strip('\r'))
-                            batch_c.append('0')
-                            batch_cr1.append('0')
-                            batch_cr1r2.append('0')
-                    print batchmag
-        ###
+        # batchname, batchband, batchmag, batch_c, batch_cr1, batch_cr1r2 = ([] for i in range(6))
+        # if sourcet_val=='P' and batchyesno_val=='batchyes':
+        #     # print batchdata
+        #     batchdata = batchdata.encode('utf-8')   # remove 'u'
+        #     # print batchdata
+        #     filelength = len(batchdata.split("\n")) # lines are split by \r
+        #     print filelength
+        #     if filelength > 92:
+        #         print "INPUT DATA CONTAINS MORE THAN 92 LINES: NOT COMPUTING"
+        #     else:
+        #         thedata = batchdata.split("\n")
+        #         print thedata
+        #         numrow = len(thedata)
+        #         print 'numrow=',numrow
+        #         # if numrow < 3 or numrow > 3:
+        #         #     print "SOMETHING WRONG WITH THE INPUT"
+        #         # else:
+        #         for i in range(numrow):
+        #             line=thedata[i]
+        #             print line
+        #             if "#" not in line:
+        #                 data = line.split(',')
+        #                 batchname.append(data[0])
+        #                 batchband.append(data[1])
+        #                 batchmag.append(data[2].strip('\r'))
+        #                 batch_c.append('0')
+        #                 batch_cr1.append('0')
+        #                 batch_cr1r2.append('0')
+        #         print batchmag
+        # ###
 
         # Different spatial and resolution elements to consider, depending on whether the source is punctual or extended.
         # Starting FOR loop for computations of SNR per frame
@@ -2035,34 +2036,41 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
             else:
                 thedata = batchdata.split("\n")
                 print 'thedata=', thedata
-                numcol = len(thedata)
-                if numcol < 3 or numcol > 3:
-                    print "SOMETHING WRONG WITH THE INPUT"
-                else:
-                    for i in range(numcol):
-                        line=thedata[i]
-                        print line
-                        if "#" not in line:
-                            data = line.split(',')
+                numrow = len(thedata)
+                # if numrow < 3 or numrow > 3:
+                #     print "SOMETHING WRONG WITH THE INPUT"
+                # else:
+                for i in range(numrow):
+                    line=thedata[i]
+                    print line
+                    if "#" not in line:
+                        data = line.split(',')
+                        if len(data) ==3:
                             batchname.append(data[0])
                             batchband.append(data[1])
                             batchmag.append(float(data[2].strip('\r')))
-                            # batch_c.append()
-                            # batch_cr1.append('0')
-                            # batch_cr1r2.append('0')
-                    print batchmag
+                        else:
+                            batchname.append('n.a.')
+                            batchband.append('n.a.')
+                            batchmag.append(-999)
+                        # batch_c.append()
+                        # batch_cr1.append('0')
+                        # batch_cr1r2.append('0')
+                print batchmag
 
                 for i in range(filelength):
-                    print 'batchmag',i,batchmag[i]
-                    print 'batchband',i,batchband[i]
-                    snr = SNRfuncbatch(batchmag[i],batchband[i],12)
-                    snr2 = SNRfuncbatch(30,batchband[i],12)
-                    batch_c.append(snr[0])
-                    batch_cr1.append(snr[1])
-                    batch_cr1r2.append(snr[2])
-                    print 'snc, sncr1, sncr1r2 = ', snr
-                    print 'Bsnc, sncr1, sncr1r2 = ', snr2
-
+                    if batchname[i]=='n.a.':
+                        batch_c.append('-999')
+                        batch_cr1.append('-999')
+                        batch_cr1r2.append('-999')
+                    else:
+                        print 'batchmag',i,batchmag[i]
+                        print 'batchband',i,batchband[i]
+                        snr = SNRfuncbatch(batchmag[i],batchband[i],12)
+                        batch_c.append(snr[0])
+                        batch_cr1.append(snr[1])
+                        batch_cr1r2.append(snr[2])
+                        print 'snc, sncr1, sncr1r2 = ', snr
 
         ###
         ######################################################################
