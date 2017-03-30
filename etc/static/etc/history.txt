@@ -1,5 +1,6 @@
 ### MEGARA ONLINE ETC HISTORY ###
 
+2017/03/30 v0.9.5 Added new calculation mode and batch process capability.
 2017/03/01 v0.8.1 Added confirmation message when resetting the form.
 2017/01/15 v0.8.0 Updated output format for both MOS and LCB. Updated calculations and creation of new tables. Bug fixes: line SNR now appear. New icons.
 2016/12/19 v0.7.7 Fixed calculations.
