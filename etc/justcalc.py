@@ -110,6 +110,8 @@ def outmessage(textcode):
     elif textcode == 114:
         outtext = "** WARNING **\nExptime per frame value must be 0 < Exptime per frame <1e6"
     elif textcode == 115:
+        outtext = "** WARNING **\nTotal SNR value must be 0 < Total SNR <1e6"
+    elif textcode == 116:
         outtext = ""
     else:
         outtext = ""
@@ -670,7 +672,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
     textcalc += "Number of frames is %s <br />" % numframe_val
 
     # Calculation mode
-    if cmode_val == 'T':
+    if cmode_val == 'T':    # Exptime to SNR
         # Exptime per frame
         exptimepframe_val = isafloat(exptimepframe_val, 1)
         snr_val = isafloat(snr_val, 1)
@@ -692,7 +694,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
             errind = warn(outtext, frame0, 'MEGARA ETC Warning')
         textcalc += "Total exposure time = Number of frames * Exp.Time per frame = %s $\\times$ %s = %s <br />" % (numframe_val, exptimepframe_val, exptime_val)
 
-    elif cmode_val == 'S':
+    elif cmode_val == 'S':  # SNR to exptime
         # Total SNR
         exptimepframe_val = isafloat(exptimepframe_val, 1)
         exptime_val = 0
@@ -700,7 +702,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
 
         if snr_val <= 0.0 or snr_val >= 1.e6:
             snr_val = 10.
-            outtext = outmessage(114)
+            outtext = outmessage(115)
             errind = warn(outtext, frame0, 'MEGARA ETC Warning')
 
         # SNR per frame

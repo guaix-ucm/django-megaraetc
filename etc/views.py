@@ -131,11 +131,11 @@ def compute5(request):
         moon_val = request.POST['moonph']
         airmass_val = float(request.POST['airmass'])
 
-        queryseeing = SeeingTemplate.objects.filter(
-            pk=request.POST['seeing']).values()
+        queryseeing = SeeingTemplate.objects.filter(pk=request.POST['seeing']).values()
         seeing_val = queryseeing[0]['name']
 
         numframes_val = float(request.POST['numframes'])
+
         # Cope for cmode variations
         cmode_val = request.POST['cmode']
         if cmode_val == 'T':
@@ -144,16 +144,20 @@ def compute5(request):
         elif cmode_val == 'S':
             exptimepframe_val = 3600
             snr_val = float(request.POST['exptimepframe'])
+
         nsbundles_val = int(request.POST['nsbundles'])
 
         plotflag_val = request.POST['plotflag']
 
         if request.POST['stype'] == 'P' and request.POST['batchyesno']=='batchyes':
             thebatchdata = request.POST['comment']
+            batchyesno_val = request.POST['batchyesno']
+            print batchyesno_val
         else:
+            batchyesno_val = 'batchno'
+            print batchyesno_val
             thebatchdata = "empty,empty,empty"
 
-        batchyesno_val = request.POST['batchyesno']
 
         outputofcalc = calc(request.POST['stype'],
                             request.POST['contmagflux'],
@@ -863,6 +867,23 @@ def etc_do(request):
             elif om_val_string == 'LCB':
                 switchstring = 'Sky-fibers:'
 
+            if fluxt_val_string == 'L':
+                addlinestring = '<tr><td>Resolved line?:</td><td>' + resolvedline_val_string + '</td></tr>' + \
+                               '<tr><td>Line wavelength:</td><td>' + wline_val_string + ' AA</td></tr>' + \
+                               '<tr><td>Line flux (integrated):</td><td>' + fline_val_string + ' erg/s/cm2</td></tr>' + \
+                               '<tr><td>Line FWHM:</td><td>' + fwhmline_val_string + ' AA</td></tr>'
+            elif fluxt_val_string == 'C':
+                addlinestring = ''
+
+            if cmode == 'T':
+                addstring0 = '<tr><td>Exptime per frame:</td><td>' + exptimepframe_val_string + ' s</td></tr>'
+                addstringT = '<tr><td>Total exptime:</td><td>' + exptime_val_string + ' s</td></tr>'
+                addstringS = ''
+            elif cmode == 'S':
+                addstring0 = ''
+                addstringT = ''
+                addstringS = '<tr><td>Total SNR:</td><td>' + snr_string + '</td></tr>'
+
             tableinputstring = '<table border=1>' + \
                                '<tr><td>INPUT PARAMETERS:</td><td></td></tr>' + \
                                '<tr><td>Calculation mode:</td><td>' + cmode_string + '</td></tr>' + \
@@ -874,10 +895,7 @@ def etc_do(request):
                                '<tr><td>Source spectrum:</td><td>' + spect_val_string + '</td></tr>' + \
                                '<tr><td>Continuum:</td><td>' + bandc_val_string + ' = ' + mag_val_string + 'mag</td></tr>' + \
                                '<tr><td>Continuum flux:</td><td>' + netflux_string + ' cgs</td></tr>' + \
-                               '<tr><td>Resolved line?:</td><td>' + resolvedline_val_string + '</td></tr>' + \
-                               '<tr><td>Line wavelength:</td><td>' + wline_val_string + ' AA</td></tr>' + \
-                               '<tr><td>Line flux (integrated):</td><td>' + fline_val_string + ' erg/s/cm2</td></tr>' + \
-                               '<tr><td>Line FWHM:</td><td>' + fwhmline_val_string + ' AA</td></tr>' + \
+                               addlinestring + \
                                '<tr><td>*Sky Condition:</td><td>' + skycond_val_string + '</td></tr>' + \
                                '<tr><td>Moon:</td><td>' + moon_val_string + '</td></tr>' + \
                                '<tr><td>Airmass: X=</td><td>' + airmass_val_string + '</td></tr>' + \
@@ -886,9 +904,9 @@ def etc_do(request):
                                '<tr><td>Seeing(@X):</td><td>' + seeingx_string + ' arcsec</td></tr>' + \
                                '<tr><td>*Observation:</td></td><td></tr>' + \
                                '<tr><td>Number of frames:</td><td>' + numframe_val_string + '</td></tr>' + \
-                               '<tr><td>Exptime per frame:</td><td>' + exptimepframe_val_string + ' s</td></tr>' + \
-                               '<tr><td>Total exptime:</td><td>' + exptime_val_string + ' s</td></tr>' + \
-                               '<tr><td>Total SNR:</td><td>' + snr_string + '</td></tr>' + \
+                               addstring0 + \
+                               addstringT + \
+                               addstringS + \
                                '<tr><td>NP_Dark:</td><td>' + npdark_val_string + '</td></tr>' + \
                                '<tr><td>' + switchstring + '</td><td>' + nsbundles_val_string + '</td></tr>' + \
                                '</table><br />'
