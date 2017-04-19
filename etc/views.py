@@ -216,7 +216,7 @@ def get_info(request):
         form4 = ObservationalSetupForm()
         form5 = OutputSetupForm()
 
-    return render(request, 'etc/webmegaraetc-0.9.5.html', {
+    return render(request, 'etc/webmegaraetc-1.0.0.html', {
         'form1': form1,
         'formU': formU,
         'form2': form2,
@@ -243,7 +243,7 @@ def etc_form(request):
                    'form5': form5,
                    }
 
-    return render(request, 'etc/webmegaraetc-0.9.5.html', total_formu)
+    return render(request, 'etc/webmegaraetc-1.0.0.html', total_formu)
 
 ########################
 # ON HOLD UNTIL I FIND A GOOD WAY TO UPLOAD FILES
@@ -373,6 +373,7 @@ def etc_do(request):
             if not tocheck:
                 x = outputofcalc['lamb']
                 y = outputofcalc['fc'] #+ outputofcalc['fs']
+                ysky = outputofcalc['fs']
                 label1 = entry_spec_name
                 label2 = outputofcalc['mag_val']
                 label3 = outputofcalc['bandc_val']
@@ -400,6 +401,7 @@ def etc_do(request):
             else:
                 x = numpy.arange(1, 1001, 1)
                 y = numpy.arange(1, 1001, 1)
+                ysky = numpy.arange(1, 1001, 1)
                 x2 = numpy.arange(1, 1001, 1)
                 y2 = numpy.arange(1, 1001, 1)
                 x2b = numpy.arange(1, 1001, 1)
@@ -435,7 +437,7 @@ def etc_do(request):
             # html += mpld3.fig_to_html(figura2)
             # html = html.replace("None", "")  # No se xq introduce string None
 
-            thescript, thediv = bokehplot1(x, y, x3, y3, z3,
+            thescript, thediv = bokehplot1(x, y, ysky, x3, y3, z3,
                                            vph_minval, vph_maxval,
                                            label1, label2, label3,
                                            x2, y2, x2b, y2b,
@@ -479,6 +481,7 @@ def etc_do(request):
             moon_val_string = str(outputofcalc['moon_val'])
             airmass_val_string = str(outputofcalc['airmass_val'])
             seeing_zenith_string = str(outputofcalc['seeing_zenith'])
+            fcont_string = '%.3e' % outputofcalc['fcont']
             fsky_string = '%.3e' % outputofcalc['fsky']
             numframe_val = outputofcalc['numframe_val']
             numframe_val_string = "{0:.0f}".format(float(numframe_val))
@@ -893,8 +896,8 @@ def etc_do(request):
                                '<tr><td>VPH:</td><td>' + vph_val_string + '</td></tr>' + \
                                '<tr><td>Input flux type:</td><td>' + fluxt_name_string + '</td></tr>' + \
                                '<tr><td>Source spectrum:</td><td>' + spect_val_string + '</td></tr>' + \
-                               '<tr><td>Continuum:</td><td>' + bandc_val_string + ' = ' + mag_val_string + 'mag</td></tr>' + \
-                               '<tr><td>Continuum flux:</td><td>' + netflux_string + ' cgs</td></tr>' + \
+                               '<tr><td>Input continuum:</td><td>' + bandc_val_string + ' = ' + mag_val_string + 'mag</td></tr>' + \
+                               '<tr><td>Resulting continuum flux:</td><td>' + fcont_string + ' erg/s/cm2/AA/arcsec2</td></tr>' + \
                                addlinestring + \
                                '<tr><td>*Sky Condition:</td><td>' + skycond_val_string + '</td></tr>' + \
                                '<tr><td>Moon:</td><td>' + moon_val_string + '</td></tr>' + \

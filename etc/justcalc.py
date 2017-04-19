@@ -788,8 +788,9 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
         sourcespectrum = numpy.array(sourcespectrum)
 
         # Reading template of sky emission [code to be done HERE]
-        skyspectrum = sourcespectrum
-
+        skydat = 'normalized_skyspectrum.txt'
+        lambsky, skyspectrum = reading(skydat, 2)
+        # skyspectrum = sourcespectrum
 
 
 
@@ -1083,6 +1084,17 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
         # Source spectrum scaled to totalflux in continuum
         normc, fc = sclspect(fcont, lamb, lc1, lc2, sourcespectrum, tfilterc, wline_val, fline_val, fwhmline_val)
         textcalc += "Normalization factor: normc = %s <br />" % normc
+        textcalc += "Scaled spectrum: fc = %s <br />" % fc
+
+        # TODO: The flux of the source, if it is a point source, is then spread
+        # because of the seeing and can span across rings of spaxels.
+        # The 4 pixels in spatial direction of a spaxel are not catching,
+        # supposedly, the same amount of flux. That is, the pixels at the edge,
+        # if counted in order, pixels 1 and 4, should receive less flux
+        # than the centered ones, pixels 2 and 3.
+        # We here assume that the shape of the flux variation across these
+        # spatial pixels is Gaussian, (but it depends on the width. How much
+        # wings do we enclose?)...
 
         if sourcet_val == 'P':
             fcctr = fc * seeing_centermean/(1*100)  # 1 spaxel
@@ -2487,6 +2499,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                 'vph_val': vph_val, 'skycond_val': skycond_val,
                 'moon_val': moon_val, \
                 'airmass_val': airmass_val, 'seeing_zenith': seeing_zenith, \
+                'fcont': fcont, \
                 'fsky': fsky, 'numframe_val': numframe_val, \
                 'cmode_val': cmode_val, \
                 'snr_val': snr_val, \

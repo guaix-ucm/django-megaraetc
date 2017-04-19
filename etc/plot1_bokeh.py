@@ -1,4 +1,4 @@
-def bokehplot1(x, y,
+def bokehplot1(x, y, ysky,
                x3, y3, z3,
                vph_minval, vph_maxval,
                label1, label2, label3,
@@ -17,12 +17,13 @@ def bokehplot1(x, y,
     # y[0::10]    # do the same here
     p1 = figure(plot_height=400, active_scroll="wheel_zoom", toolbar_location="above")
     p1.line(x, y, color='blue')
+    # p1.line(x, ysky, color='cyan')
     vlineg = Span(location=float(x3), dimension='height', line_color='green', line_width=1, line_dash='dashed')
     vlinemin = Span(location=float(vph_minval), dimension='height', line_color='red', line_width=1, line_dash='dashed')
     vlinemax = Span(location=float(vph_maxval), dimension='height', line_color='red', line_width=1, line_dash='dashed')
     vlinelambc = Span(location=float(lambc), dimension='height', line_color='orange', line_width=1, line_dash='dashed')
     p1.renderers.extend([vlineg, vlinemin, vlinemax, vlinelambc])
-    p1.yaxis.axis_label = "Flux (erg/s/cm2/Angstrom)"
+    p1.yaxis.axis_label = "Flux (erg/s/cm2/Angstrom/arcsec2)"
     p1.xaxis.axis_label = "Wavelength (Angstrom)"
     p1.x_range = Range1d(vph_minval-100, vph_maxval+100)
 

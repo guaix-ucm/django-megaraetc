@@ -541,7 +541,7 @@ def specparline(om_val, xit, areasource, diamsource, ps, disp, nfibres, areafibr
 # Function sclspect
 # This function scales the input spectrum to the input flux in the band of interest
 # Args: 
-# iflux - total flux (in erg/s/cm**2/AA) 
+# iflux - total flux (in erg/s/cm**2/AA/arcsec2)
 # wv - Wavelength (AA)
 # wv1 - Lower wavelength of bandwidth (AA)
 # wv2 - Upper wavelength of bandwidth (AA)
@@ -549,11 +549,13 @@ def specparline(om_val, xit, areasource, diamsource, ps, disp, nfibres, areafibr
 # iband - Input filter transmission
 #
 def sclspect (iflux, wv, wv1, wv2, ispect, iband, wline, fline, fwhml):
-
+    print 'FCONT=',iflux
     wv1 = numpy.array(wv1)
     wv2 = numpy.array(wv2)
     minwv = min(wv)
     maxwv = max(wv)
+    print 'wv1=', wv1
+    print 'wv2=', wv2
 
     # Extract effective wavelength of band
     leff = (wv2 + wv1) / 2.
@@ -596,18 +598,22 @@ def sclspect (iflux, wv, wv1, wv2, ispect, iband, wline, fline, fwhml):
 
     wvrange = wv[ind1:ind2]
     srange = ispect[ind1:ind2]
-
+    print "wvrange =", wvrange
+    print "srange =", srange
     # Extract filter transmission in wavelength range
     iband = iband[ind1:ind2]
-
+    print "iband =", iband
     # Integrate in range to derive value    
-    value = numpy.trapz(srange * iband ,wvrange)
-
+    value = numpy.trapz(srange * iband, wvrange)
+    print "value =",value
     # Compute scaling
     norm = iflux / value
-
+    print "iflux =", iflux
+    print "norm =", norm
     # Scaled spectrum
     scspect = norm * ispect
+    print "ispect =", ispect
+    print "scspect =", scspect
 
     # Create Gaussian
     print "# Adding Gaussian emission line"
