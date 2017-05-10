@@ -77,7 +77,7 @@ class TargetForm(forms.Form):
 
     stype_help = botton % "sourcetype" + "Source Type</a>"
     inputsize_help = botton % "inputsize" + "Input Size</a>"
-    size_help = botton % "size" + "Area (sq.arcsec)</a>"
+    size_help = botton % "size" + "Area (arcsec$^{2}$)</a>"
     radius_help = botton % "radius" + "Radius (arcsec)</a>"
     inputflux_help = botton % "inputflux" + "Input flux</a>"
     rline_help = botton % "rline" + "Resolved line?</a>"
@@ -166,7 +166,10 @@ class ObservationalSetupForm(forms.Form):
     contap = forms.FloatField(label=mark_safe(contap_help), initial=1.0, widget=forms.TextInput(attrs={'disabled':'true', 'placeholder':'contap'}))
 
 class OutputSetupForm(forms.Form):
-    plotflag = forms.ChoiceField(label="Graphic output?", initial="no", choices=PLOTCHOICES, widget=forms.RadioSelect(renderer=HorizontalRadioRenderer))
+    botton = "<a class=\"splinkcol\" href=\"Javascript:newPopupBig('/static/etc/help/%s.txt');\" >"
+    plotflag_help = botton % "plotflag" + "Graphic output?</a>"
+
+    plotflag = forms.ChoiceField(label=mark_safe(plotflag_help), initial="no", choices=PLOTCHOICES, widget=forms.RadioSelect(renderer=HorizontalRadioRenderer))
 
 
 class UploadFileForm(forms.Form):

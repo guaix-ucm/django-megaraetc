@@ -2467,16 +2467,17 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                         '<script type="text/javascript" async ' \
                         'src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>' + textcalc
         ###
-        batchout = ''
-        headstring0 = '# SNR calculated at lambda_c='+str(lambdaeff)+' Angstroms for VPH='+str(vphname)+ ' \n'
-        headstring1 = "# name, band, mag, SNR_perfr_c_voxel, SNR_perfr_cr1_voxel, SNR_perfr_cr1r2_voxel \n"
-        batchout = batchout + headstring0
-        batchout = batchout + headstring1
+        forbatchout = ''
+        headstring0 = 'SNR calculated at lambda_c='+str(lambdaeff)+' Angstroms for VPH='+str(vphname)+ ' \n'
+        headstring1 = "name, band, mag, SNR_perfr_c_voxel, SNR_perfr_cr1_voxel, SNR_perfr_cr1r2_voxel \n"
+        forbatchout = forbatchout + headstring0
+        forbatchout = forbatchout + headstring1
         if batchyesno_val=='batchyes':
             for j in range(filelength):
                 stringout = batchname[j] +','+ batchband[j] +','+ str(batchmag[j]) +','+ str(batch_c[j][0]) +','+  str(batch_cr1[j][0]) +','+  str(batch_cr1r2[j][0])
-                batchout = batchout + stringout + '\n'
-        batchout = str(batchout)
+                forbatchout = forbatchout + stringout + '\n'
+        forbatchout = str(forbatchout)
+        # forbatchout = '#F*CK\nYOU\nFIREFOX'+str(666)   # DO NOT PUT '#'
         ###
 
         # print 'globals=', globals()
@@ -2660,8 +2661,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
 \
                 'forfileoutput': forfileoutput, \
                 'forfileoutput2': forfileoutput2, \
-                'batchout': batchout \
-                }  # ADDED FOR DJANGO (for views.py)
+                'forfileoutput3': forbatchout}  # ADDED FOR DJANGO (for views.py)
     # Avoiding computations in case of exception of errind
     else:
         spectdat = specttmplt_list[spect_list.index(spect_val)]

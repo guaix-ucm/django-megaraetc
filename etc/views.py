@@ -891,19 +891,19 @@ def etc_do(request):
                                '<tr><td>INPUT PARAMETERS:</td><td></td></tr>' + \
                                '<tr><td>Calculation mode:</td><td>' + cmode_string + '</td></tr>' + \
                                '<tr><td>Source type:</td><td>' + sourcet_val_string + '</td></tr>' + \
-                               '<tr><td>Area:</td><td>' + size_val_string + ' arcsec^2</td></tr>' + \
+                               '<tr><td>Area:</td><td>' + size_val_string + ' arcsec$^{2}$</td></tr>' + \
                                '<tr><td>Observing mode:</td><td>' + om_val_string + '</td></tr>' + \
                                '<tr><td>VPH:</td><td>' + vph_val_string + '</td></tr>' + \
                                '<tr><td>Input flux type:</td><td>' + fluxt_name_string + '</td></tr>' + \
                                '<tr><td>Source spectrum:</td><td>' + spect_val_string + '</td></tr>' + \
                                '<tr><td>Input continuum:</td><td>' + bandc_val_string + ' = ' + mag_val_string + 'mag</td></tr>' + \
-                               '<tr><td>Resulting continuum flux:</td><td>' + fcont_string + ' erg/s/cm2/AA/arcsec2</td></tr>' + \
+                               '<tr><td>Resulting continuum flux:</td><td>' + fcont_string + ' erg/s/cm$^{2}$/$\mathrm{\mathring A}$/arcsec$^{2}$</td></tr>' + \
                                addlinestring + \
                                '<tr><td>*Sky Condition:</td><td>' + skycond_val_string + '</td></tr>' + \
                                '<tr><td>Moon:</td><td>' + moon_val_string + '</td></tr>' + \
                                '<tr><td>Airmass: X=</td><td>' + airmass_val_string + '</td></tr>' + \
                                '<tr><td>Seeing(@X=1):</td><td>' + seeing_zenith_string + ' arcsec</td></tr>' + \
-                               '<tr><td>Sky-flux(R,@X):</td><td>' + fsky_string + ' cgs</td></tr>' + \
+                               '<tr><td>Sky-flux(R,@X):</td><td>' + fsky_string + ' erg/s/cm$^{2}$/$\mathrm{\mathring A}$/arcsec$^{2}$</td></tr>' + \
                                '<tr><td>Seeing(@X):</td><td>' + seeingx_string + ' arcsec</td></tr>' + \
                                '<tr><td>*Observation:</td></td><td></tr>' + \
                                '<tr><td>Number of frames:</td><td>' + numframe_val_string + '</td></tr>' + \
@@ -1215,7 +1215,7 @@ def etc_do(request):
             # FOR DOWNLOADABLE FILES
             forfileoutputstring = outputofcalc['forfileoutput']
             forfileoutput2string = outputofcalc['forfileoutput2']
-            forfileoutput3string = outputofcalc['batchout']
+            forfileoutput3string = outputofcalc['forfileoutput3']
 
             # EXTRA FOOTER
             footerstring = '<span class="italicsmall">Time of request: ' + start_time_string + ' ; End of request: ' + time.strftime(
@@ -1252,6 +1252,6 @@ def etc_do(request):
                              'outhead1': outhead1string,
                              'forfile': forfileoutputstring,
                              'forfile2': forfileoutput2string,
-                             'batchout': forfileoutput3string,
+                             'forfile3': forfileoutput3string,
                              'footerstring': footerstring,
                              })

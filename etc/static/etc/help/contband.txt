@@ -1,4 +1,4 @@
 ** Continuum Band **
 Available options are UBVRI.
 Band in which the input continuum magnitude or flux is provided.
-The input template spectrum is scaled to the input magnitude in this band.
+The input template spectrum is scaled to the input magnitude (or flux) in this band.

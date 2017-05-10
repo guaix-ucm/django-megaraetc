@@ -1,0 +1,6 @@
+** Graphic output? **
+Choosing "yes" plots
+- the source spectrum flux (in erg/s/cm2/AA/arcsec2
+- the (central spaxel) SNR
+
+CAUTION: choosing "yes" takes longer to calculate the output.

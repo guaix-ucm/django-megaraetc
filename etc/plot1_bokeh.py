@@ -39,20 +39,20 @@ def bokehplot1(x, y, ysky,
         ],
         location=(1, -30),
         )
-    else:
-        legend1 = Legend(items=[
-        ("VPH min max", [p1.line(line_dash='dashed', line_width=1, color='red')]),
-        ("VPH lambda_c" , [p1.line(line_dash='dashed', line_width=1, color='orange')]),
-        ('', []),
-        ('Source: ' + str(label1), []),
-        ('Cont. mag: ' + str(label2), []),
-        ('Cont. band: ' + str(label3), []),
-        ],
-        location=(1, -30),
-        )
-
-    p1.legend.border_line_alpha = 0.5
-    p1.add_layout(legend1, 'right') # to plot outside fo plot
+    # else:
+    #     legend1 = Legend(items=[
+    #     ("VPH min max", [p1.line(line_dash='dashed', line_width=1, line_color='red')]),
+    #     ("VPH lambda_c" , [p1.line(line_dash='dashed', line_width=1, line_color='orange')]),
+    #     ('', []),
+    #     ('Source: ' + str(label1), []),
+    #     ('Cont. mag: ' + str(label2), []),
+    #     ('Cont. band: ' + str(label3), []),
+    #     ],
+    #     location=(1, -30),
+    #     )
+    #
+    # p1.legend.border_line_alpha = 0.5
+    # p1.add_layout(legend1, 'right') # to plot outside fo plot
 
 
 
@@ -78,22 +78,22 @@ def bokehplot1(x, y, ysky,
             ],
             location=(1, -30),
             )
-    else:
-        legend2 = Legend(items=[
-            ("per-fr. 1 fib.", [p2.line(line_width=1, color='red')]),
-            ("all-fr. 1 fib." , [p2.line(line_width=3, color='red')]),
-            ("per-fr. all fibs." , [p2.line(line_width=1, color='blue')]),
-            ("all-fr. all fibs.", [p2.line(line_width=3, color='blue')]),
-            ("", []),
-            ("Source: " + str(label2a), []),
-            ("VPH: " + str(label2b), []),
-            ("Cont. band: " + str(label2c), []),
-            ],
-            location=(1, -30),
-            )
-
-    p2.legend.border_line_alpha = 0.5
-    p2.add_layout(legend2, 'right')
+    # else:
+    #     legend2 = Legend(items=[
+    #         ("per-fr. 1 fib.", [p2.line(line_width=1, color='red')]),
+    #         ("all-fr. 1 fib." , [p2.line(line_width=3, color='red')]),
+    #         ("per-fr. all fibs." , [p2.line(line_width=1, color='blue')]),
+    #         ("all-fr. all fibs.", [p2.line(line_width=3, color='blue')]),
+    #         ("", []),
+    #         ("Source: " + str(label2a), []),
+    #         ("VPH: " + str(label2b), []),
+    #         ("Cont. band: " + str(label2c), []),
+    #         ],
+    #         location=(1, -30),
+    #         )
+    #
+    # p2.legend.border_line_alpha = 0.5
+    # p2.add_layout(legend2, 'right')
 
     # legend3 = Legend(items=[
     #     ("Source:"+str(label1), [p2.circle(line_width=0, fill_alpha=0)]),

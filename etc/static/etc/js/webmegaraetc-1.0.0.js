@@ -125,7 +125,7 @@ $( document ).ready(function() {
                 $("#store_result").css('visibility', 'visible');
                 forfile = $(data)[0]['forfile'];    // global variable update
                 calcfile = $(data)[0]['forfile2'];  // global variable update
-                batchfile = $(data)[0]['batchout'];
+                batchfile = $(data)[0]['forfile3'];
 
                 // Graphics
                 var thediv = $(data)[0]['thediv'];
@@ -296,7 +296,7 @@ function downloadCalcFile(calcfile){
 function downloadBatchFile(batchfile){
     var save = document.createElement('a');
     save.href = 'data:attachment/csv,' + encodeURI(batchfile);
-    save.download = 'batch-details.csv' || batchfile;
+    save.download = 'batchdetails.csv' || batchfile;
     var event = document.createEvent("MouseEvents");
         event.initMouseEvent(
                 "click", true, false, window, 0, 0, 0, 0, 0

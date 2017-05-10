@@ -554,11 +554,13 @@ def sclspect (iflux, wv, wv1, wv2, ispect, iband, wline, fline, fwhml):
     wv2 = numpy.array(wv2)
     minwv = min(wv)
     maxwv = max(wv)
+    print 'min max wv=', minwv, maxwv
     print 'wv1=', wv1
     print 'wv2=', wv2
 
     # Extract effective wavelength of band
     leff = (wv2 + wv1) / 2.
+    print "leff=", leff
 
     # Where input lambda range equals to leff - 0.5 AA
     leff1 = leff - 0.5
@@ -571,9 +573,10 @@ def sclspect (iflux, wv, wv1, wv2, ispect, iband, wline, fline, fwhml):
         ind1 = numpy.where(wv == maxwv) - 10
     else:
         ind1 = numpy.where(dif == mindif)
+    print 'leff1, dif, mindif, ind1=', leff1, dif, mindif, ind1
 
     # Where input lambda range equals to leff + 0.5 AA
-    leff2 = leff + 0.5
+    leff2 = leff + 0.6
     dif = numpy.abs(wv - (leff2))
     mindif = numpy.min(dif)
   
@@ -583,10 +586,12 @@ def sclspect (iflux, wv, wv1, wv2, ispect, iband, wline, fline, fwhml):
         ind2 = numpy.where(wv == maxwv)
     else:
         ind2 = numpy.where(dif == mindif)
+    print 'leff1, dif, mindif, ind1=', leff1, dif, mindif, ind1
 
     ind1 = ind1[0]
     ind2 = ind2[0]
-   
+    print 'ind1, ind2=', ind1, ind2
+
     if (ind1.size == 0):
         ind1 = 0
     else:
