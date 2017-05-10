@@ -2468,8 +2468,8 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                         'src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>' + textcalc
         ###
         forbatchout = ''
-        headstring0 = 'SNR calculated at lambda_c='+str(lambdaeff)+' Angstroms for VPH='+str(vphname)+ ' \n'
-        headstring1 = "name, band, mag, SNR_perfr_c_voxel, SNR_perfr_cr1_voxel, SNR_perfr_cr1r2_voxel \n"
+        headstring0 = '***SNR calculated at lambda_c='+str(lambdaeff)+' Angstroms for VPH='+str(vphname)+ ' \n'
+        headstring1 = "***name, band, mag, SNR_perfr_c_voxel, SNR_perfr_cr1_voxel, SNR_perfr_cr1r2_voxel \n"
         forbatchout = forbatchout + headstring0
         forbatchout = forbatchout + headstring1
         if batchyesno_val=='batchyes':
