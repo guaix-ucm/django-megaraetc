@@ -1751,7 +1751,13 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
 
                 print 'SNR = ', SNR
 
-                xa = 1200
+                ### Cope for bright objects
+                if mag_val < 15:
+                    xa = 120    # initial value
+                    dec = 1     # rounding precision
+                else:
+                    xa = 1200   # initial value
+                    dec = 1     # rounding precision
                 ya = SNRfunc(xa,xxit)[i]
 
                 xb = xa*2
