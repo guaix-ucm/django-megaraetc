@@ -799,82 +799,168 @@ def etc_do(request):
             snrpframe_string = "{0:.2f}".format(snrpframe_val)
 
             etpframe_c_voxel_val = outputofcalc['etpframe_c_voxel_val']
-            if etpframe_c_voxel_val < 10:
-                etpframe_c_voxel_string = "{0:.2f}".format(etpframe_c_voxel_val)
-                etallframe_c_voxel_val = outputofcalc['etallframe_c_voxel_val']
-                etallframe_c_voxel_string = "{0:.2f}".format(etallframe_c_voxel_val)
-                etpframe_cr1_voxel_val = outputofcalc['etpframe_cr1_voxel_val']
-                etpframe_cr1_voxel_string = "{0:.2f}".format(etpframe_cr1_voxel_val)
-                etallframe_cr1_voxel_val = outputofcalc['etallframe_cr1_voxel_val']
-                etallframe_cr1_voxel_string = "{0:.2f}".format(etallframe_cr1_voxel_val)
-                etpframe_cr1r2_voxel_val = outputofcalc['etpframe_cr1r2_voxel_val']
-                etpframe_cr1r2_voxel_string = "{0:.2f}".format(etpframe_cr1r2_voxel_val)
-                etallframe_cr1r2_voxel_val = outputofcalc['etallframe_cr1r2_voxel_val']
-                etallframe_cr1r2_voxel_string = "{0:.2f}".format(etallframe_cr1r2_voxel_val)
-
-                etpframe_c_aa_val = outputofcalc['etpframe_c_aa_val']
-                etpframe_c_aa_string = "{0:.2f}".format(etpframe_c_aa_val)
-                etallframe_c_aa_val = outputofcalc['etallframe_c_aa_val']
-                etallframe_c_aa_string = "{0:.2f}".format(etallframe_c_aa_val)
-                etpframe_cr1_aa_val = outputofcalc['etpframe_cr1_aa_val']
-                etpframe_cr1_aa_string = "{0:.2f}".format(etpframe_cr1_aa_val)
-                etallframe_cr1_aa_val = outputofcalc['etallframe_cr1_aa_val']
-                etallframe_cr1_aa_string = "{0:.2f}".format(etallframe_cr1_aa_val)
-                etpframe_cr1r2_aa_val = outputofcalc['etpframe_cr1r2_aa_val']
-                etpframe_cr1r2_aa_string = "{0:.2f}".format(etpframe_cr1r2_aa_val)
-                etallframe_cr1r2_aa_val = outputofcalc['etallframe_cr1r2_aa_val']
-                etallframe_cr1r2_aa_string = "{0:.2f}".format(etallframe_cr1r2_aa_val)
-
-                etpframe_c_all_val = outputofcalc['etpframe_c_all_val']
-                etpframe_c_all_string = "{0:.2f}".format(etpframe_c_all_val)
-                etallframe_c_all_val = outputofcalc['etallframe_c_all_val']
-                etallframe_c_all_string = "{0:.2f}".format(etallframe_c_all_val)
-                etpframe_cr1_all_val = outputofcalc['etpframe_cr1_all_val']
-                etpframe_cr1_all_string = "{0:.2f}".format(etpframe_cr1_all_val)
-                etallframe_cr1_all_val = outputofcalc['etallframe_cr1_all_val']
-                etallframe_cr1_all_string = "{0:.2f}".format(etallframe_cr1_all_val)
-                etpframe_cr1r2_all_val = outputofcalc['etpframe_cr1r2_all_val']
-                etpframe_cr1r2_all_string = "{0:.2f}".format(etpframe_cr1r2_all_val)
-                etallframe_cr1r2_all_val = outputofcalc['etallframe_cr1r2_all_val']
-                etallframe_cr1r2_all_string = "{0:.2f}".format(etallframe_cr1r2_all_val)
+            if etpframe_c_voxel_val < 1:
+                etpframe_c_voxel_string = "< 1"
+                # etpframe_c_voxel_string = "{0:.2f}".format(etpframe_c_voxel_val)
             else:
                 etpframe_c_voxel_string = "{0:.0f}".format(etpframe_c_voxel_val)
-                etallframe_c_voxel_val = outputofcalc['etallframe_c_voxel_val']
+
+            etallframe_c_voxel_val = outputofcalc['etallframe_c_voxel_val']
+            if etallframe_c_voxel_val < 1:
+                etallframe_c_voxel_string = "< 1"
+                # etallframe_c_voxel_string = "{0:.2f}".format(etallframe_c_voxel_val)
+            else:
                 etallframe_c_voxel_string = "{0:.0f}".format(etallframe_c_voxel_val)
-                etpframe_cr1_voxel_val = outputofcalc['etpframe_cr1_voxel_val']
+
+            etpframe_cr1_voxel_val = outputofcalc['etpframe_cr1_voxel_val']
+            if etpframe_cr1_voxel_val < 1:
+                etpframe_cr1_voxel_string = "< 1"
+                # etpframe_cr1_voxel_string = "{0:.2f}".format(etpframe_cr1_voxel_val)
+            else:
                 etpframe_cr1_voxel_string = "{0:.0f}".format(etpframe_cr1_voxel_val)
-                etallframe_cr1_voxel_val = outputofcalc['etallframe_cr1_voxel_val']
+
+            etallframe_cr1_voxel_val = outputofcalc['etallframe_cr1_voxel_val']
+            if etallframe_cr1_voxel_val < 1:
+                etallframe_cr1_voxel_string = "< 1"
+                # etallframe_cr1_voxel_string = "{0:.2f}".format(etallframe_cr1_voxel_val)
+            else:
                 etallframe_cr1_voxel_string = "{0:.0f}".format(etallframe_cr1_voxel_val)
-                etpframe_cr1r2_voxel_val = outputofcalc['etpframe_cr1r2_voxel_val']
+
+            etpframe_cr1r2_voxel_val = outputofcalc['etpframe_cr1r2_voxel_val']
+            if etpframe_cr1r2_voxel_val < 1:
+                etpframe_cr1r2_voxel_string = "< 1"
+                # etpframe_cr1r2_voxel_string = "{0:.2f}".format(etpframe_cr1r2_voxel_val)
+            else:
                 etpframe_cr1r2_voxel_string = "{0:.0f}".format(etpframe_cr1r2_voxel_val)
-                etallframe_cr1r2_voxel_val = outputofcalc['etallframe_cr1r2_voxel_val']
+
+            etallframe_cr1r2_voxel_val = outputofcalc['etallframe_cr1r2_voxel_val']
+            if etallframe_cr1r2_voxel_val < 1:
+                etallframe_cr1r2_voxel_string = "< 1"
+                # etallframe_cr1r2_voxel_string = "{0:.2f}".format(etallframe_cr1r2_voxel_val)
+            else:
                 etallframe_cr1r2_voxel_string = "{0:.0f}".format(etallframe_cr1r2_voxel_val)
-    
-                etpframe_c_aa_val = outputofcalc['etpframe_c_aa_val']
+
+            etpframe_c_aa_val = outputofcalc['etpframe_c_aa_val']
+            if etpframe_c_aa_val < 1:
+                etpframe_c_aa_string = "< 1"
+                # etpframe_c_aa_string = "{0:.2f}".format(etpframe_c_aa_val)
+            else:
                 etpframe_c_aa_string = "{0:.0f}".format(etpframe_c_aa_val)
-                etallframe_c_aa_val = outputofcalc['etallframe_c_aa_val']
+
+            etallframe_c_aa_val = outputofcalc['etallframe_c_aa_val']
+            if etallframe_c_aa_val < 1:
+                etallframe_c_aa_string = "< 1"
+                # etallframe_c_aa_string = "{0:.2f}".format(etallframe_c_aa_val)
+            else:
                 etallframe_c_aa_string = "{0:.0f}".format(etallframe_c_aa_val)
-                etpframe_cr1_aa_val = outputofcalc['etpframe_cr1_aa_val']
+
+            etpframe_cr1_aa_val = outputofcalc['etpframe_cr1_aa_val']
+            if etpframe_cr1_aa_val < 1:
+                etpframe_cr1_aa_string = "< 1"
+                # etpframe_cr1_aa_string = "{0:.2f}".format(etpframe_cr1_aa_val)
+            else:
                 etpframe_cr1_aa_string = "{0:.0f}".format(etpframe_cr1_aa_val)
-                etallframe_cr1_aa_val = outputofcalc['etallframe_cr1_aa_val']
+
+            etallframe_cr1_aa_val = outputofcalc['etallframe_cr1_aa_val']
+            if etallframe_cr1_aa_val < 1:
+                etallframe_cr1_aa_string = "< 1"
+                # etallframe_cr1_aa_string = "{0:.2f}".format(etallframe_cr1_aa_val)
+            else:
                 etallframe_cr1_aa_string = "{0:.0f}".format(etallframe_cr1_aa_val)
-                etpframe_cr1r2_aa_val = outputofcalc['etpframe_cr1r2_aa_val']
+
+            etpframe_cr1r2_aa_val = outputofcalc['etpframe_cr1r2_aa_val']
+            if etpframe_cr1r2_aa_val < 1:
+                etpframe_cr1r2_aa_string = "< 1"
+                # etpframe_cr1r2_aa_string = "{0:.2f}".format(etpframe_cr1r2_aa_val)
+            else:
                 etpframe_cr1r2_aa_string = "{0:.0f}".format(etpframe_cr1r2_aa_val)
-                etallframe_cr1r2_aa_val = outputofcalc['etallframe_cr1r2_aa_val']
+
+            etallframe_cr1r2_aa_val = outputofcalc['etallframe_cr1r2_aa_val']
+            if etallframe_cr1r2_aa_val <1:
+                etallframe_cr1r2_aa_string = "< 1"
+                # etallframe_cr1r2_aa_string = "{0:.2f}".format(etallframe_cr1r2_aa_val)
+            else:
                 etallframe_cr1r2_aa_string = "{0:.0f}".format(etallframe_cr1r2_aa_val)
-    
-                etpframe_c_all_val = outputofcalc['etpframe_c_all_val']
+
+            etpframe_c_all_val = outputofcalc['etpframe_c_all_val']
+            if etpframe_c_all_val < 1:
+                etpframe_c_all_string = "< 1"
+                # etpframe_c_all_string = "{0:.2f}".format(etpframe_c_all_val)
+            else:
                 etpframe_c_all_string = "{0:.0f}".format(etpframe_c_all_val)
-                etallframe_c_all_val = outputofcalc['etallframe_c_all_val']
+
+            etallframe_c_all_val = outputofcalc['etallframe_c_all_val']
+            if etallframe_c_all_val < 1:
+                etallframe_c_all_string = "< 1"
+                # etallframe_c_all_string = "{0:.2f}".format(etallframe_c_all_val)
+            else:
                 etallframe_c_all_string = "{0:.0f}".format(etallframe_c_all_val)
-                etpframe_cr1_all_val = outputofcalc['etpframe_cr1_all_val']
+
+            etpframe_cr1_all_val = outputofcalc['etpframe_cr1_all_val']
+            if etpframe_cr1_all_val < 1:
+                etpframe_cr1_all_string = "< 1"
+                # etpframe_cr1_all_string = "{0:.2f}".format(etpframe_cr1_all_val)
+            else:
                 etpframe_cr1_all_string = "{0:.0f}".format(etpframe_cr1_all_val)
-                etallframe_cr1_all_val = outputofcalc['etallframe_cr1_all_val']
+
+            etallframe_cr1_all_val = outputofcalc['etallframe_cr1_all_val']
+            if etallframe_cr1_all_val < 1:
+                etallframe_cr1_all_string = "< 1"
+                # etallframe_cr1_all_string = "{0:.2f}".format(etallframe_cr1_all_val)
+            else:
                 etallframe_cr1_all_string = "{0:.0f}".format(etallframe_cr1_all_val)
-                etpframe_cr1r2_all_val = outputofcalc['etpframe_cr1r2_all_val']
+
+            etpframe_cr1r2_all_val = outputofcalc['etpframe_cr1r2_all_val']
+            if etpframe_cr1r2_all_val < 1:
+                etpframe_cr1r2_all_string = "< 1"
+                # etpframe_cr1r2_all_string = "{0:.2f}".format(etpframe_cr1r2_all_val)
+            else:
                 etpframe_cr1r2_all_string = "{0:.0f}".format(etpframe_cr1r2_all_val)
-                etallframe_cr1r2_all_val = outputofcalc['etallframe_cr1r2_all_val']
+
+            etallframe_cr1r2_all_val = outputofcalc['etallframe_cr1r2_all_val']
+            if etallframe_cr1r2_all_val < 1:
+                etallframe_cr1r2_all_string = "< 1"
+                # etallframe_cr1r2_all_string = "{0:.2f}".format(etallframe_cr1r2_all_val)
+            else:
                 etallframe_cr1r2_all_string = "{0:.0f}".format(etallframe_cr1r2_all_val)
+
+
+                # etallframe_c_voxel_val = outputofcalc['etallframe_c_voxel_val']
+                # etallframe_c_voxel_string = "{0:.0f}".format(etallframe_c_voxel_val)
+                # etpframe_cr1_voxel_val = outputofcalc['etpframe_cr1_voxel_val']
+                # etpframe_cr1_voxel_string = "{0:.0f}".format(etpframe_cr1_voxel_val)
+                # etallframe_cr1_voxel_val = outputofcalc['etallframe_cr1_voxel_val']
+                # etallframe_cr1_voxel_string = "{0:.0f}".format(etallframe_cr1_voxel_val)
+                # etpframe_cr1r2_voxel_val = outputofcalc['etpframe_cr1r2_voxel_val']
+                # etpframe_cr1r2_voxel_string = "{0:.0f}".format(etpframe_cr1r2_voxel_val)
+                # etallframe_cr1r2_voxel_val = outputofcalc['etallframe_cr1r2_voxel_val']
+                # etallframe_cr1r2_voxel_string = "{0:.0f}".format(etallframe_cr1r2_voxel_val)
+                #
+                # etpframe_c_aa_val = outputofcalc['etpframe_c_aa_val']
+                # etpframe_c_aa_string = "{0:.0f}".format(etpframe_c_aa_val)
+                # etallframe_c_aa_val = outputofcalc['etallframe_c_aa_val']
+                # etallframe_c_aa_string = "{0:.0f}".format(etallframe_c_aa_val)
+                # etpframe_cr1_aa_val = outputofcalc['etpframe_cr1_aa_val']
+                # etpframe_cr1_aa_string = "{0:.0f}".format(etpframe_cr1_aa_val)
+                # etallframe_cr1_aa_val = outputofcalc['etallframe_cr1_aa_val']
+                # etallframe_cr1_aa_string = "{0:.0f}".format(etallframe_cr1_aa_val)
+                # etpframe_cr1r2_aa_val = outputofcalc['etpframe_cr1r2_aa_val']
+                # etpframe_cr1r2_aa_string = "{0:.0f}".format(etpframe_cr1r2_aa_val)
+                # etallframe_cr1r2_aa_val = outputofcalc['etallframe_cr1r2_aa_val']
+                # etallframe_cr1r2_aa_string = "{0:.0f}".format(etallframe_cr1r2_aa_val)
+    
+                # etpframe_c_all_val = outputofcalc['etpframe_c_all_val']
+                # etpframe_c_all_string = "{0:.0f}".format(etpframe_c_all_val)
+                # etallframe_c_all_val = outputofcalc['etallframe_c_all_val']
+                # etallframe_c_all_string = "{0:.0f}".format(etallframe_c_all_val)
+                # etpframe_cr1_all_val = outputofcalc['etpframe_cr1_all_val']
+                # etpframe_cr1_all_string = "{0:.0f}".format(etpframe_cr1_all_val)
+                # etallframe_cr1_all_val = outputofcalc['etallframe_cr1_all_val']
+                # etallframe_cr1_all_string = "{0:.0f}".format(etallframe_cr1_all_val)
+                # etpframe_cr1r2_all_val = outputofcalc['etpframe_cr1r2_all_val']
+                # etpframe_cr1r2_all_string = "{0:.0f}".format(etpframe_cr1r2_all_val)
+                # etallframe_cr1r2_all_val = outputofcalc['etallframe_cr1r2_all_val']
+                # etallframe_cr1r2_all_string = "{0:.0f}".format(etallframe_cr1r2_all_val)
             
             if cmode == 'S':
                 cmode_string = 'SNR to exposure time'
@@ -904,6 +990,13 @@ def etc_do(request):
                 tableloutstring = '<hr />' + \
                                   'No line input<br /><br />'
 
+
+            if sourcet_val_string == 'Point':
+                inputfluxstring = '<tr><td>Input flux:</td><td>' + netflux_string + ' erg/s/cm$^{2}$/$\mathrm{\mathring A}$</td></tr>'
+            else:
+                inputfluxstring = ''
+
+
             if om_val_string == 'MOS':
                 switchstring = 'Sky-bundles:'
             elif om_val_string == 'LCB':
@@ -912,7 +1005,7 @@ def etc_do(request):
             if fluxt_val_string == 'L':
                 addlinestring = '<tr><td>Resolved line?:</td><td>' + resolvedline_val_string + '</td></tr>' + \
                                '<tr><td>Line wavelength:</td><td>' + wline_val_string + ' AA</td></tr>' + \
-                               '<tr><td>Line flux (integrated):</td><td>' + fline_val_string + ' erg/s/cm2</td></tr>' + \
+                               '<tr><td>Line flux (integrated):</td><td>' + fline_val_string + ' erg/s/cm$^{2}$</td></tr>' + \
                                '<tr><td>Line FWHM:</td><td>' + fwhmline_val_string + ' AA</td></tr>'
             elif fluxt_val_string == 'C':
                 addlinestring = ''
@@ -936,6 +1029,7 @@ def etc_do(request):
                                '<tr><td>Input flux type:</td><td>' + fluxt_name_string + '</td></tr>' + \
                                '<tr><td>Source spectrum:</td><td>' + spect_val_string + '</td></tr>' + \
                                '<tr><td>Input continuum:</td><td>' + bandc_val_string + ' = ' + mag_val_string + 'mag</td></tr>' + \
+                               inputfluxstring + \
                                '<tr><td>Resulting continuum flux:</td><td>' + fcont_string + ' erg/s/cm$^{2}$/$\mathrm{\mathring A}$/arcsec$^{2}$</td></tr>' + \
                                addlinestring + \
                                '<tr><td>*Sky Condition:</td><td>' + skycond_val_string + '</td></tr>' + \

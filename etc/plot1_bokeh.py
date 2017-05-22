@@ -13,6 +13,7 @@ def bokehplot1(x, y, ysky,
     from bokeh.models import Span
     from bokeh.models import Legend, Label, Range1d
 
+
     # x[0::10]    # too much datapoints, extract every 10
     # y[0::10]    # do the same here
     p1 = figure(plot_height=400, active_scroll="wheel_zoom", toolbar_location="above")

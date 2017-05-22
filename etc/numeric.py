@@ -609,7 +609,7 @@ def sclspect (iflux, wv, wv1, wv2, ispect, iband, wline, fline, fwhml):
     iband = iband[ind1:ind2]
     print "iband =", iband
     # Integrate in range to derive value    
-    value = numpy.trapz(srange * iband, wvrange)
+    value = numpy.trapz(srange * iband, wvrange) / numpy.trapz(iband, wvrange)
     print "value =",value
     # Compute scaling
     norm = iflux / value

@@ -24,15 +24,16 @@
                 });
             });
             </script>
-            <link
-                href="http://cdn.pydata.org/bokeh/release/bokeh-0.12.5.min.css"
-                rel="stylesheet" type="text/css">
-            <link
-                href="http://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.5.min.css"
-                rel="stylesheet" type="text/css">
+            <!--<link href="http://cdn.pydata.org/bokeh/release/bokeh-0.12.5.min.css" rel="stylesheet" type="text/css">-->
+            <!--<link href="http://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.5.min.css" rel="stylesheet" type="text/css">-->
 
-            <script src="http://cdn.pydata.org/bokeh/release/bokeh-0.12.5.min.js"></script>
-            <script src="http://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.5.min.js"></script>
+            <!--<script src="http://cdn.pydata.org/bokeh/release/bokeh-0.12.5.min.js"></script>-->
+            <!--<script src="http://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.5.min.js"></script>-->
+
+            <link href="{% static '/etc/css/bokeh-0.12.5.min.css' %}" rel="stylesheet" type="text/css">
+            <link href="{% static '/etc/css/bokeh-widgets-0.12.5.min.css' %}" rel="stylesheet" type="text/css">
+            <script type="text/javascript" src="{% static '/etc/js/bokeh-0.12.5.min.js' %}"> </script>
+            <script type="text/javascript" src="{% static '/etc/js/bokeh-widgets-0.12.5.min.js' %}"> </script>
     {% endblock %}
 
     {% block header %}
