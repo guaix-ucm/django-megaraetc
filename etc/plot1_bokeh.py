@@ -19,7 +19,7 @@ def bokehplot1(sourcet,
     # y[0::10]    # do the same here
     p1 = figure(plot_height=400, active_scroll="wheel_zoom", toolbar_location="above", webgl=True)
     inputsource = p1.line(x, y, color='blue')
-    # p1.line(x, ysky, color='cyan')
+    skyspec = p1.line(x, ysky, color='cyan')
     vlineg = Span(location=float(x3), dimension='height', line_color='green', line_width=1, line_dash='dashed')
     vlinemin = Span(location=float(vph_minval), dimension='height', line_color='red', line_width=1, line_dash='dashed')
     vlinemax = Span(location=float(vph_maxval), dimension='height', line_color='red', line_width=1, line_dash='dashed')
@@ -36,7 +36,7 @@ def bokehplot1(sourcet,
     p1.x_range = Range1d(vph_minval-100, vph_maxval+100)
 
     if label1=='Uniform':
-        p1.y_range = Range1d(0,2*max(y))
+        p1.y_range = Range1d(0, 2*max(y+ysky))
     if fluxt == 'L':
         legend1 = Legend(items=[
         ("VPH min max", [p1.line(0, 0, line_dash='dashed', line_width=1, color='red')]),
@@ -44,6 +44,7 @@ def bokehplot1(sourcet,
         ("input line" , [p1.line(0, 0, line_dash='dashed', line_width=1, color='green')]),
         ('', []),
         ('Source: ' + str(label1), [inputsource]),
+        ('Sky: UVES sky', [skyspec]),
         ('Cont. mag: ' + str('%.2f' % label2), []),
         ('Cont. band: ' + str(label3), []),
         ],
@@ -55,6 +56,7 @@ def bokehplot1(sourcet,
         ("VPH lambda_c" , [p1.line(0, 0, line_dash='dashed', line_width=1, line_color='orange')]),
         ('', []),
         ('Source: ' + str(label1), [inputsource]),
+        ('Sky: UVES sky', [skyspec]),
         ('Cont. mag: ' + str(label2), []),
         ('Cont. band: ' + str(label3), []),
         ],
