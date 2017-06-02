@@ -1,4 +1,4 @@
-def tablenewpsfMPT(lambdaeff_string, seeingx_string,
+def tablenewpsfMPT(lambdaeff_string, seeingx_string, exptimepframe_val_string, exptime_val_string, numframe_val_string,
 seeing_centermean_string, seeing_cr1_string,
 sncont_centerspaxel_voxel_string, sncont_cr1spaxels_voxel_string,
 tsncont_centerspaxel_voxel_string, tsncont_cr1spaxels_voxel_string,
@@ -11,9 +11,10 @@ tsncont_centerspaxel_all_string, tsncont_cr1spaxels_all_string):
                         '<br />(at lambda_c(VPH) = ' + lambdaeff_string + ' AA)' + \
                         '<table border=1>' + \
                         '<tr><th class="iconcolumn" scope="col"> </th>' + \
-                            '<th scope="col" colspan="5">* Continuum SNR per spaxel zones due to PSF (MOS mode):<br />' + \
-                            'fiber diameter=0.62 arcsec; Seeing FWHM=' + seeingx_string + ' arcsec</th>' + \
-                            '</tr>' + \
+                        '<th scope="col" colspan="7">* Continuum SNR reached for input exptime (' + exptimepframe_val_string + ' seconds per frame, with ' \
+                        + numframe_val_string + ' frames, and Total exptime of ' + exptime_val_string + ' seconds) per spaxel zones due to PSF (LCB mode):<br />' + \
+                        'fiber diameter=0.62 arcsec; Seeing FWHM=' + seeingx_string + ' arcsec</th>' + \
+                        '</tr>' + \
                         '<tr><th class="iconcolumn" scope="row"></th>' + \
                             '<th scope="col" colspan="2" class="perframecolumn">** per frame</th>' + \
                             '<th scope="col" colspan="2" class="allframecolumn">** all frames</th>' + \

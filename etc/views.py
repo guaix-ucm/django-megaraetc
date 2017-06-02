@@ -156,7 +156,7 @@ def compute5(request):
         else:
             batchyesno_val = 'batchno'
             print batchyesno_val
-            thebatchdata = "empty,empty,empty"
+            thebatchdata = "empty,empty,empty,empty"
 
 
         outputofcalc = calc(request.POST['stype'],
@@ -378,6 +378,8 @@ def etc_do(request):
                 label2 = outputofcalc['mag_val']
                 label3 = outputofcalc['bandc_val']
                 lc = outputofcalc['lambdaeff']
+                sourcet = outputofcalc['sourcet_val']
+                fluxt = outputofcalc['fluxt_val']
 
                 x2 = x
                 x2b = x2
@@ -414,7 +416,10 @@ def etc_do(request):
                 label1 = "none"
                 label2 = 20.0  # Float
                 label3 = "none"
-                lc = "none"
+                lc = 0
+                sourcet = "none"
+                fluxt = "none"
+
                 label2a = "none"
                 label2b = "none"
                 label2c = "none"
@@ -425,9 +430,9 @@ def etc_do(request):
                 y3 = outputofcalc['fwhmline_val']
                 z3 = outputofcalc['fline_val']
             else:
-                x3 = numpy.arange(1, 1001, 1)
-                y3 = numpy.arange(1, 1001, 1)
-                z3 = numpy.arange(1, 1001, 1)
+                x3 = 0
+                y3 = 0
+                z3 = 0
 
             # LEGACY CODE (MPLD3)
             # figura = plot_and_save_new('', x, y, x3, y3, z3,
@@ -437,13 +442,14 @@ def etc_do(request):
             # html += mpld3.fig_to_html(figura2)
             # html = html.replace("None", "")  # No se xq introduce string None
 
-            thescript, thediv = bokehplot1(x, y, ysky, x3, y3, z3,
+            thescript, thediv = bokehplot1(sourcet,
+                                           x, y, ysky, x3, y3, z3,
                                            vph_minval, vph_maxval,
                                            label1, label2, label3,
                                            x2, y2, x2b, y2b,
                                            x2c, y2c, x2d, y2d,
                                            label2a, label2b, label2c,
-                                           outputofcalc['fluxt_val'],
+                                           fluxt,
                                            lc)
         else:
             thescript = ""
@@ -993,8 +999,10 @@ def etc_do(request):
 
             if sourcet_val_string == 'Point':
                 inputfluxstring = '<tr><td>Input flux:</td><td>' + netflux_string + ' erg/s/cm$^{2}$/$\mathrm{\mathring A}$</td></tr>'
+                resultfluxstring = '<tr><td>Continuum flux per area seeing:</td><td>' + fcont_string + ' erg/s/cm$^{2}$/$\mathrm{\mathring A}$/arcsec$^{2}$</td></tr>'
             else:
-                inputfluxstring = ''
+                inputfluxstring = '<tr><td>Input flux:</td><td>' + netflux_string + ' erg/s/cm$^{2}$/$\mathrm{\mathring A}$/arcsec$^{2}$</td></tr>'
+                resultfluxstring = ''
 
 
             if om_val_string == 'MOS':
@@ -1030,7 +1038,7 @@ def etc_do(request):
                                '<tr><td>Source spectrum:</td><td>' + spect_val_string + '</td></tr>' + \
                                '<tr><td>Input continuum:</td><td>' + bandc_val_string + ' = ' + mag_val_string + 'mag</td></tr>' + \
                                inputfluxstring + \
-                               '<tr><td>Resulting continuum flux:</td><td>' + fcont_string + ' erg/s/cm$^{2}$/$\mathrm{\mathring A}$/arcsec$^{2}$</td></tr>' + \
+                               resultfluxstring + \
                                addlinestring + \
                                '<tr><td>*Sky Condition:</td><td>' + skycond_val_string + '</td></tr>' + \
                                '<tr><td>Moon:</td><td>' + moon_val_string + '</td></tr>' + \
@@ -1068,6 +1076,9 @@ def etc_do(request):
                     from output_table_MOS_P_T import tablenewpsfMPT
                     tablenewpsfstring = tablenewpsfMPT(lambdaeff_string,
                                                        seeingx_string,
+                                                       exptimepframe_val_string,
+                                                       exptime_val_string,
+                                                       numframe_val_string,
                                                        seeing_centermean_string,
                                                        seeing_cr1_string,
                                                        sncont_centerspaxel_voxel_string,
@@ -1088,6 +1099,9 @@ def etc_do(request):
                     from output_table_MOS_E_T import tablenewpsfMET
                     tablenewpsfstring = tablenewpsfMET(lambdaeff_string,
                                                        seeingx_string,
+                                                       exptimepframe_val_string,
+                                                       exptime_val_string,
+                                                       numframe_val_string,
                                                        nfibres_string,
                                                        sncont_centerspaxel_voxel_string,
                                                        sncont_cr1spaxels_voxel_string,
@@ -1112,6 +1126,9 @@ def etc_do(request):
                     from output_table_LCB_P_T import tablenewpsfLPT
                     tablenewpsfstring = tablenewpsfLPT(lambdaeff_string,
                                                        seeingx_string,
+                                                       exptimepframe_val_string,
+                                                       exptime_val_string,
+                                                       numframe_val_string,
                                                        seeing_centermean_string,
                                                        seeing_cr1_string,
                                                        seeing_cr1r2_string,
@@ -1138,6 +1155,9 @@ def etc_do(request):
                     from output_table_LCB_E_T import tablenewpsfLET
                     tablenewpsfstring = tablenewpsfLET(lambdaeff_string,
                                                        seeingx_string,
+                                                       exptimepframe_val_string,
+                                                       exptime_val_string,
+                                                       numframe_val_string,
                                                        sncont_centerspaxel_voxel_string,
                                                        sncont_cr1spaxels_voxel_string,
                                                        sncont_cr1r2spaxels_voxel_string,

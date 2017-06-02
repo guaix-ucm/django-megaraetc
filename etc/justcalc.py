@@ -379,6 +379,22 @@ npy = 4096.0
 # Dimensions of detector (Vertical direction). Plus 16 rows devoted to dark? npy = 4112
 npx = 4096.0
 
+# Counts
+# C = photonflux * pi * rt**2 * QE * exptime
+# where
+#
+# photonflux is the photons flux in photons per square area per time received by the pixel;
+# it is proportional to the luminosity of the target divided by 4pid^2 (where d is the distance between the
+# target and the telescope) divided by the average energy of a photon after it passed through the filter used.
+#
+# pi * rt**2 is the area of the telescope.
+#
+# QE is the quantum efficiency of the CCD at the wavelengths appropriate to the filter being used with the telescope/CCD;
+# it is the ratio of the number of electrons produced to the number of incoming photons.
+#
+# exptime is the exposure time.
+#
+#
 # IMPORTANT NOTE FOR DJANGO USERS:
 # queries to the SQL database in the code will interfere with
 # the migration process of Django (1.9), when tables in the database are dropped.
@@ -501,9 +517,7 @@ skymag_list = [22.0,  # Sky U
                20.0]  # Sky I
 
 # Transmission curves
-# Atmospheric transmission at La Palma: 72% @400 nm, 80% @450 nm, 84% @500 nm
-# Preub, Hermann, Hofmann, & Kohnle NIMPR.
-# Section A, Volume 481, Issues 1-3, 1 April 2002, Pages 229-240
+# Atmospheric transmission curve combined from Anglo-Australian Observatory and Mauna Kea  (09/April/10, CEM).
 tatmdat = "MEGARA_TRANSM_0.1aa/atmt_total_0.1aa.dat"
 
 # Reading transmission curve of atmosphere
@@ -787,9 +801,33 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
         # sourcespectrum = spectdat[1]
         sourcespectrum = numpy.array(sourcespectrum)
 
-        # Reading template of sky emission [code to be done HERE]
-        skydat = 'normalized_skyspectrum.txt'
+        ### Reading template of sky emission
+        skydat = 'normalized_skyspectrum.txt'   # UVES sky
         lambsky, skyspectrum = reading(skydat, 2)
+        # print 'SKY SPECTRUM=', skyspectrum
+        print 'type(sky spectrum)=', type(skyspectrum)
+        # # Gaussian degrading
+        from scipy.ndimage.filters import gaussian_filter
+        # # FWHM = 2*sqrt(2 ln2) = 2.355 sigma
+        sigma = fwhmvph / 2.355
+        blurredy = gaussian_filter(skyspectrum, sigma=sigma)
+        # # normalize blurred(y) to 1
+        blurrednormy = []
+        # strblurrednormy = []
+        sumby = sum(blurredy)
+        print 'SUMBY=',sumby
+        for idx, val in enumerate(blurredy):
+            scaley = val / sumby
+            blurrednormy.append(scaley)
+        #     reformatted = "{:.6e}".format(scaley)
+        #     strblurrednormy.append(reformatted)
+        print 'type(blurrednormy)=',type(blurrednormy)
+        skyspectrum = numpy.array(blurrednormy)
+        print 'type(skyspectrum)=',type(skyspectrum)
+        print ''
+        # skyspectrum = blurrednormy
+
+        ### LEGACY
         # skyspectrum = sourcespectrum
 
 
@@ -2051,8 +2089,8 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
             # print batchdata
             filelength = len(batchdata.split("\n")) # lines are split by \r
             print filelength
-            if filelength > 92:
-                print "INPUT DATA CONTAINS MORE THAN 92 LINES: NOT COMPUTING"
+            if filelength > 500:
+                print "INPUT DATA CONTAINS MORE THAN 500 LINES: NOT COMPUTING"
             else:
                 thedata = batchdata.split("\n")
                 print 'thedata=', thedata
@@ -2464,7 +2502,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
             # outtext="No Warnings."     # ADDED FOR DJANGO
             outtext = ""
 
-        # THESE ARE FOR DOWNLOADABLE FILES
+        # THESE ARE FOR DOWNLOADABLE FILES ### CAUTION MATHJAX DEPRECATED; NEED TO CHANGE CDN (THAT WORKS!)
         forfileoutput = outtext + texti + textoc + textol
         forfileoutput2 = '<script type="text/x-mathjax-config">MathJax.Hub.Config({' \
                         'tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]},' \

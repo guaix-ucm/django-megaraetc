@@ -550,6 +550,7 @@ def specparline(om_val, xit, areasource, diamsource, ps, disp, nfibres, areafibr
 #
 def sclspect (iflux, wv, wv1, wv2, ispect, iband, wline, fline, fwhml):
     print 'FCONT=',iflux
+    print 'ispect=',ispect
     wv1 = numpy.array(wv1)
     wv2 = numpy.array(wv2)
     minwv = min(wv)
@@ -575,8 +576,8 @@ def sclspect (iflux, wv, wv1, wv2, ispect, iband, wline, fline, fwhml):
         ind1 = numpy.where(dif == mindif)
     print 'leff1, dif, mindif, ind1=', leff1, dif, mindif, ind1
 
-    # Where input lambda range equals to leff + 0.5 AA
-    leff2 = leff + 0.6
+    # Where input lambda range equals to leff + 0.5 AA (need to add 0.1 AA to have exactly 11 points and thus 10 intervals for the normalization)
+    leff2 = leff + 0.6 # or 0.6 for 11 points
     dif = numpy.abs(wv - (leff2))
     mindif = numpy.min(dif)
   
@@ -608,15 +609,21 @@ def sclspect (iflux, wv, wv1, wv2, ispect, iband, wline, fline, fwhml):
     # Extract filter transmission in wavelength range
     iband = iband[ind1:ind2]
     print "iband =", iband
+
     # Integrate in range to derive value    
-    value = numpy.trapz(srange * iband, wvrange) / numpy.trapz(iband, wvrange)
-    print "value =",value
+    # value = numpy.trapz(srange * iband, wvrange) #/ numpy.trapz(iband, wvrange)
+    # value = ispect[leff] / numpy.trapz(srange * iband, wvrange)
+    # print "value =",value
+
+
     # Compute scaling
-    norm = iflux / value
+    # norm = iflux / value
+    norm = iflux/ispect[leff]   #NEW scaling factor
     print "iflux =", iflux
+    print "ispect[leff] =", ispect[leff]
     print "norm =", norm
     # Scaled spectrum
-    scspect = norm * ispect
+    scspect = ispect * norm
     print "ispect =", ispect
     print "scspect =", scspect
 

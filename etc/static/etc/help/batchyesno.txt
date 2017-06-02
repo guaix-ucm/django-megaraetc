@@ -5,7 +5,7 @@ and when SOURCE TYPE is set to POINT SOURCE.
 
 You can copy/paste your input data in the text field,
 in the following three-columns format:
-(1) a name (2)the UBVRI filter band, and (3)the AB magnitude in that band.
+(1) a target name (2)the UBVRI filter band, and (3)the Vega magnitude of the target in that band.
 The columns should be separated by COMMAS.
 
 All '# (sharp)' character are considered as a comments
@@ -13,7 +13,7 @@ and are not read by the program.
 
 
 INPUT EXAMPLE:
-#name, band, ABmag
+#name, band, Vegamag
 V* T Dra,B,18.08
 LHS 1903,V,12.21
 GD 299,B,11.824
@@ -21,6 +21,6 @@ GD 299,B,11.824
 
 
 CAUTION:
-there is an upper limit of 92 (max bundles) to the number of line that can be inputted in the text field.
+there is an upper limit of 500 to the number of line that can be inputted in the text field.
 Each line counts, therefore, we recommend that you do not add a header in the text field (since it would count as a line).
-Be careful also to extra lines masqueraded as blank space.
+Be careful also to empty lines masqueraded as blank space.

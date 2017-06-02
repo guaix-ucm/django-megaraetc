@@ -205,3 +205,8 @@ div.release{
 div#recommendation{
     text-align: center;
 }
+
+.redfont {
+    color: red;
+    font-weight: bold;
+}

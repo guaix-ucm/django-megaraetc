@@ -1,7 +1,8 @@
 ** CALCULATION MODE **
 Choices:
 - Exposure time to SNR: input the exposure time per frame and output the SNR (default).
-- SNR to exposure time(1): input the total SNR you wish to reach and output total exposure time and exposure time per frame for each zone (per voxel, aa, integrated spectrum), rounded to unit second.
+- SNR to exposure time(1)(2)(3): input the total SNR you wish to reach and output total exposure time and exposure time per frame for each zone (per voxel, aa, integrated spectrum), rounded to unit second.
 
-(1) Caution: the calculations of the best exposure time are done using the so-called bisection method via multiple (maximum 20) iterations for each case (per voxel, aa, integrated spectrum), and thus,
-takes longer to complete.
+(1) Caution: the calculations of the best exposure time are done using the so-called bisection method via multiple (maximum 20) iterations for each case (per voxel, aa, integrated spectrum), and thus, takes longer to complete.
+(2) In the case of really bright source (< 12 mag), it is better to use a high value for the "Total SNR".
+(3) Exposure times of less than 1 second (Megara's minimum limit is 1 second) are shown as the string '< 1'.

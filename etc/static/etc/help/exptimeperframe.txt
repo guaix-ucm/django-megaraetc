@@ -5,4 +5,4 @@ Each frame is assumed to have this exposure time.
 or
 
 ** TOTAL SNR **
-Total (= all frame combined) Signal-to-Noise ratio (dimensionless).
+Total (= all frames combined) Signal-to-Noise ratio (dimensionless).
