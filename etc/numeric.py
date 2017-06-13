@@ -611,16 +611,16 @@ def sclspect (iflux, wv, wv1, wv2, ispect, iband, wline, fline, fwhml):
     print "iband =", iband
 
     # Integrate in range to derive value    
-    # value = numpy.trapz(srange * iband, wvrange) #/ numpy.trapz(iband, wvrange)
+    value = numpy.trapz(srange * iband, wvrange) / numpy.trapz(iband, wvrange)
     # value = ispect[leff] / numpy.trapz(srange * iband, wvrange)
     # print "value =",value
 
 
     # Compute scaling
-    # norm = iflux / value
-    norm = iflux/ispect[leff]   #NEW scaling factor
+    norm = iflux / value
+    # norm = iflux/ispect[leff]   #NEW scaling factor// UPDATE: NOT WORKING
     print "iflux =", iflux
-    print "ispect[leff] =", ispect[leff]
+    # print "ispect[leff] =", ispect[leff]  # BUGS on Apache server
     print "norm =", norm
     # Scaled spectrum
     scspect = ispect * norm
