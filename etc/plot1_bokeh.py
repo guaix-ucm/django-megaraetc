@@ -14,7 +14,6 @@ def bokehplot1(sourcet,
     from bokeh.models import Span
     from bokeh.models import Legend, Label, Range1d
 
-
     # x[0::10]    # too much datapoints, extract every 10
     # y[0::10]    # do the same here
     p1 = figure(plot_height=400, active_scroll="wheel_zoom", toolbar_location="above", webgl=True)
@@ -28,7 +27,7 @@ def bokehplot1(sourcet,
 
     # Change according to input source type (P or E)
     if sourcet=='P' or sourcet=='Point':
-        p1.yaxis.axis_label = "Flux (erg/s/cm2/Angstrom) per seeing area"
+        p1.yaxis.axis_label = "Continuum Flux (erg/s/cm2/Angstrom/arcsec2) in seeing disk"
     else:
         p1.yaxis.axis_label = "Flux (erg/s/cm2/Angstrom/arcsec2)"
 
@@ -67,6 +66,9 @@ def bokehplot1(sourcet,
     p1.add_layout(legend1, 'right') # to plot outside fo plot
 
 
+    ###################
+    ### SECOND PLOT ###
+    ###################
     p2 = figure(plot_height=400,
                 x_range=p1.x_range, active_scroll="wheel_zoom", toolbar_location="above", webgl=True)
     p2.multi_line([x2, x2b, x2c, x2d], [y2, y2b, y2c,y2d],
@@ -78,10 +80,10 @@ def bokehplot1(sourcet,
 
     if fluxt=='L':
         legend2 = Legend(items=[
-            ("per-fr. c fib.", [p2.line(0, 0, line_width=1, color='red')]),
-            ("all-fr. c fib." , [p2.line(0, 0, line_width=3, color='red')]),
-            ("per-fr. c+r1 fibs." , [p2.line(0, 0, line_width=1, color='blue')]),
-            ("all-fr. c+r1 fibs.", [p2.line(0, 0, line_width=3, color='blue')]),
+            ("per-fr. 1 fib.", [p2.line(0, 0, line_width=1, color='red')]),
+            ("all-fr. 1 fib." , [p2.line(0, 0, line_width=3, color='red')]),
+            ("per-fr. all fibs." , [p2.line(0, 0, line_width=1, color='blue')]),
+            ("all-fr. all fibs.", [p2.line(0, 0, line_width=3, color='blue')]),
             ("", []),
             ("Source: " + str(label2a), []),
             ("VPH: " + str(label2b), []),
@@ -91,10 +93,10 @@ def bokehplot1(sourcet,
             )
     else:
         legend2 = Legend(items=[
-            ("per-fr. 1 fib.", [p2.line(0, 0, line_width=1, color='red')]),
-            ("all-fr. 1 fib." , [p2.line(0, 0, line_width=3, color='red')]),
-            ("per-fr. all fibs." , [p2.line(0, 0, line_width=1, color='blue')]),
-            ("all-fr. all fibs.", [p2.line(0, 0, line_width=3, color='blue')]),
+            ("per-fr. C fib.", [p2.line(0, 0, line_width=1, color='red')]),
+            ("all-fr. C fib." , [p2.line(0, 0, line_width=3, color='red')]),
+            ("per-fr. C+R1 fibs." , [p2.line(0, 0, line_width=1, color='blue')]),
+            ("all-fr. C+R1 fibs.", [p2.line(0, 0, line_width=3, color='blue')]),
             ("", []),
             ("Source: " + str(label2a), []),
             ("VPH: " + str(label2b), []),
@@ -121,10 +123,10 @@ def bokehplot1(sourcet,
     #                  )
     # p2.add_layout(citation2)
 
-    # layout plots in a column
+    ### layout plots and widgets in a column
     allplots = column(p1, p2)
 
-    # ouptut js script and html <div>
+    ### ouptut js script and html <div>
     thescript, thediv = components(allplots, CDN)
 
     return thescript, thediv

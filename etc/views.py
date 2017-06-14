@@ -999,7 +999,7 @@ def etc_do(request):
 
             if sourcet_val_string == 'Point':
                 inputfluxstring = '<tr><td>Input flux:</td><td>' + netflux_string + ' erg/s/cm$^{2}$/$\mathrm{\mathring A}$</td></tr>'
-                resultfluxstring = '<tr><td>Continuum flux per area seeing:</td><td>' + fcont_string + ' erg/s/cm$^{2}$/$\mathrm{\mathring A}$/arcsec$^{2}$</td></tr>'
+                resultfluxstring = '<tr><td>Continuum flux per arcsec$^{2}$ <br />within the seeing disk:"</td><td>' + fcont_string + ' erg/s/cm$^{2}$/$\mathrm{\mathring A}$/arcsec$^{2}$</td></tr>'
             else:
                 inputfluxstring = '<tr><td>Input flux:</td><td>' + netflux_string + ' erg/s/cm$^{2}$/$\mathrm{\mathring A}$/arcsec$^{2}$</td></tr>'
                 resultfluxstring = ''
