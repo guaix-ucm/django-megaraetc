@@ -1049,7 +1049,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
 
         # System efficiency
         tcondmag = tcond[skycond_list.index(skycond_val)]
-        effsys = tatm * tgtcinst * tcondmag
+        effsys = tatm * tcondmag * tgtcinst * 0.822     # new value of 0.822 added June 15, 2017
         textcalc += "System efficiency: <br />"
         textcalc += "Sky conditions: %s <br />" % skycond_val
         textcalc += "System efficiency$ = tatm \\times tgtcinst \\times tcondmag$ <br />"
