@@ -1006,6 +1006,9 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
 
         # Initial and final lambda of continuum filter:
         filtercar = filterchar_list[bandc_list.index(bandc_val)]
+        filterfwhm = filtercar[1]   # Photometric filter 'width'
+        print 'FILTER TYPE =', bandc_val
+        print 'FILTER FWHM =', filterfwhm
         lc1 = filtercar[2]
         lc2 = filtercar[3]
         textcalc += "Initial lambda of continuum filter: %s <br />" % lc1
@@ -1052,7 +1055,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
         effsys = tatm * tcondmag * tgtcinst * 0.822     # new value of 0.822 added June 15, 2017
         textcalc += "System efficiency: <br />"
         textcalc += "Sky conditions: %s <br />" % skycond_val
-        textcalc += "System efficiency$ = tatm \\times tgtcinst \\times tcondmag$ <br />"
+        textcalc += "System efficiency$ = tatm \\times tgtcinst \\times tcondmag \\times 0.822 (new GTC reflectivity)$ <br />"
 
         # Telescope collecting area (cm**2)
         stel = pi * ((rt * 100.0) ** 2)
@@ -1120,7 +1123,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
             textcalc += "integrated line flux $F_{line} = \\frac{F_{line,input}}{A_{seeing}} = \\frac{%s}{%s} = %s \\textrm{erg/s/cm}^{2}$ <br />" % (fline_val, areaseeing, flineparc)
 
         # Source spectrum scaled to totalflux in continuum
-        normc, fc = sclspect(fcont, lamb, lc1, lc2, sourcespectrum, tfilterc, wline_val, fline_val, fwhmline_val)
+        normc, fc = sclspect(fcont, lamb, lc1, lc2, sourcespectrum, tfilterc, filterfwhm, wline_val, fline_val, fwhmline_val)
         textcalc += "Normalization factor: normc = %s <br />" % normc
         textcalc += "Scaled spectrum: fc = %s <br />" % fc
 
@@ -1177,7 +1180,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
         textcalc+= "Reading filter transmission file %s because bandsky= %s <br />" % (filtercvphdat, bandsky)
 
         # Sky spectrum scaled to totalflux in input filter
-        norms, fs = sclspect(fsky, lamb, ls1, ls2, skyspectrum, tfiltercvph, wline_val, fline_val, fwhmline_val)
+        norms, fs = sclspect(fsky, lamb, ls1, ls2, skyspectrum, tfiltercvph, filterfwhm, wline_val, fline_val, fwhmline_val)
         textcalc += "Normalization factor for sky spectrum norms = %s <br />" % norms
 
 
@@ -1982,7 +1985,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                 fvegac = vegafeatures[1]
                 netflux = mag2flux(magvegac, fvegac, themag)
                 fcont = netflux / areaseeing
-                normc, fc = sclspect(fcont, lamb, lc1, lc2, sourcespectrum, tfilterc, wline_val, fline_val, fwhmline_val)
+                normc, fc = sclspect(fcont, lamb, lc1, lc2, sourcespectrum, tfilterc, filterfwhm, wline_val, fline_val, fwhmline_val)
                 fcctr = fc * seeing_centermean/(1*100)  # 1 spaxel
                 fcr1 = fc * seeing_ring1mean/(6*100)    # 6 spaxels
                 fcr2 = fc * seeing_ring2mean/(12*100)   # 12 spaxels
@@ -1993,7 +1996,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                 fskyvega = mag2flux(magvegas, fvegas, skymag)
                 fsky = fskyvega * skybf
 
-                norms, fs = sclspect(fsky, lamb, ls1, ls2, skyspectrum, tfiltercvph, wline_val, fline_val, fwhmline_val)
+                norms, fs = sclspect(fsky, lamb, ls1, ls2, skyspectrum, tfiltercvph, filterfwhm, wline_val, fline_val, fwhmline_val)
 
                 # Deriving spectroscopic parameters for each case:
                 xit=xxit

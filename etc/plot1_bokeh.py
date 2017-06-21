@@ -14,11 +14,19 @@ def bokehplot1(sourcet,
     from bokeh.models import Span
     from bokeh.models import Legend, Label, Range1d
 
+    from bokeh.layouts import layout
+    from bokeh.layouts import widgetbox
+    from bokeh.models.widgets import CheckboxGroup
+    from bokeh.models import CustomJS, ColumnDataSource
+
     # x[0::10]    # too much datapoints, extract every 10
     # y[0::10]    # do the same here
+    inpsource = ColumnDataSource(data=dict(t=x, c=y))
+    skysource = ColumnDataSource(data=dict(t=x, c=ysky))
+
     p1 = figure(plot_height=400, active_scroll="wheel_zoom", toolbar_location="above", webgl=True)
-    inputsource = p1.line(x, y, color='blue')
-    skyspec = p1.line(x, ysky, color='cyan')
+    skyspec = p1.line(x, ysky, color='cyan', source=skysource)
+    inputsource = p1.line(x, y, color='blue', source=inpsource)
     vlineg = Span(location=float(x3), dimension='height', line_color='green', line_width=1, line_dash='dashed')
     vlinemin = Span(location=float(vph_minval), dimension='height', line_color='red', line_width=1, line_dash='dashed')
     vlinemax = Span(location=float(vph_maxval), dimension='height', line_color='red', line_width=1, line_dash='dashed')
@@ -35,7 +43,9 @@ def bokehplot1(sourcet,
     p1.x_range = Range1d(vph_minval-100, vph_maxval+100)
 
     if label1=='Uniform':
-        p1.y_range = Range1d(0, 2*max(y+ysky))
+        p1.y_range = Range1d(0, 2*max(y))
+    else:
+        p1.y_range = Range1d(0, 1.5*max(y))
     if fluxt == 'L':
         legend1 = Legend(items=[
         ("VPH min max", [p1.line(0, 0, line_dash='dashed', line_width=1, color='red')]),
@@ -65,6 +75,22 @@ def bokehplot1(sourcet,
     p1.legend.border_line_alpha = 0.5
     p1.add_layout(legend1, 'right') # to plot outside fo plot
 
+    # INTERACTIVE PLOTS
+    checkbox = CheckboxGroup(labels=["Input source spectrum", "Sky spectrum"], active=[0, 1])
+
+    checkbox.callback = CustomJS(args=dict(line0=inputsource, line1=skyspec), code="""
+        //console.log(cb_obj.active);
+        line0.visible = false;
+        line1.visible = false;
+        for (i in cb_obj.active) {
+            //console.log(cb_obj.active[i]);
+            if (cb_obj.active[i] == 0) {
+                line0.visible = true;
+            } else if (cb_obj.active[i] == 1) {
+                line1.visible = true;
+            }
+        }
+    """)
 
     ###################
     ### SECOND PLOT ###
@@ -123,8 +149,11 @@ def bokehplot1(sourcet,
     #                  )
     # p2.add_layout(citation2)
 
+    ### LAYOUT ###
     ### layout plots and widgets in a column
-    allplots = column(p1, p2)
+    # allplots = column(widgetbox(checkbox), p1, p2)
+    # allplots = column(p1, p2)
+    allplots = layout([widgetbox(checkbox)], [p1], [p2])
 
     ### ouptut js script and html <div>
     thescript, thediv = components(allplots, CDN)

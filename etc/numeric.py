@@ -547,10 +547,15 @@ def specparline(om_val, xit, areasource, diamsource, ps, disp, nfibres, areafibr
 # wv2 - Upper wavelength of bandwidth (AA)
 # ispect - Input spectrum template to normalize
 # iband - Input filter transmission
+# filterfwhm - Input filter FWHM (AA)
+# wline - Input line wavelength (AA)
+# fline - Input line flux
+# fwhml - Input line FWHM (AA)
 #
-def sclspect (iflux, wv, wv1, wv2, ispect, iband, wline, fline, fwhml):
+def sclspect (iflux, wv, wv1, wv2, ispect, iband, filterfwhm, wline, fline, fwhml):
     print 'FCONT=',iflux
     print 'ispect=',ispect
+    print 'filterfwhm=', filterfwhm
     wv1 = numpy.array(wv1)
     wv2 = numpy.array(wv2)
     minwv = min(wv)
@@ -564,7 +569,12 @@ def sclspect (iflux, wv, wv1, wv2, ispect, iband, wline, fline, fwhml):
     print "leff=", leff
 
     # Where input lambda range equals to leff - 0.5 AA
-    leff1 = leff - 0.5
+    # LEFT SIDE
+    # OLD
+    # leff1 = leff - 0.5
+    #
+    # NEW! USING Filter's FWHM
+    leff1 = leff - filterfwhm/2
     dif = numpy.abs(wv - (leff1))
     mindif = numpy.min(dif)
   
@@ -576,8 +586,13 @@ def sclspect (iflux, wv, wv1, wv2, ispect, iband, wline, fline, fwhml):
         ind1 = numpy.where(dif == mindif)
     print 'leff1, dif, mindif, ind1=', leff1, dif, mindif, ind1
 
+    # RIGHT SIDE
     # Where input lambda range equals to leff + 0.5 AA (need to add 0.1 AA to have exactly 11 points and thus 10 intervals for the normalization)
-    leff2 = leff + 0.6 # or 0.6 for 11 points
+    # OLD
+    # leff2 = leff + 0.6 # or 0.6 for 11 points
+    #
+    # NEW! USING Filter's FWHM
+    leff2 = leff + filterfwhm/2
     dif = numpy.abs(wv - (leff2))
     mindif = numpy.min(dif)
   

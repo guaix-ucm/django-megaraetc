@@ -216,7 +216,7 @@ def get_info(request):
         form4 = ObservationalSetupForm()
         form5 = OutputSetupForm()
 
-    return render(request, 'etc/webmegaraetc-1.0.0.html', {
+    return render(request, 'etc/webmegaraetc-1.0.1.html', {
         'form1': form1,
         'formU': formU,
         'form2': form2,
@@ -243,7 +243,7 @@ def etc_form(request):
                    'form5': form5,
                    }
 
-    return render(request, 'etc/webmegaraetc-1.0.0.html', total_formu)
+    return render(request, 'etc/webmegaraetc-1.0.1.html', total_formu)
 
 ########################
 # ON HOLD UNTIL I FIND A GOOD WAY TO UPLOAD FILES

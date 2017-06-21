@@ -1,5 +1,6 @@
 ### MEGARA ONLINE ETC HISTORY ###
 
+2017/06/21 v1.0.1 GTC reflectivity updated. Normalization of input spectrum now uses FWHM range of filter. Added line-toggling checkboxes to plot.
 2017/06/02 v1.0.0 Updated bokeh v.0.12.5, Manual, and Quick Guide.
 2017/03/30 v0.9.5 Added new calculation mode and batch process capability.
 2017/03/01 v0.8.1 Added confirmation message when resetting the form.
