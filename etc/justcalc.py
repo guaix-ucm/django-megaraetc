@@ -1126,6 +1126,9 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
         normc, fc = sclspect(fcont, lamb, lc1, lc2, sourcespectrum, tfilterc, filterfwhm, wline_val, fline_val, fwhmline_val)
         textcalc += "Normalization factor: normc = %s <br />" % normc
         textcalc += "Scaled spectrum: fc = %s <br />" % fc
+        indlambc = numpy.where(lamb == lambdaeff)
+        contatlambdacvph = fc[indlambc]
+        print 'CONTATLAMBDACVPH =', contatlambdacvph
 
         # TODO: The flux of the source, if it is a point source, is then spread
         # because of the seeing and can span across rings of spaxels.
@@ -2548,6 +2551,7 @@ def calc(sourcet_val, inputcontt_val, mag_val, fc_val, \
                 'moon_val': moon_val, \
                 'airmass_val': airmass_val, 'seeing_zenith': seeing_zenith, \
                 'fcont': fcont, \
+                'contatlambdacvph': contatlambdacvph, \
                 'fsky': fsky, 'numframe_val': numframe_val, \
                 'cmode_val': cmode_val, \
                 'snr_val': snr_val, \

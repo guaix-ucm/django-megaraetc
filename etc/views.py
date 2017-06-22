@@ -488,6 +488,7 @@ def etc_do(request):
             airmass_val_string = str(outputofcalc['airmass_val'])
             seeing_zenith_string = str(outputofcalc['seeing_zenith'])
             fcont_string = '%.3e' % outputofcalc['fcont']
+            contatlambdacvph_string = '%.3e' % outputofcalc['contatlambdacvph']
             fsky_string = '%.3e' % outputofcalc['fsky']
             numframe_val = outputofcalc['numframe_val']
             numframe_val_string = "{0:.0f}".format(float(numframe_val))
@@ -999,7 +1000,7 @@ def etc_do(request):
 
             if sourcet_val_string == 'Point':
                 inputfluxstring = '<tr><td>Input flux:</td><td>' + netflux_string + ' erg/s/cm$^{2}$/$\mathrm{\mathring A}$</td></tr>'
-                resultfluxstring = '<tr><td>Continuum flux per arcsec$^{2}$ <br />within the seeing disk:"</td><td>' + fcont_string + ' erg/s/cm$^{2}$/$\mathrm{\mathring A}$/arcsec$^{2}$</td></tr>'
+                resultfluxstring = '<tr><td>Continuum flux per arcsec$^{2}$ <br />within the seeing disk:"</td><td>' + contatlambdacvph_string + ' erg/s/cm$^{2}$/$\mathrm{\mathring A}$/arcsec$^{2}$</td></tr>'
             else:
                 inputfluxstring = '<tr><td>Input flux:</td><td>' + netflux_string + ' erg/s/cm$^{2}$/$\mathrm{\mathring A}$/arcsec$^{2}$</td></tr>'
                 resultfluxstring = ''
